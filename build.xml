@@ -1,0 +1,51 @@
+
+<project name="RelayConnector" default="all" basedir=".">
+	<target name="init">
+		<property file="project.properties"/>
+		<property name="distname" value="${projectname}-${version}"/>
+	        <mkdir dir="${builddir}" />
+	        <mkdir dir="${builddir}/classes" />
+	        <mkdir dir="${builddir}/files" />
+	</target>
+
+	<target name="compile" description="Compiles Java files" depends="init">
+		<javac srcdir="${srcdir}/java" destdir="${builddir}/classes" debug="on" optimize="on">
+			<include name="**/*.java"/>
+			<classpath>
+				<pathelement path="${libdir}/cordys/wcp.jar" />
+				<pathelement path="${libdir}/cordys/coelib.jar" />
+				<pathelement path="${libdir}/cordys/ldap.jar" />
+				<pathelement path="${libdir}/commons-httpclient-3.1.jar" />
+			</classpath>
+		</javac>
+		<copy todir="${builddir}/classes">
+			<fileset dir="${srcdir}/java">
+				<patternset><include name="**/coelib.version"/></patternset>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="jar" description="creates a jar file" depends="compile">
+		<jar jarfile="${builddir}/files/${distname}.jar"  basedir="${builddir}/classes"/>
+	</target>
+
+	<target name="isv" description="creates the ISV file" depends="jar">
+		<copy todir="${builddir}/files">
+			<fileset dir="${srcdir}">
+				<patternset>
+					<include name="web/**/*"/>
+					<include name="isv.xml"/>
+				</patternset>
+			</fileset>
+		</copy>
+		<jar jarfile="${builddir}/${distname}.isvp"  basedir="${builddir}/files"/>
+	</target>
+
+	<target name="all" depends="isv"/>
+
+       <target name="isv-xml">
+           <xslt in="in.xml" out="isv.xml"  style="create-isv.xsl"
+           />
+       </target>
+
+</project>

@@ -1,0 +1,103 @@
+<html xmlns:eibus onapplicationready="initialize()">
+    <head>
+        <link href="/cordys/wcp/style/behaviors.css" rel="stylesheet"></link>
+        <title>RelayConnector Configuration</title>
+    </head>
+    <script	src="/cordys/wcp/admin/behavior/applicationconnector.js"></script>
+    <script language="JScript">
+        /**
+         * This method creates the needed configuration for the connector
+         *
+         * @param xmlConfig The configuration-XML.
+		 *
+		 * @return true if the checks were successfull and the configuration is finished.
+		 *         false if the user still has to fill the mandatory fields.
+         */
+        function createConnectorConfiguration(xmlConfig)
+        {
+            var bReturn = true;
+            var xmlDoc = xmlConfig.ownerDocument;
+            var nConfig = xmlDoc.createElement("Configuration");
+            xmlConfig.appendChild(nConfig);
+            
+			if (bReturn == true)
+			{
+				bReturn = createXML(txtConfigLocation
+									, "Specify the config file location."
+									, nConfig
+									, "ConfigLocation");
+			}	
+
+            return bReturn;
+        }//createConnectorConfiguration
+        
+        /**
+         * This method fills the inputfields based on the XML.
+         *
+         * @param xmlConfig The configuration-XML.
+         */
+        function fillInPropertyScreen(xmlConfig)
+        {
+			fillFromXML(xmlConfig, "ConfigLocation", txtConfigLocation, "");
+        }
+        
+        /**
+		 * This method fills htmlInput's value with the data of sTagName. If sTagName could
+		 * not be found htmlInput's value is set to sDefaultValue.
+		 *
+		 * @param xmlConfig The configuration XML.
+		 * @param sTagName The name of the child tag.
+		 * @param htmlInput The HTML object.
+		 * @param sDefaultValue The value to set if sTagName was not found.
+		 */
+		function fillFromXML(xmlConfig, sTagName, htmlInput, sDefaultValue)
+		{
+			var nNode = xmlConfig.selectSingleNode(".//" + sTagName);
+	        if (nNode != null)
+	        {
+	            htmlInput.value = nNode.text;
+	        }
+	        else
+	        {
+	            htmlInput.value = sDefaultValue;
+	        }
+		}
+		
+		/**
+		 * This method creates the XML for a certain field.
+		 *
+		 * @param htmlInput The HTML object to validate.
+		 * @param sAlertMissing The message to display if the field is not filled.
+		 * @param nConfig The node to append the child to.
+		 * @param sTagname The name of the child tag to create.
+		 *
+		 * @return true if everything went ok. Otherwise false.
+		 */
+		function createXML(htmlInput, sAlertMissing, nConfig, sTagname)
+		{
+			var bReturn = true;
+			var xmlDoc = nConfig.ownerDocument;
+            nNode = xmlDoc.createElement(sTagname);
+            nNode.text = htmlInput.value;
+            nConfig.appendChild(nNode);
+			return bReturn;
+		}
+    </script>
+    <body>
+        <table width="100%" style="border: 1px solid black;" cellspacing="0" cellpadding="5">
+            <tr class="medium">
+                <td colspan="2" align="center">
+                    <STRONG>RelayConnector Details</STRONG>
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" align="right">
+                    Config file location:
+                </td>
+                <td  align="left">
+                    <input type="text" style="width:300px" id="txtConfigLocation" class="input"  value="D:/config/RelayConnector.properties"/>
+                </td>
+            </tr>
+		</table>
+    </body>
+</html>
