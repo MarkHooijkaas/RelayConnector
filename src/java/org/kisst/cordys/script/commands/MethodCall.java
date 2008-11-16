@@ -29,6 +29,8 @@ public class MethodCall {
 	private final boolean ignoreSoapFault;
 	private final ElementAppender appender;
 	private final XmlExpression appendMessagesTo;
+	//private final XmlExpression appendSoapHeadersFrom;
+	//private final XmlExpression appendSoapHeader;
 	private final String resultVar;
 	private final long timeout;
 	
@@ -54,7 +56,20 @@ public class MethodCall {
 			appendMessagesTo=null;
 		else
 			appendMessagesTo= new XmlExpression(compiler, appendMessagesToString);
+/*
+		String appendSoapHeadersFromStr = compiler.getSmartAttribute(node, "appendSoapHeadersFrom", null);
+		if (appendSoapHeadersFromStr==null)
+			appendSoapHeadersFrom=null;
+		else
+			appendSoapHeadersFrom= new XmlExpression(compiler, appendSoapHeadersFromStr);
 
+		String appendSoapHeaderStr = compiler.getSmartAttribute(node, "appendSoapHeadersFrom", null);
+		if (appendSoapHeaderStr==null)
+			appendSoapHeader=null;
+		else
+			appendSoapHeader= new XmlExpression(compiler, appendSoapHeadersFromStr);
+*/
+		
 		String tmpName=Node.getAttribute(node, "resultVar");
 		resultVar = tmpName==null? defaultResultVar : tmpName;
 		compiler.declareXmlVar(resultVar);

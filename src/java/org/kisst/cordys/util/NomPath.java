@@ -36,13 +36,17 @@ public class NomPath {
 		if (elements==null)
 			return node;
 		for(int i=0; i<elements.length; i++) {
-			String str = elements[i];
-			if (str.length()>0) {
-				String namespace = namespaces[i];
-				if (namespace==null)
-					node=Node.getElement(node, str);
-				else
-					node=NomUtil.getElement(node, namespace, str);
+			String name = elements[i];
+			if (name.length()>0) {
+				if (name.equals(".."))
+					node=Node.getParent(node);
+				else {
+					String namespace = namespaces[i];
+					if (namespace==null)
+						node=Node.getElement(node, name);
+					else
+						node=NomUtil.getElement(node, namespace, name);
+				}
 			}
 		}
 		return node;
