@@ -4,6 +4,7 @@ import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
 import org.kisst.cordys.script.expression.XmlExpression;
+import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.xml.nom.Node;
 
@@ -24,7 +25,7 @@ public class StripPrefixesStep implements Step {
 			childrenOf=null;
 		else
 			childrenOf=new XmlExpression(compiler, childrenOfStr);
-		recursive=compiler.getSmartBooleanAttribute(node, "recursive", true);
+		recursive=NomUtil.getBooleanAttribute(node, "recursive", true);
 		if (xml==null && childrenOf==null)
 			throw new RuntimeException("stripPrefixes step should have xml or childrenOf attribute");
 		if (xml!=null && childrenOf!=null)
@@ -48,7 +49,7 @@ public class StripPrefixesStep implements Step {
 	}
 
 	private void stripChildren(int node) {
-		node=Node.getFirstChild(node);
+		node=Node.getFirstElement(node);
 		while (node!=0) {
 			stripNode(node);
 			node=Node.getNextSibling(node);
