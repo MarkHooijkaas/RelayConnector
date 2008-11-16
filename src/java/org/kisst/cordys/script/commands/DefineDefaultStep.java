@@ -14,7 +14,7 @@ public class DefineDefaultStep implements Step {
 		if (attr==null)
 			throw new RuntimeException("in command <default ...> there should be an attribute with the name \"attribute\"");
 		if (value==null)
-			throw new RuntimeException("in command <default attribute=\""+attr+"\" ...> there should be an attribute with the name \"attribute\"");
+			throw new RuntimeException("in command <default attribute=\""+attr+"\" ...> there should be an attribute with the name \"value\"");
 		compiler.setDefaultAttribute(attr, value);
 	}
 
