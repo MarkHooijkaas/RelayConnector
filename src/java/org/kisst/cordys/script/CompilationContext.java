@@ -19,6 +19,7 @@ public class CompilationContext {
 	private final HashSet<String> xmlvars=new HashSet<String>();
 	private final Stack<String> parsePath = new Stack<String>();
 	private final HashMap<String,String> defaultAttributes = new HashMap<String,String>();  
+	private final HashMap<String,String> prefixes = new HashMap<String,String>();  
 	
 	public CompilationContext(RelayConnector connector, MethodDefinition def)
     {
@@ -99,4 +100,15 @@ public class CompilationContext {
 
 	public RelayConnector getRelayConnector() { return relayConnector; }
 	public RelayConfiguration getConfiguration() { return relayConnector.conf; }
+	
+	public void addPrefix(String prefix, String namespace) {
+		if (prefixes.containsKey(prefix))
+			throw new RuntimeException("prefix "+prefix+" allready defined when trying to set new namespace "+namespace);
+		prefixes.put(prefix,namespace);
+	}
+	public String resolvePrefix(String prefix) {
+		if (! prefixes.containsKey(prefix))
+			throw new RuntimeException("unknown prefix "+prefix);
+		return prefixes.get(prefix);
+	}
 }

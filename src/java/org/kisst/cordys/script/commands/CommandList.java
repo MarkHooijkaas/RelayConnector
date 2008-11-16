@@ -11,6 +11,7 @@ public class CommandList {
 	private static CommandList basicCommands=new CommandList(null);
 	
 	static {
+		basicCommands.addCommand("xmlns",  new GenericCommand(XmlnsStep.class));
 		basicCommands.addCommand("var",    new GenericCommand(VarStep.class));
 		basicCommands.addCommand("output", new GenericCommand(OutputStep.class));
 		basicCommands.addCommand("import", new GenericCommand(ImportStep.class));

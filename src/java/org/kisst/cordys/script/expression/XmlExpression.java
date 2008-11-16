@@ -23,7 +23,7 @@ public class XmlExpression  implements Expression {
 		}
 		else {
 			name=str.substring(1,pos);
-			path=new NomPath(str.substring(pos+1));
+			path=new NomPath(compiler, str.substring(pos+1));
 		}
 		if (! compiler.xmlVarExists(name))
 			throw new RuntimeException("xml expression ["+str+"] refers to non declared xmlvar "+name);
