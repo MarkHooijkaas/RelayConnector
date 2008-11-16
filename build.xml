@@ -43,6 +43,11 @@
 
 	<target name="all" depends="isv"/>
 
+	<target name="clean" >
+		<property file="project.properties"/>
+  		<delete dir="${builddir}" />
+  	</target>
+
        <target name="isv-xml">
            <xslt in="in.xml" out="isv.xml"  style="create-isv.xsl"
            />
