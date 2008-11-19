@@ -33,8 +33,15 @@ public class ExecutionContext {
 		this.relayConnector=connector; 
 		this.organization=connector.getOrganization();
     	user=request.getSOAPTransaction().getUserCredentials().getOrganizationalUser();
-		setXmlVar("input", request.getXMLNode());
-		setXmlVar("output", response.getXMLNode());
+    	int inputNode = request.getXMLNode();
+		int outputNode = response.getXMLNode();
+		setXmlVar("input", inputNode);
+		setXmlVar("output", outputNode);
+		// This fixes some strange behavior that prefix of input is not used in output
+		String inputPrefix= Node.getPrefix(inputNode);
+		if (inputPrefix!=null)
+			Node.setName(outputNode, inputPrefix+":"+Node.getLocalName(outputNode));
+			
 		doc=Node.getDocument(request.getXMLNode()); // TODO: is this the best document?
     }
 

@@ -80,4 +80,26 @@ public class NomUtil {
 		return null;
 	}
 
+	public static void setNamespace(int node, String namespace, String prefix, boolean reduceXmlns) {
+		if (namespace==null)
+			throw new RuntimeException("namespace is null when trying to define it for element named "+Node.getName(node));
+		if (prefix==null) {
+			// use default namespace mechanism
+			// remove the prefix.
+			Node.setName(node, Node.getLocalName(node));
+			
+			if (namespace.equals(Node.getNamespaceURI(node)) && reduceXmlns)
+				// nothing needs to be done
+				return;
+				
+			Node.setAttribute(node, "xmlns", namespace);
+		}
+		else {
+			// Look if prefix is already known
+			if ((!reduceXmlns) || !namespace.equals(getAttributeUpwards(node,"xmlns:"+prefix)))
+				Node.setAttribute(node, "xmlns:"+prefix, namespace);
+			Node.setName(node, prefix+":"+Node.getLocalName(node));
+		}
+	}
+
 }
