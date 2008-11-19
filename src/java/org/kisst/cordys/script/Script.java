@@ -25,7 +25,10 @@ public class Script implements Step {
     		}
     		catch (Exception e) {
     			String s = NomUtil.nodeToString(node);
-    			throw new RuntimeException("Error when parsing "+s,e);
+    			Throwable t=e;
+    			while (t.getCause()!=null)
+    				t=t.getCause();
+    			throw new RuntimeException("Error when parsing "+s+", original error: "+t.getMessage(),e);
     		}
     		node = Node.getNextSibling(node);
     		i++;
