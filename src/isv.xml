@@ -1,1 +1,73 @@
-<ISVPackage><description><owner>kisst.org</owner><name>RelayConnector</name><version>0.2 Build 0.2.1.1</version><cn>kisst.org RelayConnector 0.2</cn><wcpversion>4.2</wcpversion><eula source=""/><sidebar source=""/></description><content><filesystem loader="com.eibus.contentmanagement.ISVFileSystemManager" description="File System Objects"><file source="/home/mark/cordys/RelayConnector/build/jar/RelayConnector-0.2.jar" destination="/kisst.org/RelayConnector-0.2" dir="cordys_install_dir"/><file source="/home/mark/cordys/RelayConnector/sdk/lib/coelib.jar" destination="/kisst.org/RelayConnector-0.2" dir="cordys_install_dir"/><file source="/home/mark/cordys/RelayConnector/build/web" destination="/Web/kisst.org/RelayConnector-0.2" dir="cordys_install_dir"/></filesystem><menus loader="com.eibus.contentmanagement.ISVSOAPManager" description="Menus"/><toolbars loader="com.eibus.contentmanagement.ISVSOAPManager" description="Toolbars"/><busorganizationalroles loader="com.eibus.contentmanagement.ISVRoleManager" description="Roles"><busorganizationalrole><entry><cn><string>everyoneInkisst.org RelayConnector 0.2</string></cn><description><string>Everyone In kisst.org RelayConnector 0.2</string></description><objectclass><string>top</string><string>busorganizationalrole</string><string>busorganizationalobject</string></objectclass></entry></busorganizationalrole></busorganizationalroles><applicationconnector loader="com.eibus.contentmanagement.ISVSOAPManager" description="Application Connectors"><SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/"><SOAP:Body><UpdateXMLObject xmlns="http://schemas.cordys.com/1.0/xmlstore"><tuple version="isv" unconditional="true" key="/Cordys/WCP/Application Connector/org.kisst.cordys.relay.RelayConnector"><new><applicationconnector><step><url>/cordys//kisst.org/RelayConnector-0.2/relayconfig.html</url><description>RelayConnector</description><caption>Provide details for Relay Connector Service</caption><isv>kisst.org</isv><product>RelayConnector</product><image>/cordys/wcp/images/admin/configurationconnector.png</image><implementation>org.kisst.cordys.relay.RelayConnector</implementation><sharejvm>true</sharejvm><spycategory/><loggercategory/><classpath><location>/kisst.org/RelayConnector-0.2/RelayConnector-0.2.jar</location><location>/kisst.org/RelayConnector-0.2/coelib.jar</location></classpath></step></applicationconnector></new></tuple></UpdateXMLObject></SOAP:Body></SOAP:Envelope></applicationconnector><styles loader="com.eibus.contentmanagement.ISVSOAPManager" description="XMLStore"/><xforms loader="com.eibus.contentmanagement.ISVSOAPManager" description="XForms"/><xmlstore loader="com.eibus.contentmanagement.ISVSOAPManager" description="XMLStore"/><busmethodsets loader="com.eibus.contentmanagement.ISVMethodSetManager" description="Method Sets"/><wsappserver-content loader="com.eibus.contentmanagement.ISVSOAPManager" description="Ws-AppServer"/></content><promptset/></ISVPackage>
+<ISVPackage>
+  <description>
+    <owner>kisst.org</owner>
+    <name>RelayConnector</name>
+    <version>0.2 Build 0.2.1.1</version>
+    <cn>kisst.org RelayConnector 0.2</cn>
+    <wcpversion>4.2</wcpversion>
+    <eula source="" />
+    <sidebar source="" />
+  </description>
+  <content>
+    <filesystem loader="com.eibus.contentmanagement.ISVFileSystemManager" description="File System Objects">
+      <file source="/home/mark/cordys/RelayConnector/build/jar/RelayConnector-0.2.jar" destination="/kisst.org/RelayConnector-0.2" dir="cordys_install_dir" />
+      <file source="/home/mark/cordys/RelayConnector/sdk/lib/coelib.jar" destination="/kisst.org/RelayConnector-0.2" dir="cordys_install_dir" />
+      <file source="/home/mark/cordys/RelayConnector/build/web" destination="/Web/kisst.org/RelayConnector-0.2" dir="cordys_install_dir" />
+    </filesystem>
+    <menus loader="com.eibus.contentmanagement.ISVSOAPManager" description="Menus" />
+    <toolbars loader="com.eibus.contentmanagement.ISVSOAPManager" description="Toolbars" />
+    <busorganizationalroles loader="com.eibus.contentmanagement.ISVRoleManager" description="Roles">
+      <busorganizationalrole>
+        <entry>
+          <cn>
+            <string>everyoneInkisst.org RelayConnector 0.2</string>
+          </cn>
+          <description>
+            <string>Everyone In kisst.org RelayConnector 0.2</string>
+          </description>
+          <objectclass>
+            <string>top</string>
+            <string>busorganizationalrole</string>
+            <string>busorganizationalobject</string>
+          </objectclass>
+        </entry>
+      </busorganizationalrole>
+    </busorganizationalroles>
+    <applicationconnector loader="com.eibus.contentmanagement.ISVSOAPManager" description="Application Connectors">
+      <SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+        <SOAP:Body>
+          <UpdateXMLObject xmlns="http://schemas.cordys.com/1.0/xmlstore">
+            <tuple version="isv" unconditional="true" key="/Cordys/WCP/Application Connector/org.kisst.cordys.relay.RelayConnector">
+              <new>
+                <applicationconnector>
+                  <step>
+                    <url>/cordys//kisst.org/RelayConnector-0.2/relayconfig.html</url>
+                    <description>RelayConnector</description>
+                    <caption>Provide details for Relay Connector Service</caption>
+                    <isv>kisst.org</isv>
+                    <product>RelayConnector</product>
+                    <image>/cordys/wcp/images/admin/configurationconnector.png</image>
+                    <implementation>org.kisst.cordys.relay.RelayConnector</implementation>
+                    <sharejvm>true</sharejvm>
+                    <spycategory />
+                    <loggercategory />
+                    <classpath>
+                      <location>/kisst.org/RelayConnector-0.2/RelayConnector-0.2.jar</location>
+                      <location>/kisst.org/RelayConnector-0.2/coelib.jar</location>
+                    </classpath>
+                  </step>
+                </applicationconnector>
+              </new>
+            </tuple>
+          </UpdateXMLObject>
+        </SOAP:Body>
+      </SOAP:Envelope>
+    </applicationconnector>
+    <styles loader="com.eibus.contentmanagement.ISVSOAPManager" description="XMLStore" />
+    <xforms loader="com.eibus.contentmanagement.ISVSOAPManager" description="XForms" />
+    <xmlstore loader="com.eibus.contentmanagement.ISVSOAPManager" description="XMLStore" />
+    <busmethodsets loader="com.eibus.contentmanagement.ISVMethodSetManager" description="Method Sets" />
+    <wsappserver-content loader="com.eibus.contentmanagement.ISVSOAPManager" description="Ws-AppServer" />
+  </content>
+  <promptset />
+</ISVPackage>
