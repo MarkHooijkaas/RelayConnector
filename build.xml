@@ -1,11 +1,17 @@
 
 <project name="RelayConnector" default="all" basedir=".">
 	<target name="init">
+		<property file="user.properties"/>
 		<property file="project.properties"/>
+		<property file="buildnumber.properties"/>
+		<property name="srcdir" value="src"/>
+		<property name="libdir" value="lib"/>
+		<property name="builddir" value="build"/>
 		<property name="distname" value="${projectname}-${version}"/>
-	        <mkdir dir="${builddir}" />
-	        <mkdir dir="${builddir}/classes" />
-	        <mkdir dir="${builddir}/files" />
+		<property name="isvfile"  value="${builddir}/${distname}.${buildnumer}.isvp"/>
+		<mkdir dir="${builddir}" />
+		<mkdir dir="${builddir}/classes" />
+		<mkdir dir="${builddir}/files" />
 	</target>
 
 	<target name="compile" description="Compiles Java files" depends="init">
@@ -37,20 +43,42 @@
 					<include name="isv.xml"/>
 				</patternset>
 			</fileset>
+			<filterset>
+				<filter token="PROJECT" value="${projectname}"/>
+				<filter token="VERSION" value="${version}"/>
+				<filter token="BUILDNUMBER" value="${buildnumber}"/>
+			</filterset>
 		</copy>
-		<jar jarfile="${builddir}/${distname}.isvp"  basedir="${builddir}/files"/>
+		<copy todir="${builddir}/files" file="${libdir}/cordys/coelib.jar"/>
+		<zip destfile="${isvfile}"  basedir="${builddir}/files"/>
 	</target>
 
 	<target name="all" depends="isv"/>
 
+	<target name="scp-isv" depends="isv">
+		<exec executable="scp">
+			<arg value="${isvfile}"/>
+			<arg value="${cordys_scp_url}/Web/wcp/isvcontent/packages"/>
+		</exec>
+	</target>
+
+	<target name="setup-scp" depends="init">
+		<mkdir dir="lib/cordys" />
+		<exec executable="scp">
+			<arg value="${cordys_scp_url}/WCP/wcp.jar"/>
+			<arg value="${cordys_scp_url}/WCP/ldap.jar"/>
+			<arg value="${cordys_scp_url}/coe/coelib/coelib.jar"/>
+			<arg value="lib/cordys"/>
+		</exec>
+	</target>
+
+	
 	<target name="clean" >
-		<property file="project.properties"/>
   		<delete dir="${builddir}" />
   	</target>
 
-       <target name="isv-xml">
-           <xslt in="in.xml" out="isv.xml"  style="create-isv.xsl"
-           />
-       </target>
+	<target name="isv-xml">
+		<xslt in="in.xml" out="isv.xml"  style="create-isv.xsl"/>
+	</target>
 
 </project>

@@ -1,18 +1,18 @@
 <ISVPackage>
   <description>
     <owner>kisst.org</owner>
-    <name>RelayConnector</name>
-    <version>0.2 Build 0.2.1.1</version>
-    <cn>kisst.org RelayConnector 0.2</cn>
+    <name>@PROJECT@</name>
+    <version>@VERSION@ Build @VERSION@.@BUILDNUMBER@</version>
+    <cn>kisst.org @PROJECT@ @VERSION@</cn>
     <wcpversion>4.2</wcpversion>
     <eula source="" />
     <sidebar source="" />
   </description>
   <content>
     <filesystem loader="com.eibus.contentmanagement.ISVFileSystemManager" description="File System Objects">
-      <file source="/home/mark/cordys/RelayConnector/build/jar/RelayConnector-0.2.jar" destination="/kisst.org/RelayConnector-0.2" dir="cordys_install_dir" />
-      <file source="/home/mark/cordys/RelayConnector/sdk/lib/coelib.jar" destination="/kisst.org/RelayConnector-0.2" dir="cordys_install_dir" />
-      <file source="/home/mark/cordys/RelayConnector/build/web" destination="/Web/kisst.org/RelayConnector-0.2" dir="cordys_install_dir" />
+      <file source="@PROJECT@-@VERSION@.jar" destination="/kisst.org/@PROJECT@-@VERSION@" dir="cordys_install_dir" />
+      <file source="coelib.jar" destination="/kisst.org/@PROJECT@-@VERSION@" dir="cordys_install_dir" />
+      <file source="web" destination="/Web/kisst.org/@PROJECT@-@VERSION@" dir="cordys_install_dir" />
     </filesystem>
     <menus loader="com.eibus.contentmanagement.ISVSOAPManager" description="Menus" />
     <toolbars loader="com.eibus.contentmanagement.ISVSOAPManager" description="Toolbars" />
@@ -20,10 +20,10 @@
       <busorganizationalrole>
         <entry>
           <cn>
-            <string>everyoneInkisst.org RelayConnector 0.2</string>
+            <string>everyoneInkisst.org @PROJECT@ @VERSION@</string>
           </cn>
           <description>
-            <string>Everyone In kisst.org RelayConnector 0.2</string>
+            <string>Everyone In kisst.org @PROJECT@ @VERSION@</string>
           </description>
           <objectclass>
             <string>top</string>
@@ -37,23 +37,23 @@
       <SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP:Body>
           <UpdateXMLObject xmlns="http://schemas.cordys.com/1.0/xmlstore">
-            <tuple version="isv" unconditional="true" key="/Cordys/WCP/Application Connector/org.kisst.cordys.relay.RelayConnector">
+            <tuple version="isv" unconditional="true" key="/Cordys/WCP/Application Connector/org.kisst.cordys.relay.@PROJECT@">
               <new>
                 <applicationconnector>
                   <step>
-                    <url>/cordys//kisst.org/RelayConnector-0.2/relayconfig.html</url>
-                    <description>RelayConnector</description>
+                    <url>/cordys//kisst.org/@PROJECT@-@VERSION@/relayconfig.html</url>
+                    <description>@PROJECT@</description>
                     <caption>Provide details for Relay Connector Service</caption>
                     <isv>kisst.org</isv>
-                    <product>RelayConnector</product>
+                    <product>@PROJECT@</product>
                     <image>/cordys/wcp/images/admin/configurationconnector.png</image>
-                    <implementation>org.kisst.cordys.relay.RelayConnector</implementation>
+                    <implementation>org.kisst.cordys.relay.@PROJECT@</implementation>
                     <sharejvm>true</sharejvm>
                     <spycategory />
                     <loggercategory />
                     <classpath>
-                      <location>/kisst.org/RelayConnector-0.2/RelayConnector-0.2.jar</location>
-                      <location>/kisst.org/RelayConnector-0.2/coelib.jar</location>
+                      <location>/kisst.org/@PROJECT@-@VERSION@/@PROJECT@-@VERSION@.jar</location>
+                      <location>/kisst.org/@PROJECT@-@VERSION@/coelib.jar</location>
                     </classpath>
                   </step>
                 </applicationconnector>
