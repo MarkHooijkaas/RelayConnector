@@ -39,7 +39,7 @@
 		<copy todir="${builddir}/files">
 			<fileset dir="${srcdir}">
 				<patternset>
-					<include name="web/**/*"/>
+					<include name="web/relayconfig.html"/>
 					<include name="isv.xml"/>
 				</patternset>
 			</fileset>
@@ -50,6 +50,7 @@
 			</filterset>
 		</copy>
 		<copy todir="${builddir}/files" file="${libdir}/cordys/coelib.jar"/>
+		<copy todir="${builddir}/files/web" file="${libdir}/cordys/coelib.js"/>
 		<zip destfile="${isvfile}"  basedir="${builddir}/files"/>
 	</target>
 
@@ -81,6 +82,7 @@
 			<arg value="${cordys_scp_url}/WCP/wcp.jar"/>
 			<arg value="${cordys_scp_url}/WCP/ldap.jar"/>
 			<arg value="${cordys_scp_url}/coe/coelib/coelib.jar"/>
+			<arg value="${cordys_scp_url}/web/coe/coelib/coelib.js"/>
 			<arg value="lib/cordys"/>
 		</exec>
 	</target>
