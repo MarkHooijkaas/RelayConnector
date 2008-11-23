@@ -8,7 +8,7 @@
 		<property name="libdir" value="lib"/>
 		<property name="builddir" value="build"/>
 		<property name="distname" value="${projectname}-${version}"/>
-		<property name="isvfile"  value="${builddir}/${distname}.${buildnumer}.isvp"/>
+		<property name="isvfile"  value="${builddir}/${distname}.${buildnumber}.isvp"/>
 		<mkdir dir="${builddir}" />
 		<mkdir dir="${builddir}/classes" />
 		<mkdir dir="${builddir}/files" />
@@ -71,9 +71,25 @@
 		</exec>
 	</target>
 
+	<target name="copy-jar" depends="jar">
+		<copy file="${builddir}/files/${distname}.jar" todir="${cordys_scp_url}/kisst.org"/>
+	</target>
+
+
+	<target name="copy-isv" depends="isv">
+		<copy file="${isvfile}" todir="${cordys_scp_url}/Web/wcp/isvcontent/packages"/>
+	</target>
 
 	<target name="setup-ibiblio" depends="init">
 		<get src="http://www.ibiblio.org/maven/commons-httpclient/jars/commons-httpclient-3.1.jar" dest="lib/commons-httpclient-3.1.jar"/>
+	</target>
+
+	<target name="setup-copy" depends="init">
+		<mkdir dir="lib/cordys" />
+		<copy todir="lib/cordys" file="${cordys_dir}/WCP/wcp.jar"/>
+		<copy todir="lib/cordys" file="${cordys_dir}/WCP/ldap.jar"/>
+		<copy todir="lib/cordys" file="${cordys_dir}/coe/coelib/coelib.jar"/>
+		<copy todir="lib/cordys" file="${cordys_dir}/web/coe/coelib/coelib.js"/>
 	</target>
 
 	<target name="setup-scp" depends="init">
@@ -86,7 +102,6 @@
 			<arg value="lib/cordys"/>
 		</exec>
 	</target>
-
 	
 	<target name="clean" >
   		<delete dir="${builddir}" />
