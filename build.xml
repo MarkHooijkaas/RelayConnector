@@ -1,13 +1,16 @@
 
 <project name="RelayConnector" default="all" basedir=".">
+   
+
 	<target name="init">
 		<property file="user.properties"/>
-		<property file="project.properties"/>
+		<property name="projectfile" value="project.xml"/>
+		<xmlproperty file="${projectfile}"/>
 		<property file="buildnumber.properties"/>
 		<property name="srcdir" value="src"/>
 		<property name="libdir" value="lib"/>
 		<property name="builddir" value="build"/>
-		<property name="distname" value="${projectname}-${version}"/>
+		<property name="distname" value="${project.name}-${project.version}"/>
 		<property name="isvfile"  value="${builddir}/${distname}.${buildnumber}.isvp"/>
 		<mkdir dir="${builddir}" />
 		<mkdir dir="${builddir}/classes" />
@@ -44,15 +47,38 @@
 				</patternset>
 			</fileset>
 			<filterset>
-				<filter token="PROJECT" value="${projectname}"/>
-				<filter token="VERSION" value="${version}"/>
+				<filter token="PROJECT" value="${project.name}"/>
+				<filter token="VERSION" value="${project.version}"/>
 				<filter token="BUILDNUMBER" value="${buildnumber}"/>
+				<filter token="PACKAGE" value="org.kisst.cordys.relay"/>
 			</filterset>
 		</copy>
 		<copy todir="${builddir}/files" file="${libdir}/cordys/coelib.jar"/>
 		<copy todir="${builddir}/files/web" file="${libdir}/cordys/coelib.js"/>
 		<zip destfile="${isvfile}"  basedir="${builddir}/files"/>
 	</target>
+
+	<target name="isv-http" description="creates the ISV file" depends="jar">
+		<copy todir="${builddir}/files">
+			<fileset dir="${srcdir}">
+				<patternset>
+					<include name="web/relayconfig.html"/>
+					<include name="isv.xml"/>
+				</patternset>
+			</fileset>
+			<filterset>
+				<filter token="PROJECT" value="${project.name}"/>
+				<filter token="VERSION" value="${project.version}"/>
+				<filter token="BUILDNUMBER" value="${buildnumber}"/>
+				<filter token="PACKAGE" value="org.kisst.cordys.http"/>
+			</filterset>
+		</copy>
+		<copy todir="${builddir}/files" file="${libdir}/cordys/coelib.jar"/>
+		<copy todir="${builddir}/files/web" file="${libdir}/cordys/coelib.js"/>
+		<copy todir="${builddir}/files" file="${libdir}/commons-httpclient-3.1.jar"/>
+		<zip destfile="${isvfile}"  basedir="${builddir}/files"/>
+	</target>
+
 
 	<target name="all" depends="isv"/>
 
@@ -82,6 +108,8 @@
 
 	<target name="setup-ibiblio" depends="init">
 		<get src="http://www.ibiblio.org/maven/commons-httpclient/jars/commons-httpclient-3.1.jar" dest="lib/commons-httpclient-3.1.jar"/>
+		<get src="http://www.ibiblio.org/maven/commons-logging/jars/commons-logging-1.0.4.jar" dest="lib/commons-logging-1.0.4.jar"/>
+		<get src="http://www.ibiblio.org/maven/commons-codec/jars/commons-codec-1.2.jar" dest="lib/commons-codec-1.2.jar"/>
 	</target>
 
 	<target name="setup-copy" depends="init">
@@ -107,8 +135,15 @@
   		<delete dir="${builddir}" />
   	</target>
 
-	<target name="isv-xml">
-		<xslt in="in.xml" out="isv.xml"  style="create-isv.xsl"/>
+	<target name="isv-xml" depends="init">
+		<xslt in="${projectfile}" out="build/isv.xml"  style="sbf/create-isv.xsl">
+			<outputproperty name="indent" value="yes"/>
+			<param name="ORG" expression="${project.org}"/>
+			<param name="PROJECT" expression="${project.name}"/>
+			<param name="VERSION" expression="${project.version}"/>
+			<param name="BUILDNUMBER" expression="${buildnumber}"/>
+			<param name="PACKAGE" expression="org.kisst.cordys.relay"/>
+		</xslt>
 	</target>
 
 </project>

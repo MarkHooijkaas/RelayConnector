@@ -1,0 +1,9 @@
+<project name="HttpConnector" version="0.2">
+    <org>kisst.org</org>
+    <name>RelayConnector</name>
+    <version>0.1</version>
+    <class>org.kisst.cordys.relay.RelayConnector</class>    
+	<jarfiles>
+      <file name="coelib.jar"/>
+	</jarfiles>
+</project>
