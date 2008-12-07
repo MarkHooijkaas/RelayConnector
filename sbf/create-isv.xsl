@@ -9,7 +9,7 @@
 <xsl:param name="ORG"></xsl:param>
 <xsl:param name="PROJECT"></xsl:param>
 <xsl:param name="VERSION"></xsl:param>
-<xsl:param name="PACKAGE"></xsl:param>
+<xsl:param name="CLASSFILE"></xsl:param>
 <xsl:param name="BUILDNUMBER"></xsl:param>
 
 
@@ -65,7 +65,7 @@
       <SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP:Body>
           <UpdateXMLObject xmlns="http://schemas.cordys.com/1.0/xmlstore">
-            <tuple version="isv" unconditional="true" key="/Cordys/WCP/Application Connector/{$PACKAGE}.{$PROJECT}">
+            <tuple version="isv" unconditional="true" key="/Cordys/WCP/Application Connector/{$CLASSFILE}">
               <new>
                 <applicationconnector>
                   <step>
@@ -75,7 +75,7 @@
                     <isv><xsl:value-of select="$ORG"/></isv>
                     <product><xsl:value-of select="$PROJECT"/></product>
                     <image>/cordys/wcp/images/admin/configurationconnector.png</image>
-                    <implementation><xsl:value-of select="$PACKAGE"/>.<xsl:value-of select="$PROJECT"/></implementation>
+                    <implementation><xsl:value-of select="$CLASSFILE"/>.<xsl:value-of select="$PROJECT"/></implementation>
                     <sharejvm>true</sharejvm>
                     <spycategory />
                     <loggercategory />
