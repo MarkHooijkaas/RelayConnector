@@ -1,16 +1,16 @@
 package org.kisst.cfg4j;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Constructor;
-import java.util.Properties;
-import java.util.ArrayList;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Properties;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 public class MultiSetting extends Setting {
-  public static final Logger logger = Logger.getLogger(MultiSetting.class);
+  //public static final Logger logger = Logger.getLogger(MultiSetting.class);
 
   public final ArrayList settings=new ArrayList();
 
@@ -19,7 +19,7 @@ public class MultiSetting extends Setting {
   }
 
   public void set(Properties props, String parentName) {
-	logger.debug("Setting "+fullName);
+	//logger.debug("Setting "+fullName);
 	String path=parentName+name;
 	String str=(String) props.get(path);
 	if (str!=null && str.startsWith("@"))
@@ -44,8 +44,9 @@ public class MultiSetting extends Setting {
 	return true;
   }
 
-  public void add(Setting s) {	
-	  logger.debug("registering "+s.fullName);
+  @SuppressWarnings("unchecked")
+public void add(Setting s) {	
+//	  logger.debug("registering "+s.fullName);
 	  settings.add(s);  
   }
 
@@ -57,7 +58,7 @@ public class MultiSetting extends Setting {
   public static Properties loadProperties(String filename)  {
 	try {
 	  Properties props=new Properties();
-	  logger.info("loading settings from file "+filename);
+//	  logger.info("loading settings from file "+filename);
 	  FileInputStream inp = null;
 	  try {
 		inp = new FileInputStream(filename);

@@ -1,7 +1,5 @@
 package org.kisst.cfg4j;
 
-import java.util.Properties;
-
 public class PasswordSetting extends StringSetting {
   public PasswordSetting(MultiSetting parent, String name) {
 	super(parent,name);

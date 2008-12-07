@@ -1,7 +1,5 @@
 package org.kisst.cfg4j;
 
-import java.util.Properties;
-
 public class StringSetting extends SingleSetting {
   private String value=null;
 
@@ -17,7 +15,7 @@ public class StringSetting extends SingleSetting {
 
   public String get() { return this.value; }
   public void set(String value) { 
-	MultiSetting.logger.debug("Setting "+fullName+" to "+value);
+	//MultiSetting.logger.debug("Setting "+fullName+" to "+value);
 	this.value=value;
 	this.isSet=true;
   }
