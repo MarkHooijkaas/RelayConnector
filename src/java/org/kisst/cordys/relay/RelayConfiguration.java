@@ -4,6 +4,8 @@ package org.kisst.cordys.relay;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import org.kisst.cfg4j.MultiSetting;
+
 import com.cordys.coe.exception.GeneralException;
 import com.cordys.coe.util.XMLProperties;
 
@@ -13,11 +15,13 @@ public class RelayConfiguration
 	
 	private static final String PROP_CONFIG_LOCATION = "ConfigLocation";
 
+	public final RelaySettings settings;
 	private String configLocation;
-	private boolean cacheScripts;
-	private long timeout;
 	private final Properties properties = new Properties();
 
+	public RelayConfiguration(MultiSetting parent) {
+		settings=new RelaySettings(parent);
+	}
 	
 	public void init(int iConfigNode) 
 	{
@@ -38,29 +42,6 @@ public class RelayConfiguration
 		load();
 		//logger.debug("RelayConfiguration finished initialisation");
 	}
-	
-	static private boolean getBooleanValue(Properties props, String key, boolean defaultValue) {
-		String value = props.getProperty(key);
-		if (value==null)
-			return defaultValue;
-		if (value.trim().length()==0)
-			return defaultValue;
-		if (value.trim().equals("true"))
-			return true;
-		if (value.trim().equals("false"))
-			return false;
-		throw new RuntimeException("boolean configuration value "+key+" should be true or false");
-	}
-
-	static private long getLongValue(Properties props, String key, long defaultValue) {
-		String value = props.getProperty(key);
-		if (value==null)
-			return defaultValue;
-		if (value.trim().length()==0)
-			return defaultValue;
-		return Long.parseLong(value);
-	}
-
 	
 	public void load()
 	{
@@ -84,14 +65,11 @@ public class RelayConfiguration
 				catch (java.io.IOException e) { throw new RuntimeException(e);  }
 			}
 		}
-		cacheScripts = getBooleanValue(properties, "script.cache", false);
-		timeout=getLongValue(properties, "methodcall.timeout", 20000);
-		//logger.debug("finished (re)loading properties file");
+		settings.set(properties);
 	}
 	
-	public String getConfigLocation() { return configLocation;}
-	public boolean getCacheScripts() {	return cacheScripts; }
-	public long getTimeout() {	return timeout; }
+	public boolean getCacheScripts() {	return settings.cacheScripts.get(); }
+	public long getTimeout() {	return settings.timeout.get(); }
 	public String get(String key) { return properties.getProperty(key); }
 	public String get(String key, String defaultValue) { return properties.getProperty(key,defaultValue); }
 }

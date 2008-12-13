@@ -20,7 +20,7 @@ public class RelayConnector extends ApplicationConnector {
 	//private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayConnector.class);
     public  static final String CONNECTOR_NAME = "RelayConnector";
 
-	public final RelayConfiguration conf=new RelayConfiguration();
+	public final RelayConfiguration conf=new RelayConfiguration(null);
 	private Connector connector;
 	private String dnOrganization;
 	private final HashMap<String, Script> scriptCache=new HashMap<String, Script>();

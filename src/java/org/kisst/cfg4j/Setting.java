@@ -17,7 +17,10 @@ public abstract class Setting {
 	if(parent==null) 
 	  fullName=name;
 	else {
-	  fullName=parent.fullName+"."+name;
+		if (parent.fullName==null)
+			fullName=name;
+		else
+			fullName=parent.fullName+"."+name;
 	  parent.add(this);
 	}
   }
