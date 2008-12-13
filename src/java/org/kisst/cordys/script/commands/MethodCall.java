@@ -122,10 +122,6 @@ public class MethodCall {
 		}
 		catch (TimeoutException e) { throw new RuntimeException("Timeout when calling method "+methodName,e); }
 		catch (ExceptionGroup e) { throw new RuntimeException("Error when calling method "+methodName,e); }
-		finally {
-			// Delete the request SOAP Message node
-			Node.delete(Node.getParent(method));
-		}
 	}
 
 	private void handleResponse(ExecutionContext context, int response) {
