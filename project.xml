@@ -1,9 +1,9 @@
-<project name="HttpConnector" version="0.2">
+<project>
     <org>kisst.org</org>
     <name>RelayConnector</name>
-    <version>0.1</version>
+    <version>0.2</version>
     <class>org.kisst.cordys.relay.RelayConnector</class>    
-	<jarfiles>
-      <file name="coelib.jar"/>
+	<jarfiles pathid="jarfiles">
+      <pathelement location="lib/cordys/coelib.jar"/>
 	</jarfiles>
 </project>
