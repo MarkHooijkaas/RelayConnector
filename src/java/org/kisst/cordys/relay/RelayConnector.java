@@ -38,7 +38,7 @@ public class RelayConnector extends ApplicationConnector {
         // Check the CoELib version.
         try
         {
-            LibraryVersion.loadAndCheckLibraryVersionFromResource(this.getClass(), true);
+            LibraryVersion.loadAndCheckLibraryVersionFromResource(RelayConnector.class, true);
         }
         catch (GeneralException e) { throw new RuntimeException(e); } 
         
