@@ -28,10 +28,14 @@
   <content>
 
     <filesystem loader="com.eibus.contentmanagement.ISVFileSystemManager" description="File System Objects">
-      <xsl:for-each select="project/jarfiles/file">
+      <xsl:for-each select="project/jarfiles/pathelement">
         <file destination="/{$ORG}/{$PROJECT}-{$VERSION}" dir="cordys_install_dir">
       	   <xsl:attribute name="source">
-  			  <xsl:value-of select="@name" />
+  		<!--	  <xsl:value-of select="@location" />-->
+	        <xsl:call-template name="basename">
+    	       <xsl:with-param name="path" select="@location"/>
+	        </xsl:call-template>
+  			  
 			</xsl:attribute> 
 		</file>	
       </xsl:for-each>
@@ -80,8 +84,8 @@
                     <spycategory />
                     <loggercategory />
                     <classpath>
-                      <xsl:for-each select="project/jarfiles/file">
-                        <location>/<xsl:value-of select="$ORG"/>/<xsl:value-of select="$PROJECT"/>-<xsl:value-of select="$VERSION"/>/<xsl:value-of select="@name"/></location>
+                      <xsl:for-each select="project/jarfiles/pathelement">
+                        <location>/<xsl:value-of select="$ORG"/>/<xsl:value-of select="$PROJECT"/>-<xsl:value-of select="$VERSION"/>/<xsl:call-template name="basename"><xsl:with-param name="path" select="@location"/></xsl:call-template></location>
                       </xsl:for-each>
                       <location>/<xsl:value-of select="$ORG"/>/<xsl:value-of select="$PROJECT"/>-<xsl:value-of select="$VERSION"/>/<xsl:value-of select="$PROJECT"/>-<xsl:value-of select="$VERSION"/>.jar</location>
                     </classpath>
@@ -103,4 +107,20 @@
 </ISVPackage>
 
 </xsl:template>
+
+
+<xsl:template name="basename">
+  <xsl:param name="path"/>
+  <xsl:choose>
+     <xsl:when test="contains($path, '/')">
+        <xsl:call-template name="basename">
+           <xsl:with-param name="path" select="substring-after($path, '/')"/>
+        </xsl:call-template>
+     </xsl:when>
+     <xsl:otherwise>
+        <xsl:value-of select="$path"/>
+     </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
 </xsl:stylesheet>
