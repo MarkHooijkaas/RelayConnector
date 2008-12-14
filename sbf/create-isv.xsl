@@ -79,7 +79,7 @@
                     <isv><xsl:value-of select="$ORG"/></isv>
                     <product><xsl:value-of select="$PROJECT"/></product>
                     <image>/cordys/wcp/images/admin/configurationconnector.png</image>
-                    <implementation><xsl:value-of select="$CLASSFILE"/>.<xsl:value-of select="$PROJECT"/></implementation>
+                    <implementation><xsl:value-of select="$CLASSFILE"/></implementation>
                     <sharejvm>true</sharejvm>
                     <spycategory />
                     <loggercategory />
