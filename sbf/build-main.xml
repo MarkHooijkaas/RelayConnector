@@ -21,7 +21,7 @@
 		
 
 	<target name="compile" description="Compiles Java files" depends="init">
-		<javac srcdir="${srcdir}/java" destdir="${builddir}/classes" debug="on" optimize="on">
+		<javac srcdir="${srcdir}/java" destdir="${builddir}/classes" debug="on" optimize="on" target="1.5">
 			<include name="**/*.java"/>
 			<classpath>
 				<pathelement path="${libdir}/cordys/wcp.jar" />
