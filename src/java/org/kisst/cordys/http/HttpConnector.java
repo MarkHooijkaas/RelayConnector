@@ -9,7 +9,7 @@ import org.kisst.cordys.script.commands.CommandList;
 public class HttpConnector extends RelayConnector {
     public  static final String CONNECTOR_NAME = "HttpConnector";
 
-	public class Settings extends MultiSetting {
+	public static class Settings extends MultiSetting {
 		public RelaySettings relay = new RelaySettings(this);
 		public HttpSettings  http  = new HttpSettings(this);
 		public Settings(MultiSetting parent) { super(parent, null); }
