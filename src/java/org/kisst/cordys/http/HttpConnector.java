@@ -6,6 +6,8 @@ import org.kisst.cordys.relay.RelaySettings;
 import org.kisst.cordys.script.GenericCommand;
 import org.kisst.cordys.script.commands.CommandList;
 
+import com.eibus.soap.Processor;
+
 public class HttpConnector extends RelayConnector {
     public  static final String CONNECTOR_NAME = "HttpConnector";
 
@@ -21,4 +23,17 @@ public class HttpConnector extends RelayConnector {
     }
     protected String getManagedComponentType() { return "HttpConnector"; }
     protected String getManagementName() { return "HttpConnector"; }
+    
+	@Override
+    public void open(Processor processor) {
+    	super.open(processor);
+    	settings.set(conf.properties);
+    }
+
+	@Override
+	public void reset(Processor processor) {
+		super.reset(processor);
+    	settings.set(conf.properties);
+	}
+
 }

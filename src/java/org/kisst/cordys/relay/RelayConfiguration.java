@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import org.kisst.cfg4j.MultiSetting;
+import org.kisst.cfg4j.Setting;
 
 import com.cordys.coe.exception.GeneralException;
 import com.cordys.coe.util.XMLProperties;
@@ -17,7 +18,7 @@ public class RelayConfiguration
 
 	public final RelaySettings settings;
 	private String configLocation;
-	private final Properties properties = new Properties();
+	public final Properties properties = new Properties();
 
 	public RelayConfiguration(MultiSetting parent) {
 		settings=new RelaySettings(parent);

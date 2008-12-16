@@ -18,23 +18,18 @@ public class MultiSetting extends Setting {
 	super(parent, name);
   }
 
-  public void set(Properties props, String parentName) {
+  public void set(Properties props) {
 	//logger.debug("Setting "+fullName);
-	String path=parentName+name;
-	String str=(String) props.get(path);
-	if (str!=null && str.startsWith("@"))
-		path=str.substring(1).trim();
-	path+=".";
 	for (int i=0; i<settings.size(); i++) {
 	  Setting s=(Setting) settings.get(i);
 	  //logger.debug("Setting "+s.fullName);
-	  s.set(props, path);
+	  s.set(props);
 	}
   }
 
 
   public String asString() { return "TODO"; }
-  public void set(String value) { throw new RuntimeException("NOT Supported"); }
+  public void set(String value) { }
 
   public boolean ok() {
 	for (int i=0; i<settings.size(); i++) {

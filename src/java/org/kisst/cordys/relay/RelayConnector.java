@@ -1,6 +1,7 @@
 package org.kisst.cordys.relay;
 
 import java.util.HashMap;
+import java.util.Properties;
 
 import org.kisst.cordys.script.Script;
 
@@ -24,6 +25,7 @@ public class RelayConnector extends ApplicationConnector {
 	private Connector connector;
 	private String dnOrganization;
 	private final HashMap<String, Script> scriptCache=new HashMap<String, Script>();
+	public Properties properties=null;
 	
     /**
      * This method gets called when the processor is started. It reads the

@@ -27,25 +27,12 @@ public abstract class Setting {
   
   public boolean ok() { return this.isSet || ! this.required; }
 
-  public void set(Properties props, String parentAlias) {
-	String path=parentAlias+name;
-	String str=(String) props.get(path);
-	if (str!=null && str.startsWith("@")) {
-		path=str.substring(1).trim();
-		str=(String) props.get(path);
-	}
-	if (str!=null) {
-		//logger.debug("Setting "+fullName+" to "+str);
-		set(str);
-	}
-  }
 
 
-  public void set(Properties props) { 
-	  if (parent==null)
-		  set(props, ""); 
-	  else
-		  set(props, parent.fullName+"."); 
+  public void set(Properties props) {
+	  String value=props.getProperty(fullName);
+	  if (value!=null)
+		  set(value);
   }
 
 
