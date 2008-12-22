@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import org.kisst.cfg4j.MultiSetting;
-import org.kisst.cfg4j.Setting;
 
 import com.cordys.coe.exception.GeneralException;
 import com.cordys.coe.util.XMLProperties;
