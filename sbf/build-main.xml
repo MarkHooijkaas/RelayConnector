@@ -64,7 +64,7 @@
 	<target name="scp-jar" depends="jar">
 		<exec executable="scp">
 			<arg value="${isvdir}/${distname}.jar"/>
-			<arg value="${cordys_scp_url}/${project.org}/${distname}"/>
+			<arg value="${cordys.scp.dir}/${project.org}/${distname}"/>
 		</exec>
 	</target>
 
@@ -72,43 +72,53 @@
 	<target name="scp-isv" depends="isv">
 		<exec executable="scp">
 			<arg value="${isvfile}"/>
-			<arg value="${cordys_scp_url}/Web/wcp/isvcontent/packages"/>
+			<arg value="${cordys.scp.dir}/Web/wcp/isvcontent/packages"/>
 		</exec>
 	</target>
 
 	<target name="copy-jar" depends="jar">
-		<copy file="${isvdir}/${distname}.jar" todir="${cordys_scp_url}/${project.org}"/>
+		<copy file="${isvdir}/${distname}.jar" todir="${cordys.scp.dir}/${project.org}"/>
 	</target>
 
 
 	<target name="copy-isv" depends="isv">
-		<copy file="${isvfile}" todir="${cordys_scp_url}/Web/wcp/isvcontent/packages"/>
+		<copy file="${isvfile}" todir="${cordys.scp.dir}/Web/wcp/isvcontent/packages"/>
 	</target>
 
-	<target name="setup-commons" depends="init">
+	<target name="proxy" depends="probe-proxy" if="proxy.host">
+		<property name="proxy.port" value="80"/>
+		<property name="proxy.user" value=""/>
+		<property name="proxy.pass" value=""/>
+		<setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}" proxyuser="${proxy.user}" proxypassword="${proxy.pass}"/>
+	</target>
+
+
+	<target name="setup-commons" depends="init,proxy">
 		<get src="http://repo2.maven.org/maven2/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar" dest="lib/commons-httpclient-3.1.jar"/>
 		<get src="http://repo2.maven.org/maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar" dest="lib/commons-logging-1.0.4.jar"/>
 		<get src="http://repo2.maven.org/maven2/commons-codec/commons-codec/1.2/commons-codec-1.2.jar" dest="lib/commons-codec-1.2.jar"/>
 	</target>
 
-	<target name="setup-copy" depends="init">
+	<target name="setup-copy" depends="init" if="cordys.dir">
 		<mkdir dir="lib/cordys" />
-		<copy todir="lib/cordys" file="${cordys_dir}/WCP/wcp.jar"/>
-		<copy todir="lib/cordys" file="${cordys_dir}/WCP/ldap.jar"/>
-		<copy todir="lib/cordys" file="${cordys_dir}/coe/coelib/coelib.jar"/>
-		<copy todir="lib/cordys" file="${cordys_dir}/web/coe/coelib/coelib.js"/>
+		<copy todir="lib/cordys" file="${cordys.dir}/WCP/wcp.jar"/>
+		<copy todir="lib/cordys" file="${cordys.dir}/WCP/ldap.jar"/>
+		<copy todir="lib/cordys" file="${cordys.dir}/coe/coelib/coelib.jar"/>
+		<copy todir="lib/cordys" file="${cordys.dir}/web/coe/coelib/coelib.js"/>
 	</target>
 
-	<target name="setup-scp" depends="init">
+	<target name="setup-scp" depends="init" if="cordys.scp.dir">
 		<mkdir dir="lib/cordys" />
 		<exec executable="scp">
-			<arg value="${cordys_scp_url}/WCP/wcp.jar"/>
-			<arg value="${cordys_scp_url}/WCP/ldap.jar"/>
-			<arg value="${cordys_scp_url}/coe/coelib/coelib.jar"/>
-			<arg value="${cordys_scp_url}/web/coe/coelib/coelib.js"/>
+			<arg value="${cordys.scp.dir}/WCP/wcp.jar"/>
+			<arg value="${cordys.scp.dir}/WCP/ldap.jar"/>
+			<arg value="${cordys.scp.dir}/coe/coelib/coelib.jar"/>
+			<arg value="${cordys.scp.dir}/web/coe/coelib/coelib.js"/>
 			<arg value="lib/cordys"/>
 		</exec>
 	</target>
+
+	<target name="setup" depends="setup-copy,setup-scp,setup-commons"/>
 	
 	<target name="clean" >
   		<delete dir="${builddir}" />
