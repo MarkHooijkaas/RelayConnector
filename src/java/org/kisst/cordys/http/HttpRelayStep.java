@@ -27,10 +27,14 @@ public class HttpRelayStep extends HttpBaseStep implements Step {
 			// clear entire boilerplate response: clear Header and Body children, remove attributes
 			// Note, the nodes are left intact. It seems necessary not to delete these
 			int child=Node.getFirstChild(output);
+			int originalCordysHeader=0;
 			while (child!=0) {
 				// there should only be two children (Header and Body)
-				if (Node.getLocalName(child).equals("Body"))
-					NomUtil.clearNode(child);
+				if (Node.getLocalName(child).equals("Header")) {
+					originalCordysHeader=Node.getElement(child, "header");
+					originalCordysHeader=Node.unlink(originalCordysHeader);
+				}
+				NomUtil.clearNode(child);
 				child=Node.getNextSibling(child);
 			}
 			//NomUtil.clearAttributes(output);
@@ -41,13 +45,14 @@ public class HttpRelayStep extends HttpBaseStep implements Step {
 			// copy children (Header and Body)
 			int srcchild=Node.getFirstChild(responseNode);
 			while (srcchild!=0) {  
-				if (Node.getLocalName(srcchild).equals("Body")) {
-					int destchild=Node.getElement(output, Node.getLocalName(srcchild));
-					if (destchild==0) // Node did not exist (should not happen)
-						destchild=Node.createElement(Node.getLocalName(responseNode), output);
-					NomUtil.copyAttributes(srcchild, destchild);
-					Node.duplicateAndAppendToChildren(Node.getFirstChild(srcchild), Node.getLastChild(srcchild), destchild );
+				int destchild=Node.getElement(output, Node.getLocalName(srcchild));
+				if (destchild==0) // Node did not exist (should not happen)
+					destchild=Node.createElement(Node.getLocalName(responseNode), output);
+				NomUtil.copyAttributes(srcchild, destchild);
+				if (Node.getLocalName(srcchild).equals("Header")) {
+					Node.appendToChildren(originalCordysHeader, destchild);
 				}
+				Node.duplicateAndAppendToChildren(Node.getFirstChild(srcchild), Node.getLastChild(srcchild), destchild );
 				srcchild=Node.getNextSibling(srcchild);
 			}
 	    }
