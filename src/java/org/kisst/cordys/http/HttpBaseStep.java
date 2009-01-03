@@ -53,7 +53,7 @@ public class HttpBaseStep {
 		urlExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "url"));
 		application = Node.getAttribute(node, "application");
 		//TODO: body=new XmlExpression(compiler, Node.getElement(node, "body"));
-		body=new XmlExpression(compiler, Node.getAttribute(node, "body"));
+		body=new XmlExpression(compiler, Node.getAttribute(node, "body", "/input/../.."));
 		prettyPrint = compiler.getSmartBooleanAttribute(node, "prettyPrint", true);
 	}
 

@@ -102,4 +102,23 @@ public class NomUtil {
 		}
 	}
 
+	public static void clearNode(int node) {
+		Node.delete(Node.getFirstChild(node), Node.getLastChild(node));
+		clearAttributes(node);
+	}
+	public static void clearAttributes(int node) {
+		Node.setName(node, Node.getLocalName(node)); // without prefix, because attributes are deleted
+		for (int i=Node.getNumAttributes(node); i>=0; i--)
+			Node.removeAttribute(node, Node.getAttributeName(node, i));
+	}
+	
+	public static void copyAttributes(int src, int dest) {
+		int count=Node.getNumAttributes(src);
+		for (int i=0; i<count; i++) {
+			String name=Node.getAttributeName(src, i);
+			Node.setAttribute(dest, name, Node.getAttribute(src, name));
+		}
+		Node.setName(dest, Node.getName(src));
+	}
+
 }
