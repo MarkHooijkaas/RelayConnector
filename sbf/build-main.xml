@@ -85,7 +85,7 @@
 		<copy file="${isvfile}" todir="${cordys.scp.dir}/Web/wcp/isvcontent/packages"/>
 	</target>
 
-	<target name="proxy" depends="probe-proxy" if="proxy.host">
+	<target name="proxy" if="proxy.host">
 		<property name="proxy.port" value="80"/>
 		<property name="proxy.user" value=""/>
 		<property name="proxy.pass" value=""/>
