@@ -20,6 +20,7 @@ public class HttpConnector extends RelayConnector {
 	public final Settings settings=new Settings(null);
     public HttpConnector() {
     	CommandList.getBasicCommands().addCommand("http",  new GenericCommand(HttpStep.class));
+    	CommandList.getBasicCommands().addCommand("http-relay",  new GenericCommand(HttpRelayStep.class));
     }
     protected String getManagedComponentType() { return "HttpConnector"; }
     protected String getManagementName() { return "HttpConnector"; }

@@ -14,16 +14,14 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
-import org.kisst.cordys.script.Step;
 import org.kisst.cordys.script.expression.Expression;
 import org.kisst.cordys.script.expression.ExpressionParser;
 import org.kisst.cordys.script.expression.XmlExpression;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.xml.nom.Node;
-import com.eibus.xml.nom.XMLException;
 
-public class HttpStep implements Step {
+public class HttpBaseStep {
     private static final HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
     
     public static void reset() {
@@ -47,18 +45,15 @@ public class HttpStep implements Step {
 	private final Expression urlExpression;
 	private final String application;
     protected final XmlExpression body;
-    protected final String resultVar;
     protected final boolean prettyPrint;
 	
-	public HttpStep(CompilationContext compiler, final int node) {
+	public HttpBaseStep(CompilationContext compiler, final int node) {
 		connector=(HttpConnector) compiler.getRelayConnector();
 		headers = new HttpHeader[NomUtil.countElements(node, "header")];
 		urlExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "url"));
 		application = Node.getAttribute(node, "application");
 		//TODO: body=new XmlExpression(compiler, Node.getElement(node, "body"));
 		body=new XmlExpression(compiler, Node.getAttribute(node, "body"));
-		resultVar = Node.getAttribute(node, "resultVar", application);
-		compiler.declareXmlVar(resultVar);
 		prettyPrint = compiler.getSmartBooleanAttribute(node, "prettyPrint", true);
 	}
 
@@ -117,16 +112,5 @@ public class HttpStep implements Step {
 	    finally {
 	    	method.releaseConnection(); // TODO: what if connection not yet borrowed?
 	    }
-	}
-
-	public void executeStep(final ExecutionContext context) {
-		int bodyNode= body.getNode(context);
-	    String xml=Node.writeToString(bodyNode, prettyPrint);
-	    byte[] responseBytes=call(context, xml);
-	    try {
-	    	int responseNode = context.getDocument().load(responseBytes);
-			context.setXmlVar(resultVar, responseNode);
-	    }
-	    catch (XMLException e) { throw new RuntimeException(e); }
 	}
 }
