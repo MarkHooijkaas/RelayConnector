@@ -49,6 +49,13 @@ public class HttpBaseStep {
 	public HttpBaseStep(CompilationContext compiler, final int node) {
 		connector=(HttpConnector) compiler.getRelayConnector();
 		headers = new HttpHeader[NomUtil.countElements(node, "header")];
+		int child=Node.getFirstChild(node);
+		int idx=0;
+		while (child!=0) {
+			if (Node.getLocalName(child).equals("header"))
+				headers[idx++]=new HttpHeader(compiler, child);
+			child=Node.getNextSibling(child);
+		}
 		urlExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "url"));
 		application = Node.getAttribute(node, "application");
 		//TODO: body=new XmlExpression(compiler, Node.getElement(node, "body"));
@@ -60,9 +67,8 @@ public class HttpBaseStep {
 		HostSettings host=getHost();
 		String url=urlExpression.getString(context);
 	    PostMethod method = new PostMethod(host.url.get()+url); // TODO: handle slashes /
-    	// TODO: better values vor mime type and encoding and make configurable
 		try {
-			method.setRequestEntity(new StringRequestEntity(xml, "", null));
+			method.setRequestEntity(new StringRequestEntity(xml, "text/xml", "UTF-8"));
 		}
 		catch (UnsupportedEncodingException e) { throw new RuntimeException(e); }
 		for (HttpHeader h:headers) {
