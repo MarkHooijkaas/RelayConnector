@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -90,11 +89,10 @@ public class HttpBaseStep {
 	}	
 	
 	protected byte[] retrieveResponse(final ExecutionContext context, PostMethod method, int statusCode) {
-		if (statusCode != HttpStatus.SC_OK) {
-			throw new RuntimeException("Incorrect HTTP return code "+statusCode);
-		}
 		try {
-			 return method.getResponseBody();
+			if (statusCode >= 300 && ! connector.settings.http.ignoreReturnCode.get())
+				throw new RuntimeException("Incorrect HTTP return code "+statusCode+", received message is:"+method.getResponseBody());
+			return method.getResponseBody();
 		}
 	    catch (IOException e) {  throw new RuntimeException(e); }
 	}
