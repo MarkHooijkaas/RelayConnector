@@ -18,35 +18,30 @@ public class HttpRelayStep extends HttpBaseStep implements Step {
 		int bodyNode= body.getNode(context);
 	    String xml=Node.writeToString(bodyNode, prettyPrint);
 	    byte[] responseBytes=call(context, xml);
-	    int responseNode = 0;
+	    int httpResponse = 0;
 	    try {
-	    	responseNode = context.getDocument().load(responseBytes);
-			int output=context.getXmlVar("output");
-			output=Node.getParent(output); // get Soap:Body
-			output=Node.getParent(output); // get Soap:Envelope
-			
-			// clear entire boilerplate response: clear Header and Body children of their attributes
-			// Note, the nodes are left intact. The Soap Header contains a Cordys header that is necessary 
-			int child=Node.getFirstChild(output);
-			while (child!=0) {
-				// there should only be two children (Header and Body)
-				if (Node.getLocalName(child).equals("Body"))
-					NomUtil.clearNode(child); // Body needs boilerplate response child removed
-				else
-					NomUtil.clearAttributes(child); // Header just cleared of attributes
-				child=Node.getNextSibling(child);
-			}
-			NomUtil.clearAttributes(output);
-
+	    	// This code merges the response from the HTTP call with the
+	    	// boilerplate response that Cordys made. The boilerplate response
+	    	// Body should be cleared, but the Header has some important Cordys info.
+	    	// The merging is a bit tricky, because of namespace prefix differences.
+	    	httpResponse = context.getDocument().load(responseBytes);
+			int cordysResponse=context.getXmlVar("output");
+			cordysResponse=Node.getParent(cordysResponse); // get Soap:Body
+			cordysResponse=Node.getParent(cordysResponse); // get Soap:Envelope
 			
 			// copy Envelope attributes
-			NomUtil.copyAttributes(responseNode, output);
+			NomUtil.copyAttributes(httpResponse, cordysResponse);
 			// copy children (Header and Body)
-			int srcchild=Node.getFirstChild(responseNode);
-			while (srcchild!=0) {  
-				int destchild=Node.getElement(output, Node.getLocalName(srcchild));
-				if (destchild==0) // Node did not exist (should not happen)
-					destchild=Node.createElement(Node.getLocalName(responseNode), output);
+			int srcchild=Node.getFirstChild(httpResponse);
+			while (srcchild!=0) {
+				// Find the equivalent node in the cordysResponse 
+				int destchild=NomUtil.getElement(cordysResponse, Node.getNamespaceURI(srcchild), Node.getLocalName(srcchild));
+				if (destchild==0) { 
+					// Node did not exist (should not happen)
+					destchild=Node.createElement(Node.getLocalName(httpResponse), cordysResponse);
+				}
+				if (Node.getLocalName(srcchild).equals("Body"))
+					NomUtil.clearNode(destchild); // Body needs boilerplate response child removed
 				NomUtil.copyAttributes(srcchild, destchild);
 				Node.duplicateAndAppendToChildren(Node.getFirstChild(srcchild), Node.getLastChild(srcchild), destchild );
 				srcchild=Node.getNextSibling(srcchild);
@@ -54,7 +49,7 @@ public class HttpRelayStep extends HttpBaseStep implements Step {
 	    }
 	    catch (XMLException e) { throw new RuntimeException(e); }
 	    finally {
-	    	Node.delete(responseNode);
+	    	Node.delete(httpResponse);
 	    }
 	}
 
