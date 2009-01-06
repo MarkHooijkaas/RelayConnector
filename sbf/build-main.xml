@@ -11,10 +11,10 @@
 		<property name="libdir" value="lib"/>
 		<property name="builddir" value="build"/>
 		<property name="isvdir" value="${builddir}/${project.name}"/>
-		<property name="copy-jar.dir" value="${cordys.dir}/${project.org}/${distname}"/>
-		<property name="scp-jar.dir"  value="${cordys.scp.dir}/${project.org}/${distname}"/>
 		<property name="distname" value="${project.name}-${project.version}"/>
 		<property name="isvfile"  value="${builddir}/${distname}.${buildnumber}.isvp"/>
+		<property name="copy-jar.dir" value="${cordys.dir}/${project.org}/${distname}"/>
+		<property name="scp-jar.dir"  value="${cordys.scp.dir}/${project.org}/${distname}"/>
 		<mkdir dir="${builddir}" />
 		<mkdir dir="${builddir}/classes" />
 		<mkdir dir="${isvdir}" />
