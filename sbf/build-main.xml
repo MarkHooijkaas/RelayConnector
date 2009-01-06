@@ -11,6 +11,8 @@
 		<property name="libdir" value="lib"/>
 		<property name="builddir" value="build"/>
 		<property name="isvdir" value="${builddir}/${project.name}"/>
+		<property name="copy-jar.dir" value="${cordys.dir}/${project.org}/${distname}"/>
+		<property name="scp-jar.dir"  value="${cordys.scp.dir}/${project.org}/${distname}"/>
 		<property name="distname" value="${project.name}-${project.version}"/>
 		<property name="isvfile"  value="${builddir}/${distname}.${buildnumber}.isvp"/>
 		<mkdir dir="${builddir}" />
@@ -64,10 +66,9 @@
 	<target name="scp-jar" depends="jar">
 		<exec executable="scp">
 			<arg value="${isvdir}/${distname}.jar"/>
-			<arg value="${cordys.scp.dir}/${project.org}/${distname}"/>
+			<arg value="${scp-jar.dir}"/>
 		</exec>
 	</target>
-
 
 	<target name="scp-isv" depends="isv">
 		<exec executable="scp">
@@ -77,12 +78,11 @@
 	</target>
 
 	<target name="copy-jar" depends="jar">
-		<copy file="${isvdir}/${distname}.jar" todir="${cordys.scp.dir}/${project.org}"/>
+		<copy file="${isvdir}/${distname}.jar" todir="${copy-jar.dir}"/>
 	</target>
 
-
 	<target name="copy-isv" depends="isv">
-		<copy file="${isvfile}" todir="${cordys.scp.dir}/Web/wcp/isvcontent/packages"/>
+		<copy file="${isvfile}" todir="${cordys.dir}/Web/wcp/isvcontent/packages"/>
 	</target>
 
 	<target name="proxy" if="proxy.host">
