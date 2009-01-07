@@ -2,7 +2,6 @@ package org.kisst.cfg4j;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -75,9 +74,7 @@ public void add(Setting s) {
 			  if (Setting.class.isAssignableFrom(fld.getType())) {
 				  // TODO: check if public
 				  if (fld.get(this)!=null) {
-					  Constructor cons=fld.getType().getConstructor(new Class[] {MultiSetting.class, String.class});
-					  Object obj=cons.newInstance(new Object[] { this, fld.getName() });
-					  fld.set(this, obj);
+					  add((Setting) fld.get(this));
 				  }
 			  }
 		  }

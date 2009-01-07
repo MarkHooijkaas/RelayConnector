@@ -36,5 +36,4 @@ public class HttpConnector extends RelayConnector {
 		super.reset(processor);
     	settings.set(conf.properties);
 	}
-
 }

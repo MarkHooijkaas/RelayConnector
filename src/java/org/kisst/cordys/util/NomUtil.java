@@ -3,7 +3,9 @@ package org.kisst.cordys.util;
 import com.eibus.xml.nom.Node;
 
 public class NomUtil {
-
+	//public static final String SoapNamespace ="http://www.w3.org/2003/05/soap-envelope";
+	public static final String SoapNamespace="http://schemas.xmlsoap.org/soap/envelope/";
+	// public static final String SoapNamespace ="http://www.w3.org/2001/12/soap-envelope";
 	public static boolean getBooleanAttribute(int node, String attrName , boolean defaultValue) {
     	String str = Node.getAttribute(node, attrName);
 		if (str==null)

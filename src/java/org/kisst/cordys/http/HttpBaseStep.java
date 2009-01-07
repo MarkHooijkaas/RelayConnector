@@ -104,6 +104,9 @@ public class HttpBaseStep {
 	}
 
 	protected byte[] call(final ExecutionContext context, String xml) {
+    	if (connector.settings.http.wireLogging.get()!=null)
+    		setLogger("wire", connector.settings.http.wireLogging.get());
+		
 		HttpState state=createState();
 	    PostMethod method = createMethod(context, state, xml);
 	    try {
@@ -116,5 +119,16 @@ public class HttpBaseStep {
 	    finally {
 	    	method.releaseConnection(); // TODO: what if connection not yet borrowed?
 	    }
+	}
+
+	
+	private void setLogger(String loggerName, String levelName) {
+		try {
+			// dirty trick, use reflection, so no dependency is on log4j libraries
+			// this will prevent linkage errors if log4j is not present.
+			Object level = Class.forName("org.apache.log4j.Level").getField(levelName).get(null);
+			Object logger = Class.forName("org.apache.log4j.Logger").getMethod("getLogger", new Class[] {String.class} ).invoke(null, new Object[] {loggerName});
+			logger.getClass().getMethod("setLevel", new Class[] { level.getClass()}).invoke(logger, new Object[] { level });
+		} catch (Exception e) { throw new RuntimeException(e); /* ignore, log4j is not working */		}
 	}
 }

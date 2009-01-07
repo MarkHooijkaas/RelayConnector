@@ -10,16 +10,27 @@ import com.eibus.xml.nom.XMLException;
 
 public class HttpRelayStep extends HttpBaseStep implements Step {
 
+	private static final String wsaNamespace="http://www.w3.org/2005/08/addressing";
+	//private static final String wsaAnonymous="http://www.w3.org/2005/08/addressing/anonymous";
+	
+	private final boolean wsa;
+	
 	public HttpRelayStep(CompilationContext compiler, final int node) {
 		super(compiler, node);
+		wsa = compiler.getSmartBooleanAttribute(node, "wsa", false);
 	}
 	
 	public void executeStep(final ExecutionContext context) {
 		int bodyNode= body.getNode(context);
-	    String xml=Node.writeToString(bodyNode, prettyPrint);
-	    byte[] responseBytes=call(context, xml);
 	    int httpResponse = 0;
 	    try {
+		    if (wsa) {
+		    	bodyNode=Node.clone(bodyNode, true);
+		    	wsaTransform(bodyNode);
+		    }
+	    	String xml=Node.writeToString(bodyNode, prettyPrint);
+		    		
+	    	byte[] responseBytes=call(context, xml);
 	    	// This code merges the response from the HTTP call with the
 	    	// boilerplate response that Cordys made. The boilerplate response
 	    	// Body should be cleared, but the Header has some important Cordys info.
@@ -50,7 +61,27 @@ public class HttpRelayStep extends HttpBaseStep implements Step {
 	    catch (XMLException e) { throw new RuntimeException(e); }
 	    finally {
 	    	Node.delete(httpResponse);
+	    	if (wsa)
+	    		Node.delete(bodyNode);
 	    }
 	}
 
+	private void wsaTransform(int top) {
+		int header=NomUtil.getElement(top, NomUtil.SoapNamespace, "Header");
+		//int to=NomUtil.getElement(header, wsaNamespace, "To");
+		//if (to==0)
+		//	throw new RuntimeException("Missing wsa:To element");
+		int refpar=Node.createElement("ReferenceParameters", header);
+		moveNode(header, "ReferenceParameters", refpar);
+		moveNode(header, "ReplyTo", refpar);
+		moveNode(header, "FaultTo", refpar);
+	}
+
+	private void moveNode(int header, String name, int dest) {
+		int orig = NomUtil.getElement(header, wsaNamespace, name);
+		if (orig==0)
+			return;
+		Node.unlink(orig);
+		Node.appendToChildren(orig,dest);
+	}
 }
