@@ -72,9 +72,12 @@ public class HttpRelayStep extends HttpBaseStep implements Step {
 		//if (to==0)
 		//	throw new RuntimeException("Missing wsa:To element");
 		int refpar=Node.createElement("ReferenceParameters", header);
-		moveNode(header, "ReferenceParameters", refpar);
-		moveNode(header, "ReplyTo", refpar);
-		moveNode(header, "FaultTo", refpar);
+		NomUtil.setNamespace(refpar, wsaNamespace, "wsa", false);
+		int cb=Node.createElement("HttpConnectorCallback", refpar);
+		NomUtil.setNamespace(cb, "kisst.org", "kisst", false);
+		moveNode(header, "ReferenceParameters", cb);
+		moveNode(header, "ReplyTo", cb);
+		moveNode(header, "FaultTo", cb);
 	}
 
 	private void moveNode(int header, String name, int dest) {
