@@ -43,15 +43,16 @@ public class NomUtil {
 
 	/**
 	 * Finds a element with a certain tagname, with a certain namespace  
-	 * @param count if multiple elements with same name and namespace exist, this is an index (starting at 0)
 	 * @return returns 0 if not found 
 	 */
 	public static int getElement(int node, String namespace, String tag) {
 		return getElement(node, namespace, tag, 0);
 	}
-		/**
+	
+
+	/**
 	 * Finds a element with a certain tagname, with a certain namespace  
-	 * @param count if multiple elements with same name and namespace exist, this is an index (starting at 0)
+	 * @param index if multiple elements with same name and namespace exist, this is an index (starting at 0)
 	 * @return returns 0 if not found 
 	 */
 	public static int getElement(int node, String namespace, String tag, int index) {
@@ -66,6 +67,35 @@ public class NomUtil {
 		}
 		return 0;
 	}
+
+	
+	
+	/**
+	 * Finds a element with a certain tagname, no matter what namespace or prefix it has  
+	 * @return returns 0 if not found 
+	 */
+	public static int getElementByLocalName(int node, String tag) {
+		return getElementByLocalName(node, tag, 0);
+	}
+		
+	/**
+	 * Finds a element with a certain tagname, no matter what namespace or prefix it has  
+	 * @param index if multiple elements with same name exist, this is an index (starting at 0)
+	 * @return returns 0 if not found 
+	 */
+	public static int getElementByLocalName(int node, String tag, int index) {
+		node=Node.getFirstChild(node);
+		while (node!=0) {
+			if (tag.equals(Node.getLocalName(node))) {
+				if (index==0)
+					return node;
+				index--;
+			}
+			node=Node.getNextSibling(node);
+		}
+		return 0;
+	}
+
 	
 	/**
 	 * returns the attribute of an element, or if not found, it looks upward to parent

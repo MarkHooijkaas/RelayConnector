@@ -136,9 +136,9 @@ public class MethodCall {
 			if ("Fault".equals(Node.getLocalName(responseBody)) 
 					&& SOAP_NAMESPACE.equals(Node.getNamespaceURI(responseBody))) 
 			{
-				int codeNode=NomUtil.getElement(responseBody, SOAP_NAMESPACE, "faultcode");
+				int codeNode=NomUtil.getElementByLocalName(responseBody, "faultcode");
 				String code=Node.getData(codeNode);
-				int messageNode=NomUtil.getElement(responseBody, SOAP_NAMESPACE, "faultstring");
+				int messageNode=NomUtil.getElementByLocalName(responseBody, "faultstring");
 				String message=Node.getData(messageNode);
 				// TODO: handle details, actor and other fields
 				if (async)
