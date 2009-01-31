@@ -105,7 +105,7 @@ public class HttpBaseStep {
 
 	protected byte[] call(final ExecutionContext context, String xml) {
     	if (connector.settings.http.wireLogging.get()!=null)
-    		setLogger("wire", connector.settings.http.wireLogging.get());
+    		setLogger("httpclient.wire", connector.settings.http.wireLogging.get());
 		
 		HttpState state=createState();
 	    PostMethod method = createMethod(context, state, xml);
