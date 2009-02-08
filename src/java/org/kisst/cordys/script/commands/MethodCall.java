@@ -5,6 +5,8 @@ import java.util.Date;
 import org.kisst.cordys.relay.SoapFaultException;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
+import org.kisst.cordys.script.expression.Expression;
+import org.kisst.cordys.script.expression.ExpressionParser;
 import org.kisst.cordys.script.expression.XmlExpression;
 import org.kisst.cordys.script.xml.ElementAppender;
 import org.kisst.cordys.util.NomUtil;
@@ -24,15 +26,18 @@ public class MethodCall {
 	
 	private final String namespace;
 	private final String methodName;
+	private final Expression methodExpression;
 	private final boolean async;
 	private final boolean showSoap;
 	private final boolean ignoreSoapFault;
+	private final Severity logSoapFault;
 	private final ElementAppender appender;
 	private final XmlExpression appendMessagesTo;
 	//private final XmlExpression appendSoapHeadersFrom;
 	//private final XmlExpression appendSoapHeader;
 	private final String resultVar;
 	private final long timeout;
+
 	
 	public MethodCall(CompilationContext compiler, final int node) {
 		this(compiler, node, Node.getAttribute(node, "method"));
@@ -40,9 +45,16 @@ public class MethodCall {
 	
 	public MethodCall(CompilationContext compiler, final int node, String defaultResultVar) {
 		methodName=Node.getAttribute(node, "method");
-		if (methodName==null)
-			throw new RuntimeException("attribute method should be set");
-
+		String expr=Node.getAttribute(node, "methodExpression");
+		if (methodName==null && expr==null)
+			throw new RuntimeException("attribute method or methodExpression should be set");
+		if (methodName!=null && expr!=null)
+			throw new RuntimeException("attribute method and methodExpression should not be set both");
+		if (expr!=null)
+			methodExpression=ExpressionParser.parse(compiler,expr);
+		else
+			methodExpression=null;
+		
 		namespace=compiler.getSmartAttribute(node, "namespace", null);
 		if (namespace==null)
 			throw new RuntimeException("attribute namespace should be set or a default should be defined");
@@ -50,6 +62,7 @@ public class MethodCall {
 		async=compiler.getSmartBooleanAttribute(node, "async", false);
 		showSoap=compiler.getSmartBooleanAttribute(node, "showSoap", false);
 		ignoreSoapFault=compiler.getSmartBooleanAttribute(node, "ignoreSoapFault", false);
+		logSoapFault=parseSeverity(compiler.getSmartAttribute(node, "logSoapFault", null));
 		appender=new ElementAppender(compiler, node);
 		String appendMessagesToString = compiler.getSmartAttribute(node, "appendMessagesTo", null);
 		if (appendMessagesToString==null)
@@ -72,6 +85,8 @@ public class MethodCall {
 		
 		String tmpName=Node.getAttribute(node, "resultVar");
 		resultVar = tmpName==null? defaultResultVar : tmpName;
+		if (resultVar==null)
+			throw new RuntimeException("resultVar should be defined when using methodExpression");
 		compiler.declareXmlVar(resultVar);
 		String timeoutString=Node.getAttribute(node, "timeout");
 		if (timeoutString==null)
@@ -80,6 +95,16 @@ public class MethodCall {
 			timeout=Long.parseLong(timeoutString);
 	}
 	
+	private Severity parseSeverity(String sev) {
+		if (sev==null)           return null;
+		if (sev.equals("DEBUG")) return Severity.DEBUG;
+		if (sev.equals("INFO"))  return Severity.INFO;
+		if (sev.equals("WARN"))  return Severity.WARN;
+		if (sev.equals("ERROR")) return Severity.ERROR;
+		if (sev.equals("FATAL")) return Severity.FATAL;
+		throw new RuntimeException("unknown LogLevel "+sev);
+	}
+
 	protected int createMethod(final ExecutionContext context) {
 		String effectiveNamespace = namespace;
 		if (effectiveNamespace == null )
@@ -89,7 +114,10 @@ public class MethodCall {
 		Connector connector = context.getRelayConnector().getConnector();
 		int method;
 		try {
-			method = connector.createSOAPMethod(dnUser, dnOrganization, effectiveNamespace, methodName);
+			String m=methodName;
+			if (m==null)
+				m=methodExpression.getString(context);
+			method = connector.createSOAPMethod(dnUser, dnOrganization, effectiveNamespace, m);
 		} 
 		catch (DirectoryException e) {  throw new RuntimeException("Error when handling method "+methodName,e); }
 		appender.append(context, method);
@@ -142,6 +170,8 @@ public class MethodCall {
 			if ("Fault".equals(Node.getLocalName(responseBody)) 
 					&& SOAP_NAMESPACE.equals(Node.getNamespaceURI(responseBody))) 
 			{
+				if (logSoapFault!=null)
+					logger.log(logSoapFault, "Calling method "+methodName+" returned Fault: "+Node.writeToString(response, true));
 				int codeNode=NomUtil.getElementByLocalName(responseBody, "faultcode");
 				String code=Node.getData(codeNode);
 				int messageNode=NomUtil.getElementByLocalName(responseBody, "faultstring");
