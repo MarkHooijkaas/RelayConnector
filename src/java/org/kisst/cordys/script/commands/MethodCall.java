@@ -9,7 +9,7 @@ import org.kisst.cordys.script.expression.Expression;
 import org.kisst.cordys.script.expression.ExpressionParser;
 import org.kisst.cordys.script.expression.XmlExpression;
 import org.kisst.cordys.script.xml.ElementAppender;
-import org.kisst.cordys.util.NomUtil;
+import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.connector.nom.Connector;
 import com.eibus.connector.nom.SOAPMessageListener;
@@ -22,7 +22,6 @@ import com.eibus.xml.nom.Node;
 
 public class MethodCall {
 	private static final CordysLogger logger=CordysLogger.getCordysLogger(MethodCall.class);
-	private static final String SOAP_NAMESPACE = "http://schemas.xmlsoap.org/soap/envelope/";
 	
 	private final String namespace;
 	private final String methodName;
@@ -159,42 +158,36 @@ public class MethodCall {
 	}
 
 	private void handleResponse(ExecutionContext context, int response) {
-		if (logger.isInfoEnabled())
-			logger.log(Severity.INFO, "received response\n"+Node.writeToString(response, true));
-		if (appendMessagesTo!=null) {
-			int logNode=appendMessagesTo.getNode(context);
-			Node.duplicateAndAppendToChildren(response, response, logNode);
-		}
-		int responseBody=stripSoap(response);
-		if (! ignoreSoapFault) {
-			if ("Fault".equals(Node.getLocalName(responseBody)) 
-					&& SOAP_NAMESPACE.equals(Node.getNamespaceURI(responseBody))) 
-			{
-				if (logSoapFault!=null)
-					logger.log(logSoapFault, "Calling method "+methodName+" returned Fault: "+Node.writeToString(response, true));
-				int codeNode=NomUtil.getElementByLocalName(responseBody, "faultcode");
-				String code=Node.getData(codeNode);
-				int messageNode=NomUtil.getElementByLocalName(responseBody, "faultstring");
-				String message=Node.getData(messageNode);
-				// TODO: handle details, actor and other fields
-				if (async)
-					context.setAsynchronousError(new SoapFaultException(code, message));
-				else
-					throw new SoapFaultException(code, message);
+		boolean ok=false;
+		try {
+			if (logger.isInfoEnabled())
+				logger.log(Severity.INFO, "received response\n"+Node.writeToString(response, true));
+			if (appendMessagesTo!=null) {
+				int logNode=appendMessagesTo.getNode(context);
+				Node.duplicateAndAppendToChildren(response, response, logNode);
 			}
+			int responseBody=SoapUtil.getContent(response);
+			if (SoapUtil.isSoapFault(responseBody)) {
+				if (logSoapFault!=null)
+					logger.log(logSoapFault, "Calling method "+methodName+" returned Fault: "+Node.writeToString(responseBody, true));
+				if (! ignoreSoapFault) {
+					if (async) {
+						context.setAsynchronousError(new SoapFaultException(responseBody));
+						return;
+					}
+					else
+						throw new SoapFaultException(responseBody);
+				}
+			}
+			if (showSoap)
+				context.setXmlVar(resultVar, response);
+			else
+				context.setXmlVar(resultVar, responseBody);
+			ok=true;
 		}
-		if (showSoap)
-			context.setXmlVar(resultVar, response);
-		else
-			context.setXmlVar(resultVar, responseBody);
+		finally {
+			if (! ok)
+				Node.delete(response);
+		}
 	}
-	
-	private int stripSoap(int node) {
-		node=NomUtil.getElement(node, SOAP_NAMESPACE, "Body");
-		node=Node.getFirstChild(node);  // get response node
-		return node;
-	}
-
-	public String getMethodName() {	return methodName;	}
-	
 }

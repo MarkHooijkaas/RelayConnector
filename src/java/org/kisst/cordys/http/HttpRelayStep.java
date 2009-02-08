@@ -4,6 +4,7 @@ import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
 import org.kisst.cordys.util.NomUtil;
+import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.xml.nom.Node;
 import com.eibus.xml.nom.XMLException;
@@ -67,7 +68,7 @@ public class HttpRelayStep extends HttpBaseStep implements Step {
 	}
 
 	private void wsaTransform(int top) {
-		int header=NomUtil.getElement(top, NomUtil.SoapNamespace, "Header");
+		int header=NomUtil.getElement(top, SoapUtil.SoapNamespace, "Header");
 		//int to=NomUtil.getElement(header, wsaNamespace, "To");
 		//if (to==0)
 		//	throw new RuntimeException("Missing wsa:To element");
