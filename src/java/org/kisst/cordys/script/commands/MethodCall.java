@@ -97,6 +97,12 @@ public class MethodCall {
 
 	}
 
+	// TODO: fix possible memory leak if async calls never return a answer
+	// Such call will register a SOAPListener which will never be removed.
+	// In long term this could lead to a OutOfMemory error.
+	// Possible fix would be to not use sendAndCallback, but just send, and use a 
+	// default SOAPListener. This in considered not very urgent yet.
+	
 	protected void callMethod(final ExecutionContext context, int method) {
 		try {
 			if (appendMessagesTo!=null) {
