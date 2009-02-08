@@ -6,10 +6,14 @@ import java.util.HashMap;
 import org.kisst.cordys.relay.RelayConnector;
 
 import com.eibus.soap.BodyBlock;
+import com.eibus.util.logger.CordysLogger;
+import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Document;
 import com.eibus.xml.nom.Node;
 
 public class ExecutionContext {
+	private static final CordysLogger logger = CordysLogger.getCordysLogger(ExecutionContext.class);
+	
 	private static class XmlVar {
 		String method;
 		long timeoutTime;
@@ -28,6 +32,7 @@ public class ExecutionContext {
 	private final HashMap<String,XmlVar>  xmlvars  = new HashMap<String,XmlVar>();
 	private final Document doc;
 	private RuntimeException asynchronousError=null;
+	private boolean allreadyDestroyed=false;
 
 	public ExecutionContext(RelayConnector connector, BodyBlock request, BodyBlock response) {
 		this.relayConnector=connector; 
@@ -49,11 +54,19 @@ public class ExecutionContext {
 		xmlvars.put(name, new XmlVar(method, timeoutTime));
 	}
 	synchronized public void setXmlVar(String name, int node) {
-		xmlvars.put(name, new XmlVar(node));
-		this.notifyAll(); // notify should suffice as well instead of notifyAll
+		if (allreadyDestroyed) {
+			logger.log(Severity.WARN, "Trying to set xml var ["+name+"] on allready destroyed context, deleting NOM node");
+			Node.delete(node);
+		}
+		else {
+			xmlvars.put(name, new XmlVar(node));
+			this.notifyAll(); // notify should suffice as well instead of notifyAll
+		}
 	}
 
 	synchronized public void setTextVar(String name, String value) {
+		if (allreadyDestroyed)
+			logger.log(Severity.WARN, "Trying to set text var ["+name+"] on allready destroyed context to value ["+value+"]");
 		textvars.put(name, new TextVar(value));
 	}
 	
@@ -65,6 +78,8 @@ public class ExecutionContext {
 
 	synchronized public int getXmlVar(String name) {
 		while (true) {
+			if (allreadyDestroyed)
+				throw new RuntimeException("Trying to get xml var ["+name+"] from allready destroyed context");
 			if (asynchronousError!=null)
 				throw asynchronousError;
 			XmlVar xmlvar=xmlvars.get(name);
@@ -83,6 +98,9 @@ public class ExecutionContext {
 	}
 
 	synchronized public void destroy() {
+		if (allreadyDestroyed)
+			throw new RuntimeException("Trying to destroy allready destroyed context");
+		allreadyDestroyed=true;
 		// remove output (and input) nodes, so these are not destroyed
 		xmlvars.remove("input");
 		xmlvars.remove("output");
