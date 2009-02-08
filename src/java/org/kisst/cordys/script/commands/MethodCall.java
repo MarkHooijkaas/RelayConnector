@@ -61,7 +61,7 @@ public class MethodCall {
 		async=compiler.getSmartBooleanAttribute(node, "async", false);
 		showSoap=compiler.getSmartBooleanAttribute(node, "showSoap", false);
 		ignoreSoapFault=compiler.getSmartBooleanAttribute(node, "ignoreSoapFault", false);
-		logSoapFault=parseSeverity(compiler.getSmartAttribute(node, "logSoapFault", null));
+		logSoapFault=parseSeverity(compiler.getSmartAttribute(node, "logSoapFault", compiler.getConfiguration().settings.logSoapFaults.get()));
 		appender=new ElementAppender(compiler, node);
 		String appendMessagesToString = compiler.getSmartAttribute(node, "appendMessagesTo", null);
 		if (appendMessagesToString==null)
@@ -96,12 +96,13 @@ public class MethodCall {
 	
 	private Severity parseSeverity(String sev) {
 		if (sev==null)           return null;
+		if (sev.equals("NONE"))  return null;
 		if (sev.equals("DEBUG")) return Severity.DEBUG;
 		if (sev.equals("INFO"))  return Severity.INFO;
 		if (sev.equals("WARN"))  return Severity.WARN;
 		if (sev.equals("ERROR")) return Severity.ERROR;
 		if (sev.equals("FATAL")) return Severity.FATAL;
-		throw new RuntimeException("unknown LogLevel "+sev);
+		throw new RuntimeException("unknown LogLevel ["+sev+"] should be NONE, DEBUG, INFO, WARN, ERROR or FATAL");
 	}
 
 	protected int createMethod(final ExecutionContext context) {
