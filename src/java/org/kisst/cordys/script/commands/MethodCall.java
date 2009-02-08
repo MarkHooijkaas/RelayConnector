@@ -190,8 +190,6 @@ public class MethodCall {
 	}
 	
 	private int stripSoap(int node) {
-		if (showSoap)
-			return node;
 		node=NomUtil.getElement(node, SOAP_NAMESPACE, "Body");
 		node=Node.getFirstChild(node);  // get response node
 		return node;
