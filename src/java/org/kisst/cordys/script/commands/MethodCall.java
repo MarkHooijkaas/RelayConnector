@@ -183,7 +183,7 @@ public class MethodCall {
 			if (showSoap)
 				context.setXmlVar(resultVar, response);
 			else
-				context.setXmlVar(resultVar, responseBody);
+				context.setXmlVar(resultVar, responseBody, response);
 			ok=true;
 		}
 		finally {

@@ -18,7 +18,8 @@ public class ExecutionContext {
 		String method;
 		long timeoutTime;
 		int node=0;
-		private XmlVar(int node) { this.node=node;}
+		int nodeToDestroy=0;
+		private XmlVar(int node, int nodeToDestroy) { this.node=node; this.nodeToDestroy=nodeToDestroy;}
 		private XmlVar(String method, long timeoutTime) { this.method=method; this.timeoutTime=timeoutTime;}
 	}
 	private static class TextVar {
@@ -40,8 +41,8 @@ public class ExecutionContext {
     	user=request.getSOAPTransaction().getUserCredentials().getOrganizationalUser();
     	int inputNode = request.getXMLNode();
 		int outputNode = response.getXMLNode();
-		setXmlVar("input", inputNode);
-		setXmlVar("output", outputNode);
+		setXmlVar("input", inputNode, 0);
+		setXmlVar("output", outputNode, 0);
 		// This fixes some strange behavior that prefix of input is not used in output
 		String inputPrefix= Node.getPrefix(inputNode);
 		if (inputPrefix!=null)
@@ -54,12 +55,15 @@ public class ExecutionContext {
 		xmlvars.put(name, new XmlVar(method, timeoutTime));
 	}
 	synchronized public void setXmlVar(String name, int node) {
+		setXmlVar(name,node,node);
+	}
+	synchronized public void setXmlVar(String name, int node, int nodeToDestroy) {
 		if (allreadyDestroyed) {
 			logger.log(Severity.WARN, "Trying to set xml var ["+name+"] on allready destroyed context, deleting NOM node");
 			Node.delete(node);
 		}
 		else {
-			xmlvars.put(name, new XmlVar(node));
+			xmlvars.put(name, new XmlVar(node, nodeToDestroy));
 			this.notifyAll(); // notify should suffice as well instead of notifyAll
 		}
 	}
@@ -102,11 +106,9 @@ public class ExecutionContext {
 			throw new RuntimeException("Trying to destroy allready destroyed context");
 		allreadyDestroyed=true;
 		// remove output (and input) nodes, so these are not destroyed
-		xmlvars.remove("input");
-		xmlvars.remove("output");
 		for(XmlVar v:xmlvars.values()) {
-			if (v.node!=0)
-				Node.delete(v.node);
+			if (v.nodeToDestroy!=0)
+				Node.delete(v.nodeToDestroy);
 		}
 	}
 
