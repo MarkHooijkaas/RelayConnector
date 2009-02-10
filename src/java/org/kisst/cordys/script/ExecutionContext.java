@@ -88,7 +88,7 @@ public class ExecutionContext {
 			if (xmlvar.node != 0)
 				return xmlvar.node;
 			long now=new Date().getTime();
-			if (now>xmlvar.timeoutTime)
+			if (now>=xmlvar.timeoutTime)
 				throw new RuntimeException("Timeout waiting for xml variable "+name+" as result from calling method "+xmlvar.method);
 			try {
 				this.wait(xmlvar.timeoutTime - now); 
