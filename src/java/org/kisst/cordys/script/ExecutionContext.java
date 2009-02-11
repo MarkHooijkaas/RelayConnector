@@ -60,7 +60,8 @@ public class ExecutionContext {
 	synchronized public void setXmlVar(String name, int node, int nodeToDestroy) {
 		if (allreadyDestroyed) {
 			logger.log(Severity.WARN, "Trying to set xml var ["+name+"] on allready destroyed context, deleting NOM node");
-			Node.delete(node);
+			if (nodeToDestroy!=0)
+				Node.delete(nodeToDestroy);
 		}
 		else {
 			xmlvars.put(name, new XmlVar(node, nodeToDestroy));

@@ -20,7 +20,7 @@ public class CallStep extends MethodCall implements Step {
 		}
 		finally {
 			if (method!=0)
-				Node.delete(method);
+				Node.delete(Node.getParent(Node.getParent(method)));
 		}
 	}
 }
