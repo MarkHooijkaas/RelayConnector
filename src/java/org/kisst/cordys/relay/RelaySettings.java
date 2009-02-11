@@ -6,8 +6,8 @@ import org.kisst.cfg4j.MultiSetting;
 import org.kisst.cfg4j.StringSetting;
 
 public class RelaySettings extends MultiSetting {
-	public IntSetting timeout=new IntSetting(this, "timeout");
-	public BooleanSetting cacheScripts=new BooleanSetting(this, "cacheScripts");
+	public IntSetting timeout=new IntSetting(this, "timeout",20000);
+	public BooleanSetting cacheScripts=new BooleanSetting(this, "cacheScripts", false);
 	public StringSetting logSoapFaults=new StringSetting(this, "logSoapFaults", null);
 
 	public RelaySettings(MultiSetting parent) { super(parent, "relay"); }
