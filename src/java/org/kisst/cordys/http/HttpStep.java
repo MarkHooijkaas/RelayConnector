@@ -7,7 +7,7 @@ import org.kisst.cordys.script.Step;
 import com.eibus.xml.nom.Node;
 import com.eibus.xml.nom.XMLException;
 
-public class HttpStep extends HttpBaseStep implements Step {
+public class HttpStep extends HttpBase2 implements Step {
     protected final String resultVar;
 
 	public HttpStep(CompilationContext compiler, final int node) {
@@ -17,9 +17,8 @@ public class HttpStep extends HttpBaseStep implements Step {
 	}
 	
 	public void executeStep(final ExecutionContext context) {
-		int bodyNode= body.getNode(context);
-	    String xml=Node.writeToString(bodyNode, prettyPrint);
-	    byte[] responseBytes=call(context, xml);
+	    int bodyNode= getBody(context);
+	    byte[] responseBytes=call(context, bodyNode);
 	    try {
 	    	int responseNode = context.getDocument().load(responseBytes);
 			context.setXmlVar(resultVar, responseNode);

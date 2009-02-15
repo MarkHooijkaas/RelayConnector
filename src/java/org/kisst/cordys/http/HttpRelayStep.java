@@ -9,7 +9,7 @@ import org.kisst.cordys.util.SoapUtil;
 import com.eibus.xml.nom.Node;
 import com.eibus.xml.nom.XMLException;
 
-public class HttpRelayStep extends HttpBaseStep implements Step {
+public class HttpRelayStep extends HttpBase2 implements Step {
 	private final boolean wsa;
 	
 	public HttpRelayStep(CompilationContext compiler, final int node) {
@@ -18,16 +18,14 @@ public class HttpRelayStep extends HttpBaseStep implements Step {
 	}
 	
 	public void executeStep(final ExecutionContext context) {
-	    int bodyNode= body.getNode(context);
+	    int bodyNode= getBody(context);
 	    int httpResponse = 0;
 	    try {
 		    if (wsa) {
 		    	bodyNode=Node.clone(bodyNode, true);
 		    	wsaTransform(bodyNode);
 		    }
-	    	String xml=Node.writeToString(bodyNode, prettyPrint);
-		    		
-	    	byte[] responseBytes=call(context, xml);
+	    	byte[] responseBytes=call(context, bodyNode);
 	    	httpResponse = context.getDocument().load(responseBytes);
 			int cordysResponse=context.getXmlVar("output");
 
