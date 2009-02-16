@@ -21,6 +21,7 @@ public class HttpConnector extends RelayConnector {
     public HttpConnector() {
     	CommandList.getBasicCommands().addCommand("http",  new GenericCommand(HttpStep.class));
     	CommandList.getBasicCommands().addCommand("http-relay",  new GenericCommand(HttpRelayStep.class));
+    	CommandList.getBasicCommands().addCommand("http-callback",  new GenericCommand(HttpCallbackStep.class));
     }
     protected String getManagedComponentType() { return "HttpConnector"; }
     protected String getManagementName() { return "HttpConnector"; }
