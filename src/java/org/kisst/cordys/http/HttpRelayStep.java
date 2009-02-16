@@ -17,6 +17,7 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 	private final String wrappperElementName;
 	private final String wrappperElementNamespace;
 	private final Expression replyToExpression;
+	private final Expression faultToExpression;
 
 	public HttpRelayStep(CompilationContext compiler, final int node) {
 		super(compiler, node);
@@ -24,6 +25,7 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 		wrappperElementName     =compiler.getSmartAttribute(node, "wrapperName", HttpCallbackStep.defaultWrapperElementName);
 		wrappperElementNamespace=compiler.getSmartAttribute(node, "wrapperNamespace", HttpCallbackStep.defaultWrapperElementNamespace);
 		replyToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "replyTo"));
+		faultToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "faultTo"));
 	}
 	
 	public void executeStep(final ExecutionContext context) {
@@ -63,6 +65,11 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 		int replyToNode=Node.createElement("ReplyTo", header);
 		NomUtil.setNamespace(replyToNode, SoapUtil.wsaNamespace, "wsa", false);
 		Node.setData(replyToNode, replyToExpression.getString(context));
+		if (faultToExpression!=null) {
+			int faultToNode=Node.createElement("FaultTo", header);
+			NomUtil.setNamespace(faultToNode, SoapUtil.wsaNamespace, "wsa", false);
+			Node.setData(faultToNode, faultToExpression.getString(context));
+		}
 	}
 
 	private void moveNode(int header, String name, int dest) {
