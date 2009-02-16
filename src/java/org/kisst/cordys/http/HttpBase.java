@@ -38,8 +38,10 @@ public class HttpBase {
 		return connector.settings;
 	}
 
-	protected int getBody(final ExecutionContext context) {
-		return body.getNode(context);
+	protected int createBody(final ExecutionContext context) {
+		// Note: this method always clones the XML, so it may be modified, and should always be deleted
+		// It might be more efficient, to not clone, but then it becomes tricky if the node needs to be deleted
+		return Node.clone(body.getNode(context), true);
 	}
 
 	protected PostMethod createPostMethod(String url, int bodyNode) {

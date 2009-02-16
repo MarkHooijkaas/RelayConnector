@@ -3,6 +3,8 @@ package org.kisst.cordys.http;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
+import org.kisst.cordys.script.expression.Expression;
+import org.kisst.cordys.script.expression.ExpressionParser;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
@@ -11,20 +13,26 @@ import com.eibus.xml.nom.XMLException;
 
 public class HttpRelayStep extends HttpBase2 implements Step {
 	private final boolean wsa;
-	
+
+	private final String wrappperElementName;
+	private final String wrappperElementNamespace;
+	private final Expression replyToExpression;
+
 	public HttpRelayStep(CompilationContext compiler, final int node) {
 		super(compiler, node);
 		wsa = compiler.getSmartBooleanAttribute(node, "wsa", false);
+		wrappperElementName     =compiler.getSmartAttribute(node, "wrapperName", HttpCallbackStep.defaultWrapperElementName);
+		wrappperElementNamespace=compiler.getSmartAttribute(node, "wrapperNamespace", HttpCallbackStep.defaultWrapperElementNamespace);
+		replyToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "replyTo"));
 	}
 	
 	public void executeStep(final ExecutionContext context) {
-	    int bodyNode= getBody(context);
+	    int bodyNode= 0;
 	    int httpResponse = 0;
 	    try {
-		    if (wsa) {
-		    	bodyNode=Node.clone(bodyNode, true);
-		    	wsaTransform(bodyNode);
-		    }
+	    	bodyNode= createBody(context);
+		    if (wsa)
+		    	wsaTransform(context, bodyNode);
 	    	byte[] responseBytes=call(context, bodyNode);
 	    	httpResponse = context.getDocument().load(responseBytes);
 			int cordysResponse=context.getXmlVar("output");
@@ -33,24 +41,28 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 	    }
 	    catch (XMLException e) { throw new RuntimeException(e); }
 	    finally {
-	    	Node.delete(httpResponse);
-	    	if (wsa)
-	    		Node.delete(bodyNode);
+	    	if (httpResponse!=0) Node.delete(httpResponse);
+	    	if (bodyNode!=0) Node.delete(bodyNode);
 	    }
 	}
 
-	private void wsaTransform(int top) {
+	private void wsaTransform(final ExecutionContext context, int top) {
 		int header=NomUtil.getElement(top, SoapUtil.SoapNamespace, "Header");
 		//int to=NomUtil.getElement(header, wsaNamespace, "To");
 		//if (to==0)
 		//	throw new RuntimeException("Missing wsa:To element");
-		int refpar=Node.createElement("ReferenceParameters", header);
-		NomUtil.setNamespace(refpar, SoapUtil.wsaNamespace, "wsa", false);
-		int cb=Node.createElement("HttpConnectorCallback", refpar);
-		NomUtil.setNamespace(cb, "kisst.org", "kisst", false);
-		moveNode(header, "ReferenceParameters", cb);
+		int refpar=NomUtil.getElement(header, SoapUtil.wsaNamespace, "ReferenceParameters");
+		if (refpar==0) {
+			Node.createElement("ReferenceParameters", header);
+			NomUtil.setNamespace(refpar, SoapUtil.wsaNamespace, "wsa", false);
+		}
+		int cb=Node.createElement(wrappperElementName, refpar); // TODO: Check if this node already exists...
+		NomUtil.setNamespace(cb, wrappperElementNamespace, "kisst", false);
 		moveNode(header, "ReplyTo", cb);
 		moveNode(header, "FaultTo", cb);
+		int replyToNode=Node.createElement("ReplyTo", header);
+		NomUtil.setNamespace(replyToNode, SoapUtil.wsaNamespace, "wsa", false);
+		Node.setData(replyToNode, replyToExpression.getString(context));
 	}
 
 	private void moveNode(int header, String name, int dest) {

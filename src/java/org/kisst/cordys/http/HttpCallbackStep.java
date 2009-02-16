@@ -11,22 +11,25 @@ import com.eibus.xml.nom.Node;
 import com.eibus.xml.nom.XMLException;
 
 public class HttpCallbackStep extends HttpBase2 implements Step {
-	protected final String wrappperElementName;
-	protected final String wrappperElementNamespace;
+	public static final String defaultWrapperElementNamespace = "http://kisst.org/cordys/http";
+	public static final String defaultWrapperElementName = "CallbackWrapper";
+	
+	private final String wrappperElementName;
+	private final String wrappperElementNamespace;
 	
 	public HttpCallbackStep(CompilationContext compiler, final int node) {
 		super(compiler, node);
-		wrappperElementName     =compiler.getSmartAttribute(node, "wrapperName", "CallbackWrapper");
-		wrappperElementNamespace=compiler.getSmartAttribute(node, "wrapperNamespace", "http://kisst.org/cordys/http");
+		wrappperElementName     =compiler.getSmartAttribute(node, "wrapperName", defaultWrapperElementName);
+		wrappperElementNamespace=compiler.getSmartAttribute(node, "wrapperNamespace", defaultWrapperElementNamespace);
 	}
 	
 	public void executeStep(final ExecutionContext context) {
-	    int bodyNode= getBody(context);
+	    int bodyNode= createBody(context);
 	    int httpResponse = 0;
 	    try {
 	    	int header=NomUtil.getElement(bodyNode, SoapUtil.SoapNamespace, "Header");
 	    	int wrapper=NomUtil.getElement(header,  wrappperElementNamespace, wrappperElementName);
-	    	String url=Node.getData(NomUtil.getElementByLocalName(wrapper, "replyTo"));
+	    	String url=Node.getData(NomUtil.getElementByLocalName(wrapper, "ReplyTo")); // TODO: check for FaultTo
 	    	PostMethod method=createPostMethod(url, bodyNode);
 		    		
 	    	byte[] responseBytes=httpCall(method, null);

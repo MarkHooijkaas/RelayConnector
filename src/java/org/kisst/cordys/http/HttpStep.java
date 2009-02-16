@@ -17,7 +17,7 @@ public class HttpStep extends HttpBase2 implements Step {
 	}
 	
 	public void executeStep(final ExecutionContext context) {
-	    int bodyNode= getBody(context);
+	    int bodyNode= createBody(context);
 	    byte[] responseBytes=call(context, bodyNode);
 	    try {
 	    	int responseNode = context.getDocument().load(responseBytes);
