@@ -27,15 +27,12 @@
 			<include name="**/*.java"/>
 			<classpath>
 				<pathelement path="${libdir}/cordys/wcp.jar" />
-				<pathelement path="${libdir}/cordys/coelib.jar" />
 				<pathelement path="${libdir}/cordys/ldap.jar" />
 				<pathelement path="${libdir}/commons-httpclient-3.1.jar" />
 			</classpath>
 		</javac>
 		<copy todir="${builddir}/classes">
-			<fileset dir="${srcdir}/java">
-				<patternset><include name="**/coelib.version"/></patternset>
-			</fileset>
+			<fileset dir="${srcdir}/java"/>
 		</copy>
 	</target>
 
@@ -57,7 +54,6 @@
 				<filter token="PROJECT" value="${project.name}"/>
 			</filterset>
 		</copy>
-		<copy todir="${isvdir}/web" file="${libdir}/cordys/coelib.js"/>
 		<zip destfile="${isvfile}"  basedir="${isvdir}"/>
 	</target>
 
@@ -103,8 +99,6 @@
 		<mkdir dir="lib/cordys" />
 		<copy todir="lib/cordys" file="${cordys.dir}/WCP/wcp.jar"/>
 		<copy todir="lib/cordys" file="${cordys.dir}/WCP/ldap.jar"/>
-		<copy todir="lib/cordys" file="${cordys.dir}/coe/coelib/coelib.jar"/>
-		<copy todir="lib/cordys" file="${cordys.dir}/web/coe/coelib/coelib.js"/>
 	</target>
 
 	<target name="setup-scp" depends="init" if="cordys.scp.dir">
@@ -112,8 +106,6 @@
 		<exec executable="scp">
 			<arg value="${cordys.scp.dir}/WCP/wcp.jar"/>
 			<arg value="${cordys.scp.dir}/WCP/ldap.jar"/>
-			<arg value="${cordys.scp.dir}/coe/coelib/coelib.jar"/>
-			<arg value="${cordys.scp.dir}/web/coe/coelib/coelib.js"/>
 			<arg value="lib/cordys"/>
 		</exec>
 	</target>

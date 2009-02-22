@@ -4,6 +4,5 @@
     <version>0.2</version>
     <class>org.kisst.cordys.relay.RelayConnector</class>    
 	<jarfiles pathid="jarfiles">
-      <pathelement location="lib/cordys/coelib.jar"/>
 	</jarfiles>
 </project>
