@@ -1,5 +1,6 @@
 package org.kisst.cordys.http;
 
+import org.kisst.cordys.relay.CompileException;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
@@ -25,6 +26,8 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 		wrappperElementName     =compiler.getSmartAttribute(node, "wrapperName", HttpCallbackStep.defaultWrapperElementName);
 		wrappperElementNamespace=compiler.getSmartAttribute(node, "wrapperNamespace", HttpCallbackStep.defaultWrapperElementNamespace);
 		replyToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "replyTo"));
+		if (wsa && replyToExpression==null)
+			throw new CompileException("when wsa attribute is true a replyTo attribute is mandatory");
 		faultToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "faultTo"));
 	}
 	
@@ -35,8 +38,8 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 	    	bodyNode= createBody(context);
 		    if (wsa)
 		    	wsaTransform(context, bodyNode);
-	    	byte[] responseBytes=call(context, bodyNode);
-	    	httpResponse = context.getDocument().load(responseBytes);
+	    	String response=call(context, bodyNode);
+	    	httpResponse = context.getDocument().load(response);
 			int cordysResponse=context.getXmlVar("output");
 
 			SoapUtil.mergeResponses(httpResponse, cordysResponse);

@@ -33,7 +33,10 @@ public class SoapUtil {
 			node=getBody(node);
 		if ("Body".equals(Node.getLocalName(node)))
 			node=NomUtil.getElement(node, soapNamespace, "Fault");
-		return node;
+		if ("Fault".equals(Node.getLocalName(node)) && soapNamespace.equals(Node.getNamespaceURI(node)))
+			return node;
+		else 
+			return 0;
 	}
 	
 	/** Returns the NOM node of the SOAP:Body element

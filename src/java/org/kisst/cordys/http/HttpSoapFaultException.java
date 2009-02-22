@@ -19,26 +19,26 @@ import com.eibus.xml.nom.XMLException;
  */
 public class HttpSoapFaultException extends SoapFaultException {
 	private static final long serialVersionUID = 1L;
-	private final byte[] responseBytes;
+	private final String response;
 
 	
-	public HttpSoapFaultException(int httpCode, byte[] response) {
+	public HttpSoapFaultException(int httpCode, String response) {
 		super("HTTP.Status."+httpCode, "HTTP call returned code "+httpCode);
-		this.responseBytes=response;
+		this.response=response;
 	}
 
 	public void createResponse(BodyBlock responseBlock) {
 		int cordysResponse=responseBlock.getXMLNode();
 		int httpresponse=0;
 		try {
-			httpresponse = Node.getDocument(cordysResponse).load(responseBytes);
+			httpresponse = Node.getDocument(cordysResponse).load(response);
 			if (httpresponse !=0 && SoapUtil.isSoapFault(httpresponse))
 				SoapUtil.mergeResponses(httpresponse, cordysResponse);
 			else {
 				cordysResponse=responseBlock.createSOAPFault(getFaultcode(),getFaultstring());
-				Node.createCDataElement("details", responseBytes.toString(), cordysResponse);
+				Node.createCDataElement("details", response, cordysResponse);
 			}
-		} catch (XMLException e) { throw new RuntimeException(e); }
+		} catch (XMLException e) { /* Ignore this error, XML is not parseable which is OK */ }
 		finally {
 			if (httpresponse!=0)
 				Node.delete(httpresponse);

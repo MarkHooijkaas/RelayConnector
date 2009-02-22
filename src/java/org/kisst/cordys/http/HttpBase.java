@@ -9,7 +9,6 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.kisst.cordys.relay.SoapFaultException;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.XmlExpression;
@@ -55,18 +54,18 @@ public class HttpBase {
 		return method;
 	}
 	
-	private byte[] retrieveResponse(PostMethod method, int statusCode) {
+	private String retrieveResponse(PostMethod method, int statusCode) {
 		try {
-			byte[] result=method.getResponseBody();
+			String  result=new String(method.getResponseBody(), "utf-8"); // TODO: use correct encoding
 			if (statusCode >= 300 && ! connector.settings.http.ignoreReturnCode.get()) {
-				throw new SoapFaultException("HttpReturnCode."+statusCode, "Incorrect HTTP return code "+statusCode+", received message is:"+method.getResponseBody());
+				throw new HttpSoapFaultException(statusCode, result);
 			}
-			return result;
+			return result; 
 		}
 	    catch (IOException e) {  throw new RuntimeException(e); }
 	}
 
-	protected byte[] httpCall(final PostMethod method, HttpState state) {
+	protected String httpCall(final PostMethod method, HttpState state) {
     	if (connector.settings.http.wireLogging.get()!=null)
     		setLogger("httpclient.wire", connector.settings.http.wireLogging.get());
 	    try {

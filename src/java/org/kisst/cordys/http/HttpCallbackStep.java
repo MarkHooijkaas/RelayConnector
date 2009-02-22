@@ -32,8 +32,8 @@ public class HttpCallbackStep extends HttpBase2 implements Step {
 	    	String url=Node.getData(NomUtil.getElementByLocalName(wrapper, "ReplyTo")); // TODO: check for FaultTo
 	    	PostMethod method=createPostMethod(url, bodyNode);
 		    		
-	    	byte[] responseBytes=httpCall(method, null);
-	    	httpResponse = context.getDocument().load(responseBytes);
+	    	String response=httpCall(method, null);
+	    	httpResponse = context.getDocument().load(response);
 			int cordysResponse=context.getXmlVar("output");
 			SoapUtil.mergeResponses(httpResponse, cordysResponse);
 
