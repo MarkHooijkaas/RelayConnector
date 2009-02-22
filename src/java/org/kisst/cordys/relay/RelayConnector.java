@@ -5,8 +5,6 @@ import java.util.Properties;
 
 import org.kisst.cordys.script.Script;
 
-import com.cordys.coe.coelib.LibraryVersion;
-import com.cordys.coe.exception.GeneralException;
 import com.eibus.connector.nom.Connector;
 import com.eibus.directory.soap.DirectoryException;
 import com.eibus.exception.ExceptionGroup;
@@ -37,13 +35,6 @@ public class RelayConnector extends ApplicationConnector {
      */
     public void open(Processor processor)
     {
-        // Check the CoELib version.
-        try
-        {
-            LibraryVersion.loadAndCheckLibraryVersionFromResource(RelayConnector.class, true);
-        }
-        catch (GeneralException e) { throw new RuntimeException(e); } 
-        
         dnOrganization=processor.getOrganization();
         try {
     		conf.init(getConfiguration());

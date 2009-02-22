@@ -5,15 +5,13 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import org.kisst.cfg4j.MultiSetting;
+import org.kisst.cordys.util.NomUtil;
 
-import com.cordys.coe.exception.GeneralException;
-import com.cordys.coe.util.XMLProperties;
+import com.eibus.xml.nom.Node;
 
 public class RelayConfiguration 
 {
 	//private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayConfiguration.class);
-	
-	private static final String PROP_CONFIG_LOCATION = "ConfigLocation";
 
 	public final RelaySettings settings;
 	private String configLocation;
@@ -23,21 +21,16 @@ public class RelayConfiguration
 		settings=new RelaySettings(parent);
 	}
 	
-	public void init(int iConfigNode) 
+	public void init(int configNode) 
 	{
 		//logger.debug("RelayConfiguration starting initialisation");
-		XMLProperties xpBase;
-		if (iConfigNode == 0)
+		if (configNode == 0)
 			throw new RuntimeException("Configuration not found.");
 
-		if (!com.eibus.xml.nom.Node.getName(iConfigNode).equals("configuration"))
+		if (!Node.getLocalName(configNode).equals("configuration"))
 			throw new RuntimeException("Root-tag of the configuration should be <configuration>");
-
-		try {
-			xpBase = new XMLProperties(iConfigNode);
-		}
-		catch (GeneralException e) { throw new RuntimeException(e); }
-		configLocation     = xpBase.getStringValue(PROP_CONFIG_LOCATION); 
+		configNode=NomUtil.getElementByLocalName(configNode, "Configuration");
+		configLocation = Node.getData(NomUtil.getElementByLocalName(configNode,"ConfigLocation")); 
 		
 		load();
 		//logger.debug("RelayConfiguration finished initialisation");
