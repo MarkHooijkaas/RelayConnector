@@ -54,18 +54,18 @@ public class HttpBase {
 		return method;
 	}
 	
-	private String retrieveResponse(PostMethod method, int statusCode) {
+	private HttpResponse retrieveResponse(PostMethod method, int statusCode) {
 		try {
-			String  result=new String(method.getResponseBody(), "utf-8"); // TODO: use correct encoding
+			HttpResponse result=new HttpResponse(statusCode, method.getResponseBody());
 			if (statusCode >= 300 && ! connector.settings.http.ignoreReturnCode.get()) {
-				throw new HttpSoapFaultException(statusCode, result);
+				throw new HttpSoapFaultException(result);
 			}
-			return result; 
+			return result;
 		}
 	    catch (IOException e) {  throw new RuntimeException(e); }
 	}
 
-	protected String httpCall(final PostMethod method, HttpState state) {
+	protected HttpResponse httpCall(final PostMethod method, HttpState state) {
     	if (connector.settings.http.wireLogging.get()!=null)
     		setLogger("httpclient.wire", connector.settings.http.wireLogging.get());
 	    try {

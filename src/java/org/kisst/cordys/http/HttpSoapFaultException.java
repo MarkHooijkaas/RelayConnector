@@ -5,7 +5,6 @@ import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.soap.BodyBlock;
 import com.eibus.xml.nom.Node;
-import com.eibus.xml.nom.XMLException;
 
 /**
  * This class is used when a HTTP call returns a HTTP code that indicates an error.
@@ -19,11 +18,11 @@ import com.eibus.xml.nom.XMLException;
  */
 public class HttpSoapFaultException extends SoapFaultException {
 	private static final long serialVersionUID = 1L;
-	private final String response;
+	private final HttpResponse response;
 
 	
-	public HttpSoapFaultException(int httpCode, String response) {
-		super("HTTP.Status."+httpCode, "HTTP call returned code "+httpCode);
+	public HttpSoapFaultException(HttpResponse response) {
+		super("HTTP.Status."+response.getCode(), "HTTP call returned code "+response.getCode());
 		this.response=response;
 	}
 
@@ -31,14 +30,14 @@ public class HttpSoapFaultException extends SoapFaultException {
 		int cordysResponse=responseBlock.getXMLNode();
 		int httpresponse=0;
 		try {
-			httpresponse = Node.getDocument(cordysResponse).load(response);
+			httpresponse = response.getResponseXml(Node.getDocument(cordysResponse));
 			if (httpresponse !=0 && SoapUtil.isSoapFault(httpresponse))
 				SoapUtil.mergeResponses(httpresponse, cordysResponse);
 			else {
 				cordysResponse=responseBlock.createSOAPFault(getFaultcode(),getFaultstring());
-				Node.createCDataElement("details", response, cordysResponse);
+				Node.createCDataElement("details", response.getResponseString(), cordysResponse);
 			}
-		} catch (XMLException e) { /* Ignore this error, XML is not parseable which is OK */ }
+		} 
 		finally {
 			if (httpresponse!=0)
 				Node.delete(httpresponse);

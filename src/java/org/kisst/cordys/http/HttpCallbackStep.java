@@ -8,7 +8,6 @@ import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.xml.nom.Node;
-import com.eibus.xml.nom.XMLException;
 
 public class HttpCallbackStep extends HttpBase2 implements Step {
 	public static final String defaultWrapperElementNamespace = "http://kisst.org/cordys/http";
@@ -32,13 +31,12 @@ public class HttpCallbackStep extends HttpBase2 implements Step {
 	    	String url=Node.getData(NomUtil.getElementByLocalName(wrapper, "ReplyTo")); // TODO: check for FaultTo
 	    	PostMethod method=createPostMethod(url, bodyNode);
 		    		
-	    	String response=httpCall(method, null);
-	    	httpResponse = context.getDocument().load(response);
+	    	HttpResponse response=httpCall(method, null);
+	    	httpResponse = response.getResponseXml(context.getDocument());
 			int cordysResponse=context.getXmlVar("output");
 			SoapUtil.mergeResponses(httpResponse, cordysResponse);
 
 	    }
-	    catch (XMLException e) { throw new RuntimeException(e); }
 	    finally {
 	    	Node.delete(httpResponse);
 	    }

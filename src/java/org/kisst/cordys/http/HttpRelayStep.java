@@ -10,7 +10,6 @@ import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.xml.nom.Node;
-import com.eibus.xml.nom.XMLException;
 
 public class HttpRelayStep extends HttpBase2 implements Step {
 	private final boolean wsa;
@@ -38,13 +37,12 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 	    	bodyNode= createBody(context);
 		    if (wsa)
 		    	wsaTransform(context, bodyNode);
-	    	String response=call(context, bodyNode);
-	    	httpResponse = context.getDocument().load(response);
+		    HttpResponse response=call(context, bodyNode);
+	    	httpResponse = response.getResponseXml(context.getDocument());
 			int cordysResponse=context.getXmlVar("output");
 
 			SoapUtil.mergeResponses(httpResponse, cordysResponse);
 	    }
-	    catch (XMLException e) { throw new RuntimeException(e); }
 	    finally {
 	    	if (httpResponse!=0) Node.delete(httpResponse);
 	    	if (bodyNode!=0) Node.delete(bodyNode);

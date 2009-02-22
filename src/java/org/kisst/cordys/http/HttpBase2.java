@@ -69,7 +69,7 @@ public class HttpBase2 extends HttpBase {
 		return getSettings().http.host.get(application);
 	}	
 
-	protected String call(final ExecutionContext context, int bodyNode) {
+	protected HttpResponse call(final ExecutionContext context, int bodyNode) {
 		HttpState state=createState();
 	    PostMethod method = createPostMethod(context, state, bodyNode);
 	    return httpCall(method, state);
