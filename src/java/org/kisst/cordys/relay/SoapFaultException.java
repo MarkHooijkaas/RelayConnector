@@ -1,35 +1,45 @@
 package org.kisst.cordys.relay;
 
-import org.kisst.cordys.util.NomUtil;
-import org.kisst.cordys.util.SoapUtil;
+import com.eibus.soap.BodyBlock;
 
-import com.eibus.xml.nom.Node;
 
+/** 
+ * This Exception class is used to have more control of generated SOAP Fault messages.
+ * 
+ * When an error somewhere in the code happens, one could normally throw any kind of Exception.
+ * This would be caught by the Cordys Framework and translated into a SOAP:Fault with 
+ * the Exception Message and stack trace
+ * If one would use this class or any of it's children classes instead, one has total control 
+ * over the SOAP:Fault message created.
+ * Also no stack trace is added to the details section. 
+ * This is considered good practice, since Stack traces might show vulnerable information. 
+ *
+ */
 public class SoapFaultException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
-	public final String code;
-	public final String message;
+	private final String faultcode;
+	private final String faultstring;
 
-	public SoapFaultException(String code, String message) {
-		super(message);
-		this.code=code;
-		this.message=message;
-	}
-
-	public SoapFaultException(String code, String message, Throwable e) {
-		super(message, e);
-		this.code=code;
-		this.message=message;
+	public SoapFaultException(String faultcode, String faultstring) {
+		super(faultstring);
+		this.faultcode=faultcode;
+		this.faultstring=faultstring;
 	}
 	
-	public SoapFaultException(int node) {
-		if ("Envelope".equals(Node.getLocalName(node)));
-			node=NomUtil.getElement(node, SoapUtil.SoapNamespace, "Body");
-		node=Node.getFirstChild(node);  // get response node
-		// TODO: build in extra safety, when one passes in the Envelope or Body
-		int codeNode=NomUtil.getElementByLocalName(node, "faultcode");
-		code=Node.getData(codeNode);
-		int messageNode=NomUtil.getElementByLocalName(node, "faultstring");
-		message=Node.getData(messageNode);
+	public SoapFaultException(String faultcode, String faultstring, Throwable e) {
+		super(faultstring, e);
+		this.faultcode=faultcode;
+		this.faultstring=faultstring;
 	}
-}
+
+	/** Creates the Cordys response XML, which should usually contain a SOAP:Fault
+	 * @param response the respose BodyBlock 
+	 */
+	public void createResponse(BodyBlock response) {
+		response.createSOAPFault(faultcode,faultstring);
+	}
+	
+	public String getFaultcode() { return faultcode; } 
+	public String getFaultstring() { return faultstring; } 
+}	
+

@@ -49,7 +49,7 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 	}
 
 	private void wsaTransform(final ExecutionContext context, int top) {
-		int header=NomUtil.getElement(top, SoapUtil.SoapNamespace, "Header");
+		int header=NomUtil.getElement(top, SoapUtil.soapNamespace, "Header");
 		//int to=NomUtil.getElement(header, wsaNamespace, "To");
 		//if (to==0)
 		//	throw new RuntimeException("Missing wsa:To element");

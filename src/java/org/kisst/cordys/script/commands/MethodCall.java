@@ -2,7 +2,6 @@ package org.kisst.cordys.script.commands;
 
 import java.util.Date;
 
-import org.kisst.cordys.relay.SoapFaultException;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.Expression;
@@ -173,11 +172,11 @@ public class MethodCall {
 					logger.log(logSoapFault, "Calling method "+methodName+" returned Fault: "+Node.writeToString(responseBody, true));
 				if (! ignoreSoapFault) {
 					if (async) {
-						context.setAsynchronousError(new SoapFaultException(responseBody));
+						context.setAsynchronousError(new RelaySoapFaultException(responseBody));
 						return;
 					}
 					else
-						throw new SoapFaultException(responseBody);
+						throw new RelaySoapFaultException(responseBody);
 				}
 			}
 			if (showSoap)

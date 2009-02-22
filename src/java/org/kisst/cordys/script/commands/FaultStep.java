@@ -13,6 +13,7 @@ public class FaultStep implements Step {
 	private final String code;
 	private final Expression messageExpression;
 	
+	
 	public FaultStep(CompilationContext compiler, final int node) {
 		code = Node.getAttribute(node, "code");
 		messageExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "message"));

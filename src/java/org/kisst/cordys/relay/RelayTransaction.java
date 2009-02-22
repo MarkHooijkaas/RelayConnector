@@ -36,8 +36,7 @@ public class RelayTransaction  implements ApplicationTransaction
     		script.execute(connector, request, response);
     	}
     	catch (SoapFaultException e) {
-    		// TODO: add detail and actor info
-    		response.createSOAPFault(e.code,e.message);
+    		e.createResponse(response);
     	}
         return true; // connector has to send the response
     }

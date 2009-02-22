@@ -9,6 +9,7 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.kisst.cordys.relay.SoapFaultException;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.XmlExpression;
@@ -56,9 +57,11 @@ public class HttpBase {
 	
 	private byte[] retrieveResponse(PostMethod method, int statusCode) {
 		try {
-			if (statusCode >= 300 && ! connector.settings.http.ignoreReturnCode.get())
-				throw new RuntimeException("Incorrect HTTP return code "+statusCode+", received message is:"+method.getResponseBody());
-			return method.getResponseBody();
+			byte[] result=method.getResponseBody();
+			if (statusCode >= 300 && ! connector.settings.http.ignoreReturnCode.get()) {
+				throw new SoapFaultException("HttpReturnCode."+statusCode, "Incorrect HTTP return code "+statusCode+", received message is:"+method.getResponseBody());
+			}
+			return result;
 		}
 	    catch (IOException e) {  throw new RuntimeException(e); }
 	}
