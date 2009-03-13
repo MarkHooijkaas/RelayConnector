@@ -131,9 +131,8 @@ public class NomUtil {
 		}
 	}
 
-	public static void clearNode(int node) {
+	public static void deleteChildren(int node) {
 		Node.delete(Node.getFirstChild(node), Node.getLastChild(node));
-		clearAttributes(node);
 	}
 	public static void clearAttributes(int node) {
 		Node.setName(node, Node.getLocalName(node)); // without prefix, because attributes are deleted
@@ -147,6 +146,5 @@ public class NomUtil {
 			String name=Node.getAttributeName(src, i);
 			Node.setAttribute(dest, name, Node.getAttribute(src, name));
 		}
-		Node.setName(dest, Node.getName(src));
 	}
 }

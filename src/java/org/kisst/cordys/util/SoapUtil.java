@@ -80,7 +80,7 @@ public class SoapUtil {
 				destchild=Node.createElement(Node.getLocalName(originalResponse), cordysResponse);
 			}
 			if (Node.getLocalName(srcchild).equals("Body"))
-				NomUtil.clearNode(destchild); // Body needs boilerplate response child removed
+				NomUtil.deleteChildren(destchild); // Body needs boilerplate response child removed
 			NomUtil.copyAttributes(srcchild, destchild);
 			Node.duplicateAndAppendToChildren(Node.getFirstChild(srcchild), Node.getLastChild(srcchild), destchild );
 			srcchild=Node.getNextSibling(srcchild);
