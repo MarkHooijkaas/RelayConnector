@@ -5,9 +5,14 @@ import org.kisst.cordys.script.Script;
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;
 import com.eibus.soap.MethodDefinition;
+import com.eibus.util.logger.CordysLogger;
+import com.eibus.util.logger.Severity;
+import com.eibus.xml.nom.Node;
 
 public class RelayTransaction  implements ApplicationTransaction
 {
+	private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTransaction.class);
+
 	private final RelayConnector connector;
 	
 	public RelayTransaction(RelayConnector connector) {
@@ -30,6 +35,9 @@ public class RelayTransaction  implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
+    	if (logger.isInfoEnabled()) {
+    		logger.log(Severity.INFO, "Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), true));
+    	}
 		MethodDefinition def = request.getMethodDefinition();
     	try {
     		Script script=connector.getScript(def);
@@ -37,6 +45,9 @@ public class RelayTransaction  implements ApplicationTransaction
     	}
     	catch (SoapFaultException e) {
     		e.createResponse(response);
+    	}
+    	if (logger.isInfoEnabled()) {
+    		logger.log(Severity.INFO, "Replied with response:\n"+Node.writeToString(Node.getParent(Node.getParent(response.getXMLNode())), true));
     	}
         return true; // connector has to send the response
     }
