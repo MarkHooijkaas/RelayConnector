@@ -30,7 +30,7 @@ public class HttpBase {
 	
 	public HttpBase(CompilationContext compiler, final int node) {
 		connector=(HttpConnector) compiler.getRelayConnector();
-		prettyPrint = compiler.getSmartBooleanAttribute(node, "prettyPrint", true);
+		prettyPrint = compiler.getSmartBooleanAttribute(node, "prettyPrint", false);
 		body=new XmlExpression(compiler, Node.getAttribute(node, "body", "/input/../.."));
 	}
 
