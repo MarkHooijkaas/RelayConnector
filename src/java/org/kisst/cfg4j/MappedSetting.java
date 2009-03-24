@@ -5,8 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Properties;
 
-import org.kisst.cfg4j.MultiSetting;
-
 
 public class MappedSetting<T extends Setting> extends MultiSetting {
 	private Properties properties;

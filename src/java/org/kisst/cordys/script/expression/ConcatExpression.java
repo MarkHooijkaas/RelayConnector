@@ -2,8 +2,8 @@ package org.kisst.cordys.script.expression;
 
 import java.util.regex.Pattern;
 
-import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.CompilationContext;
+import org.kisst.cordys.script.ExecutionContext;
 
 public class ConcatExpression implements Expression {
 	private static Pattern splitter = Pattern.compile("[+]");

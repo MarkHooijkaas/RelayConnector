@@ -4,8 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.CompilationContext;
+import org.kisst.cordys.script.ExecutionContext;
 
 public class JavaExpression implements Expression {
 	private final Method method;
