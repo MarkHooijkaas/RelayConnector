@@ -5,7 +5,7 @@ import org.kisst.cordys.script.ExecutionContext;
 
 public class VarExpression implements Expression {
 	private final String name;
-	private final boolean useVar;
+	private String value=null;
 	public VarExpression(CompilationContext compiler, String str) {
 		str=str.trim();
 		if (str.startsWith("${")) {
@@ -16,21 +16,22 @@ public class VarExpression implements Expression {
 		}
 		else
 			name=str;
-		if (compiler.textVarExists(name))
-			useVar=true;
-		else if (compiler.getRelayConnector().conf.get(name, null)!=null)
+		if (! compiler.textVarExists(name)) {
+			value=compiler.getRelayConnector().conf.get(name, null);
 			// Note: if compiled script is cached, and configuration is reloaded,
-			// then script cache is cleared.
-			useVar=false;
-		else
-			throw new RuntimeException("Variable expression ["+str+"] refers to non declared string variable,"+
-					" which is also not in the configuration file");
+			// the script cache is cleared, so it is safe to remember here, even if script is cached
+			if (value==null && "plus".equals(name))
+				value="+";
+			if (value==null)
+				throw new RuntimeException("Variable expression ["+str+"] refers to non declared string variable,"+
+				" which is also not in the configuration file");
+		}
 	}
 
 	public String getString(ExecutionContext context) {
-		if (useVar)
+		if (value==null)
 			return context.getTextVar(name);
 		else
-			return context.getRelayConnector().conf.get(name);
+			return value;
 	}
 }
