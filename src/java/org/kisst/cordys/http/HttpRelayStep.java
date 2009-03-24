@@ -23,49 +23,50 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 		super(compiler, node);
 		wsa = compiler.getSmartBooleanAttribute(node, "wsa", false);
 		wrappperElementName     =compiler.getSmartAttribute(node, "wrapperName", HttpCallbackStep.defaultWrapperElementName);
+
 		wrappperElementNamespace=compiler.getSmartAttribute(node, "wrapperNamespace", HttpCallbackStep.defaultWrapperElementNamespace);
+
 		replyToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "replyTo"));
 		if (wsa && replyToExpression==null)
 			throw new CompileException("when wsa attribute is true a replyTo attribute is mandatory");
 		faultToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "faultTo"));
 	}
-	
+
 	public void executeStep(final ExecutionContext context) {
-	    int bodyNode= 0;
-	    int httpResponse = 0;
-	    try {
-	    	bodyNode= createBody(context);
-		    if (wsa)
-		    	wsaTransform(context, bodyNode);
-		    HttpResponse response=call(context, bodyNode);
-	    	httpResponse = response.getResponseXml(context.getDocument());
+		int bodyNode= 0;
+		int httpResponse = 0;
+		try {
+			bodyNode= createBody(context);
+			if (wsa)
+				wsaTransform(context, bodyNode);
+			HttpResponse response=call(context, bodyNode);
+			httpResponse = response.getResponseXml(context.getDocument());
 			int cordysResponse=context.getXmlVar("output");
 
 			SoapUtil.mergeResponses(httpResponse, cordysResponse);
-	    }
-	    finally {
-	    	if (httpResponse!=0) Node.delete(httpResponse);
-	    	if (bodyNode!=0) Node.delete(bodyNode);
-	    }
+		}
+		finally {
+			if (httpResponse!=0) Node.delete(httpResponse);
+			if (bodyNode!=0) Node.delete(bodyNode);
+		}
 	}
 
 	private void wsaTransform(final ExecutionContext context, int top) {
 		int header=NomUtil.getElement(top, SoapUtil.soapNamespace, "Header");
 		//int to=NomUtil.getElement(header, wsaNamespace, "To");
 		//if (to==0)
-		//	throw new RuntimeException("Missing wsa:To element");
+		//      throw new RuntimeException("Missing wsa:To element");
 		int refpar=NomUtil.getElement(header, SoapUtil.wsaNamespace, "ReferenceParameters");
 		if (refpar==0) {
-			Node.createElement("ReferenceParameters", header);
+			refpar=Node.createElement("ReferenceParameters", header);
 			NomUtil.setNamespace(refpar, SoapUtil.wsaNamespace, "wsa", false);
 		}
 		int cb=Node.createElement(wrappperElementName, refpar); // TODO: Check if this node already exists...
 		NomUtil.setNamespace(cb, wrappperElementNamespace, "kisst", false);
 		moveNode(header, "ReplyTo", cb);
 		moveNode(header, "FaultTo", cb);
-		int replyToNode=Node.createElement("ReplyTo", header);
+		int replyToNode=Node.createTextElement("ReplyTo", replyToExpression.getString(context), header);
 		NomUtil.setNamespace(replyToNode, SoapUtil.wsaNamespace, "wsa", false);
-		Node.setData(replyToNode, replyToExpression.getString(context));
 		if (faultToExpression!=null) {
 			int faultToNode=Node.createElement("FaultTo", header);
 			NomUtil.setNamespace(faultToNode, SoapUtil.wsaNamespace, "wsa", false);
