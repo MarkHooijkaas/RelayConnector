@@ -130,6 +130,7 @@ public class MethodCall {
 	// Possible fix would be to not use sendAndCallback, but just send, and use a 
 	// default SOAPListener. This in considered not very urgent yet.
 	
+	@SuppressWarnings("deprecation")
 	protected void callMethod(final ExecutionContext context, int method) {
 		try {
 			if (appendMessagesTo!=null) {
