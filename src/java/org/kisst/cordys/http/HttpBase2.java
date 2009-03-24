@@ -25,7 +25,7 @@ public class HttpBase2 extends HttpBase {
     
     private final HttpHeader headers[];
 	private final Expression urlExpression;
-	private final String application;
+	private final Expression applicationExpression ;
 	
 	public HttpBase2(CompilationContext compiler, final int node) {
 		super(compiler, node);
@@ -38,12 +38,12 @@ public class HttpBase2 extends HttpBase {
 			child=Node.getNextSibling(child);
 		}
 		urlExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "url"));
-		application = Node.getAttribute(node, "application");
+		applicationExpression  = ExpressionParser.parse(compiler, Node.getAttribute(node, "application"));
 		//TODO: body=new XmlExpression(compiler, Node.getElement(node, "body"));
 	}
 	
 	protected PostMethod createPostMethod(ExecutionContext context, HttpState state, int bodyNode) {
-		HostSettings host=getHost();
+		HostSettings host=getHost(context);
 		String url=urlExpression.getString(context);
 	    PostMethod method = createPostMethod(host.url.get()+url, bodyNode); // TODO: handle slashes /
 		for (HttpHeader h:headers) {
@@ -54,8 +54,8 @@ public class HttpBase2 extends HttpBase {
 		return method;
 	}
 
-	protected HttpState createState() {
-		HostSettings host=getHost();
+	protected HttpState createState(final ExecutionContext context) {
+		HostSettings host=getHost(context);
 		if (host.username.get() != null) {
 			HttpState state=new HttpState();
 			state.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(host.username.get(), host.password.get()));
@@ -64,13 +64,13 @@ public class HttpBase2 extends HttpBase {
 		return null;
 	}
 
-	protected HostSettings getHost() {
+	protected HostSettings getHost(final ExecutionContext context) {
 		//connector.settings.set(connector.conf.properties);
-		return getSettings().http.host.get(application);
+		return getSettings().http.host.get(applicationExpression.getString(context));
 	}	
 
 	protected HttpResponse call(final ExecutionContext context, int bodyNode) {
-		HttpState state=createState();
+		HttpState state=createState(context);
 	    PostMethod method = createPostMethod(context, state, bodyNode);
 	    return httpCall(method, state);
 	}
