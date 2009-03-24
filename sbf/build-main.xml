@@ -121,7 +121,7 @@
 
 	<target name="setup" depends="setup-copy,setup-scp,setup-commons,setup-log4j,setup-freemarker"/>
 	
-	<target name="clean" >
+	<target name="clean" depends="init">
   		<delete dir="${builddir}" />
   	</target>
 
