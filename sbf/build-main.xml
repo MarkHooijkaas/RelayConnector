@@ -154,11 +154,21 @@
 		  <classpath><pathelement location="lib/freemarker-2.3.15.jar"/></classpath>
 		  <classpath><pathelement location="build/sbf/classes"/></classpath>
 		</taskdef>
-		<mkdir dir="build/html" />
-		<freemarker output="build/html/usermanual.html" template="docs/usermanual/main.ftl">  
+		<mkdir dir="build/docs/html" />
+		<freemarker output="build/docs/usermanual.docbook" template="docs/usermanual/main.ftl">  
 		  <var name="buildnumber" value="${buildnumber}"/>
 		  <var name="projectname" value="${project.name}"/>
 		</freemarker>
+		<exec executable="docbook2html">
+			<arg value="build/docs/usermanual.docbook"/>
+			<arg value="--output"/>
+			<arg value="build/docs/html"/>
+		</exec>
+		<exec executable="docbook2pdf">
+			<arg value="build/docs/usermanual.docbook"/>
+			<arg value="--output"/>
+			<arg value="build/docs"/>
+		</exec>
 	</target>
 	
 </project>
