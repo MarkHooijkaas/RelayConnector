@@ -2,6 +2,13 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "/usr/share/xml/docbook/schema/dtd/4.4/docbookx.dtd">
 
+<#assign dollar="$">
+
+<#macro xmlcode>
+<programlisting>
+<#nested>
+</programlisting>
+</#macro>
 
 <!-- <book xmlns="http://docbook.org/ns/docbook">-->
 <book>
@@ -9,6 +16,7 @@
 
 <subtitle>buildnumber ${buildnumber}</subtitle>
 
-<#include "overview.ftl">
+
+<#include "all.ftl">
 
 </book>
