@@ -20,7 +20,7 @@ to one or more other methods, with some simple transformations.
 
 <para>In order to use the RelayConnector, one
 must define methods by adding a method to a method set, and entering
-a small XML script in the &#34;implementation&#34; section of this
+a small XML script in the "implementation" section of this
 method. The RelayConnector is not meant to be a full scripting
 language. It is intended that a script should only be 10 or 20 lines
 long. In fact a macro facility has been removed from the
@@ -85,10 +85,10 @@ variable name (thus with a leading slash), selecting an existing XML
 variable, or a children using a path like construction.  See the
 example below.</para>
 <@xmlcode>
-  &#60;!-- appends the entire input message to output --&#62;
-  &#60;output xml=&#34;/input&#34;/&#62;
-  &#60;!-- appends a part of the input message to output --&#62;
-  &#60;output xml=&#34;/input/tuple/old&#34;/&#62;
+  <!-- appends the entire input message to output -->
+  <output xml="/input"/>
+  <!-- appends a part of the input message to output -->
+  <output xml="/input/tuple/old"/>
 </@xmlcode>
 <para>These expressions are still very
 limited. There is no support for recurring elements with the same
@@ -106,10 +106,10 @@ header of the input. The following example will return the SOAP
 header from the call.</para>
 
 <@xmlcode>
-&#60;implementation type=&#34;RelayCall&#34;&#62;
-  &#60;xmlns prefix=&#34;SOAP&#34; namespace=&#34;http://schemas.xmlsoap.org/soap/envelope/&#34;/&#62; 
-  &#60;output xml=&#34;/input/../../SOAP:Header&#34;/&#62;
-&#60;/implementation&#62;
+<implementation type="RelayCall">
+  <xmlns prefix="SOAP" namespace="http://schemas.xmlsoap.org/soap/envelope/"/> 
+  <output xml="/input/../../SOAP:Header"/>
+</implementation>
 </@xmlcode>
 
 </sect2>
@@ -137,8 +137,8 @@ has some serious limitations of the parser:</para>
 rule is to split around + signs, it is not possible to use a literal
 + sign, not even when embedded in a constant string, surrounded with
 [ and ]. If one needs to use a literal plus sign, there is a
-predefined variable ${dollar}{plus}, e.g. to use &#34;C++&#34; in a
-expression, one could encode this as &#34;C+${dollar}{plus}+${dollar}{plus}&#34;. 
+predefined variable ${dollar}{plus}, e.g. to use "C++" in a
+expression, one could encode this as "C+${dollar}{plus}+${dollar}{plus}". 
 </para>
 </sect2>
 </sect1>
@@ -177,41 +177,41 @@ and createXmlVar command all
 share this syntax.</para>
 
 <@xmlcode>
-&#60;output 
-	[name=&#34;<replaceable>element-name</replaceable>&#34;] 
-	[prefix=&#34;prefix<replaceable>-name</replaceable>&#34; [scriptXmlns=&#34;false&#34;]] 
-	[namespace=&#34;<replaceable>namespace</replaceable>&#34; [reduceXmlns=&#34;false&#34;]] 
-	[text=&#34;<replaceable>text-expression</replaceable>&#34;]
-	[xml=&#34;<replaceable>xml-expression</replaceable>&#34;] 
-	[childrenOf=&#34;<replaceable>xml-expression</replaceable>&#34;]
-&#62;
-  &#60;!-- any of the following elements in any order, as many times as needed --&#62;
-  &#60;element 
-	[name=&#34;<replaceable>element-name</replaceable>&#34;] 
-	[prefix=&#34;prefix<replaceable>-name</replaceable>&#34; [scriptXmlns=&#34;false&#34;]] 
-	[namespace=&#34;<replaceable>namespace</replaceable>&#34; [reduceXmlns=&#34;false&#34;]] 
-	[text=&#34;<replaceable>text-expression</replaceable>&#34;]
-	[xml=&#34;<replaceable>xml-expression</replaceable>&#34;] 
-	[childrenOf=&#34;<replaceable>xml-expression</replaceable>&#34;]
-  &#62;
-    &#60;!-- nested elements, attributes, etc if needed --&#62;
-  &#60;/element&#62;
+<output 
+	[name="<replaceable>element-name</replaceable>"] 
+	[prefix="prefix<replaceable>-name</replaceable>" [scriptXmlns="false"]] 
+	[namespace="<replaceable>namespace</replaceable>" [reduceXmlns="false"]] 
+	[text="<replaceable>text-expression</replaceable>"]
+	[xml="<replaceable>xml-expression</replaceable>"] 
+	[childrenOf="<replaceable>xml-expression</replaceable>"]
+>
+  <!-- any of the following elements in any order, as many times as needed -->
+  <element 
+	[name="<replaceable>element-name</replaceable>"] 
+	[prefix="prefix<replaceable>-name</replaceable>" [scriptXmlns="false"]] 
+	[namespace="<replaceable>namespace</replaceable>" [reduceXmlns="false"]] 
+	[text="<replaceable>text-expression</replaceable>"]
+	[xml="<replaceable>xml-expression</replaceable>"] 
+	[childrenOf="<replaceable>xml-expression</replaceable>"]
+  >
+    <!-- nested elements, attributes, etc if needed -->
+  </element>
 
-  &#60;attribute name=&#34;<replaceable>attribute-name</replaceable>&#34; text=&#34;<replaceable>text-expression</replaceable>&#34; /&#62;
-  &#60;text 
-	[name=&#34;<replaceable>element-name</replaceable>&#34;]
-	[prefix=&#34;prefix<replaceable>-name</replaceable>&#34; [scriptXmlns=&#34;false&#34;]] 
-	[namespace=&#34;<replaceable>namespace</replaceable>&#34; [reduceXmlns=&#34;false&#34;]] 
-	[text=&#34;<replaceable>text-expression</replaceable>&#34;]&#62;	[<replaceable>fixed-text</replaceable>]&#60;/text&#62;
-  &#60;cdata 
+  <attribute name="<replaceable>attribute-name</replaceable>" text="<replaceable>text-expression</replaceable>" />
+  <text 
+	[name="<replaceable>element-name</replaceable>"]
+	[prefix="prefix<replaceable>-name</replaceable>" [scriptXmlns="false"]] 
+	[namespace="<replaceable>namespace</replaceable>" [reduceXmlns="false"]] 
+	[text="<replaceable>text-expression</replaceable>"]>	[<replaceable>fixed-text</replaceable>]</text>
+  <cdata 
 
-	[name=&#34;<replaceable>element-name</replaceable>&#34;]
-	[prefix=&#34;prefix<replaceable>-name</replaceable>&#34; [scriptXmlns=&#34;false&#34;]] 
-	[namespace=&#34;<replaceable>namespace</replaceable>&#34; [reduceXmlns=&#34;false&#34;]] 
+	[name="<replaceable>element-name</replaceable>"]
+	[prefix="prefix<replaceable>-name</replaceable>" [scriptXmlns="false"]] 
+	[namespace="<replaceable>namespace</replaceable>" [reduceXmlns="false"]] 
 
-	[text=&#34;<replaceable>text-expression</replaceable>&#34;]&#62;[<replaceable>fixed-text</replaceable>]&#60;/cdata&#62;
-  &#60;include ..../&#62; &#60;!-- synonym for element --&#62;
-&#60;/output&#62;
+	[text="<replaceable>text-expression</replaceable>"]>[<replaceable>fixed-text</replaceable>]</cdata>
+  <include ..../> <!-- synonym for element -->
+</output>
 </@xmlcode>
 
 
@@ -230,61 +230,61 @@ children elements. The rules are as follows:</para>
 
 <para>An example without a name for a new element</para>
 <@xmlcode>
-&#60;output text=&#34;hello world!&#34;/&#62;
+<output text="hello world!"/>
 
-&#60;!-- is shorthand for --&#62;
+<!-- is shorthand for -->
 
-&#60;output&#62;
-  &#60;text text=&#34;hello world!&#34;/&#62;
-&#60;/output&#62;
+<output>
+  <text text="hello world!"/>
+</output>
 
-&#60;output xml=&#34;/input/field1&#34;/&#62;
+<output xml="/input/field1"/>
 
-&#60;!-- is shorthand for --&#62;
+<!-- is shorthand for -->
 
-&#60;output&#62;
-  &#60;include xml=&#34;/input/field1&#34;/&#62;
-&#60;/output&#62;
-
-
-&#60;output childrenOf=&#34;/input/field1&#34;/&#62;
-
-&#60;!-- is shorthand for --&#62;
-
-&#60;output&#62;
-  &#60;include childrenOf=&#34;/input/field1&#34;/&#62;
-&#60;/output&#62;
+<output>
+  <include xml="/input/field1"/>
+</output>
 
 
-&#60;output name=&#34;data&#34; .....&#62;
-  &#60;!-- possibly extra elements --&#62;
-&#60;/output&#62;
+<output childrenOf="/input/field1"/>
 
-&#60;!-- is shorthand for --&#62;
+<!-- is shorthand for -->
 
-&#60;output&#62;
-  &#60;element name=&#34;&#34; ....&#62;
-    &#60;!-- possibly extra elements --&#62;
-  &#60;/element&#62;
-&#60;/output&#62;
+<output>
+  <include childrenOf="/input/field1"/>
+</output>
+
+
+<output name="data" .....>
+  <!-- possibly extra elements -->
+</output>
+
+<!-- is shorthand for -->
+
+<output>
+  <element name="" ....>
+    <!-- possibly extra elements -->
+  </element>
+</output>
 </@xmlcode>
 <para>And the same example with a new element name.</para>
 <@xmlcode>
-&#60;output name=&#34;data&#34; text=&#34;hello world!&#34;/&#62;
+<output name="data" text="hello world!"/>
 
-&#60;!-- is shorthand for --&#62;
+<!-- is shorthand for -->
 
-&#60;output&#62;
-  &#60;element name=&#34;data&#34; text=&#34;hello world!&#34;/&#62;
-&#60;/output&#62;
+<output>
+  <element name="data" text="hello world!"/>
+</output>
 
-&#60;!-- is shorthand for --&#62;
+<!-- is shorthand for -->
 
-&#60;output&#62;
-  &#60;element name=&#34;data&#34;&#62;
-    &#60;text text=&#34;hello world!&#34;/&#62;
-  &#60;/element&#62;
-&#60;/output&#62;
+<output>
+  <element name="data">
+    <text text="hello world!"/>
+  </element>
+</output>
 </@xmlcode>
 
 </sect1>
@@ -296,29 +296,29 @@ children elements. The rules are as follows:</para>
 <para>The example below shows some the main
 elements</para>
 <@xmlcode>
-  &#60;output name=&#34;demo&#34;&#62;
-    &#60;attribute name=&#34;optional&#34; text=&#34;true&#34;/&#62;
-    &#60;text text=&#34;Here one can use a text expression&#34;/&#62;
-    &#60;element name=&#34;bold&#34; text=&#34;New York&#34;/&#62;
-    &#60;text&#62;Static text can also be added in the element&#60;/text&#62;
-  &#60;/output&#62;
+  <output name="demo">
+    <attribute name="optional" text="true"/>
+    <text text="Here one can use a text expression"/>
+    <element name="bold" text="New York"/>
+    <text>Static text can also be added in the element</text>
+  </output>
 </@xmlcode>
 
 
 <para>This construct will create a new
-element with the name &#34;demo&#34;. In this element a new
-attribute named &#34;optional&#34; is created with  as value the
-text &#34;true&#34;. Then some text is added, a new subelement
-named &#34;bold&#34; is created, and finally some more text is
+element with the name "demo". In this element a new
+attribute named "optional" is created with  as value the
+text "true". Then some text is added, a new subelement
+named "bold" is created, and finally some more text is
 appended. 
 </para>
 
 <@xmlcode>
-    &#60;demo optional=&#34;true&#34;&#62;
+    <demo optional="true">
       Here one can use a text expression
-      &#60;bold&#62;New York&#60;/bold&#62;
+      <bold>New York</bold>
       Static text can also be added in the element
-    &#60;/demo&#62;
+    </demo>
 </@xmlcode>
 <para>Note that t</para>
 
@@ -366,10 +366,10 @@ common cases.</para>
 	namespace is already defined in a parent element. This behavior can
 	be changed by setting the reduceXmlns attribute to false.</para></listitem>
 	<listitem><para>If a prefix is given, the element
-	name will have this prefix, and a &#34;xmnls:<replaceable>prefix</replaceable>&#34;
+	name will have this prefix, and a "xmnls:<replaceable>prefix</replaceable>"
 	attribute will be added (if needed).</para></listitem>
 	<listitem><para>If no prefix is given, the element
-	name will have no prefix, using the default mechanism, and a &#34;xmnls&#34;
+	name will have no prefix, using the default mechanism, and a "xmnls"
 	attribute will be added (if needed).</para></listitem>
 </itemizedlist>
 
@@ -379,8 +379,10 @@ common cases.</para>
 
 <chapter><title>Command reference RelayConnector</title>
 <sect1><title>import command</title>
-<para>&#60;import name=&#34;<replaceable>commandname</replaceable>&#34;
-class=&#34;<replaceable>classname</replaceable>&#34;/&#62;</para>
+<@xmlcode>
+<import name="<replaceable>commandname</replaceable>" class="<replaceable>classname</replaceable>"/>
+</@xmlcode>
+
 <para>This command defines a new command with
 the name <replaceable>commandname</replaceable>. The command is implemented in a Java
 class given by classname. The exact specifications of such a Java
@@ -390,8 +392,10 @@ class will be described elsewhere.</para>
 
 
 <sect1><title>default command</title>
-<para>&#60;default attribute=&#34;<replaceable>attribute-name</replaceable>&#34;
-value=&#34;<replaceable>fixed-text</replaceable>&#34;/&#62;</para>
+<@xmlcode>
+<default attribute="<replaceable>attribute-name</replaceable>"
+value="<replaceable>fixed-text</replaceable>"/>
+</@xmlcode>
 <para>This is a convenience function, that
 allows to define a default value for certain attributes. Currently
 the following attributes support this mechanism:</para>
@@ -405,38 +409,38 @@ the following attributes support this mechanism:</para>
 
 
 <sect1><title>xmlns command</title>
-<para>&#60;xmlns prefix=&#34;<replaceable>prefix</replaceable>&#34;
-namespace=&#34;<replaceable>namespace</replaceable>&#34;/&#62;</para>
+<@xmlcode>
+<xmlns prefix="<replaceable>prefix</replaceable>" namespace="<replaceable>namespace</replaceable>"/></para>
+</@xmlcode>
 <para>This function defines a certain prefix
 to be used to relate to a certain namespace. These prefixes can then
 be used in subsequent XML expressions, see chapter 2.2.1.</para>
 <para>It is considered to be an error to
 define the same prefix twice.</para>
-<para>In the example below the prefix &#34;ns&#34;
+<para>In the example below the prefix "ns"
 is defined and subsequently used.</para>
 <@xmlcode>
-&#60;xmlns prefix=&#34;<emphasis><replaceable>ns</replaceable></emphasis>&#34;
-namespace=&#34;<replaceable>http://kisst.org/test</replaceable>&#34;/&#62;
-&#60;output xml=&#34;/input/<emphasis>ns</emphasis>:node&#34;/&#62;
+<xmlns prefix="<emphasis><replaceable>ns</replaceable></emphasis>"
+namespace="<replaceable>http://kisst.org/test</replaceable>"/>
+<output xml="/input/<emphasis>ns</emphasis>:node"/>
 </@xmlcode>
 </sect1>
 
 
 
-<sect1><title>append
-command</title>
+<sect1><title>append command</title>
 <@xmlcode>
-&#60;append to=&#34;<replaceable>xml-expression</replaceable>&#34;
-    [name=&#34;<replaceable>name</replaceable>&#34;]
-    [xml=&#34;<replaceable>xml-expression</replaceable>&#34;] 
-    [text=&#34;<replaceable>text-expression</replaceable>&#34;]&#62;
-  &#60;!-- see chapter 3 --&#62;
-  &#60;element ..../&#62;
-  &#60;attribute..../&#62;
-  &#60;text ..../&#62;
-  &#60;cdata..../&#62;
-  &#60;include..../&#62;
-&#60;/append&#62;
+<append to="<replaceable>xml-expression</replaceable>"
+    [name="<replaceable>name</replaceable>"]
+    [xml="<replaceable>xml-expression</replaceable>"] 
+    [text="<replaceable>text-expression</replaceable>"]>
+  <!-- see chapter 3 -->
+  <element ..../>
+  <attribute..../>
+  <text ..../>
+  <cdata..../>
+  <include..../>
+</append>
 </@xmlcode>
 
 <para>This command appends XML to an existing
@@ -444,13 +448,11 @@ XML structure.
 </para>
 
 <@xmlcode>
-&#60;append to=&#34;/output&#34;
-name=&#34;city&#34;
-text=&#34;New York&#34;/&#62;
+<append to="/output" name="city" text="New York"/>
 
-&#60;append to=&#34;/output&#34;&#62;
-  &#60;element name=&#34;city&#34; text=&#34;New York&#34;/&#62;
-&#60;/append&#62;
+<append to="/output">
+  <element name="city" text="New York"/>
+</append>
 </@xmlcode>
 </sect1>
 
@@ -458,55 +460,55 @@ text=&#34;New York&#34;/&#62;
 
 <sect1><title>output command</title>
 <@xmlcode>
-&#60;output
-	[name=&#34;<replaceable>name</replaceable>&#34;]
-	[rename=&#34;<replaceable>name</replaceable>&#34;]
-	[xml=&#34;<replaceable>xml-expression</replaceable>&#34;] 
+<output
+	[name="<replaceable>name</replaceable>"]
+	[rename="<replaceable>name</replaceable>"]
+	[xml="<replaceable>xml-expression</replaceable>"] 
 
-	[text=&#34;<replaceable>text-expression</replaceable>&#34;]&#62;
-  &#60;!-- see chapter 3 --&#62;
-  &#60;element ..../&#62;
-  &#60;attribute..../&#62;
-  &#60;text ..../&#62;
-  &#60;cdata..../&#62;
-  &#60;include..../&#62;
-&#60;/output&#62;
+	[text="<replaceable>text-expression</replaceable>"]>
+  <!-- see chapter 3 -->
+  <element ..../>
+  <attribute..../>
+  <text ..../>
+  <cdata..../>
+  <include..../>
+</output>
 </@xmlcode>
-<para>This is a convenience function that is
-a synonym for &#60;append to=&#34;/output&#34; .....</para>
+<para>This is a convenience function that is a synonym for</para> 
+<@xmlcode>
+<append to="/output" .....
+</@xmlcode>
 <para>It has one special attribute: rename.
 If this attribute is present, the output element will be renamed.
 This option is provided, because by default Cordys will create an
 output message with as name, the name of the input message, with the
-postfix &#34;Response&#34;.</para>
+postfix "Response".</para>
 </sect1>
 
 
 
 <sect1><title>call command</title>
 <@xmlcode>
-&#60;call
-method=&#34;<replaceable>method-name&#34;|</replaceable>methodExpression<replaceable>=&#34;expr&#34;
+<call method="<replaceable>method-name"|</replaceable>methodExpression<replaceable>="expr"
 </replaceable>
-  [namespace=&#34;<replaceable>namespace&#34;]</replaceable>*
-  [async=&#34;true|false&#34;]*
-  [showSoap=&#34;true|false&#34;]*
-  [ignoreSoapFault=&#34;true|false&#34;]*
-  [appendMessagesTo=&#34;<replaceable>xml-expression</replaceable>&#34;]*
-  [resultVar=&#34;<replaceable>result-var-name</replaceable>&#34;]
-  [timeout=&#34;<replaceable>millisec</replaceable>&#34;]
-
-  [name<replaceable>=&#34;element-name&#34;</replaceable>]
-  [xml=&#34;<replaceable>xml-expression</replaceable>&#34;] 
-  [text=&#34;<replaceable>text-expression</replaceable>&#34;]
-&#62;
-  &#60;!-- see chapter 3 --&#62;
-  &#60;element ..../&#62;
-  &#60;attribute..../&#62;
-  &#60;text ..../&#62;
-  &#60;cdata..../&#62;
-  &#60;include..../&#62;
-&#60;/call&#62;
+  [namespace="<replaceable>namespace"]</replaceable>*
+  [async="true|false"]*
+  [showSoap="true|false"]*
+  [ignoreSoapFault="true|false"]*
+  [appendMessagesTo="<replaceable>xml-expression</replaceable>"]*
+  [resultVar="<replaceable>result-var-name</replaceable>"]
+  [timeout="<replaceable>millisec</replaceable>"]
+  [name<replaceable>="element-name"</replaceable>]
+  [xml="<replaceable>xml-expression</replaceable>"] 
+  [text="<replaceable>text-expression</replaceable>"]
+>
+  <!-- see chapter 3 -->
+  <element ..../>
+  <attribute..../>
+  <text ..../>
+  <cdata..../>
+  <include..../>
+</call>
 </@xmlcode>
 
 <para>This
@@ -522,9 +524,7 @@ depending on some content. In this case the resultVar attribute is
 mandatory.</para>
 
 <sect2><title>async attribute</title>
-<para>If the
-async
-flag is true, the script sends the request message and will not wait
+<para>If the async flag is true, the script sends the request message and will not wait
 for the response, but will continue processing the next steps of the
 script. If the script evaluates an expression that refers to
 <replaceable>result-var-name</replaceable>, and
@@ -589,27 +589,27 @@ attribute</title>
 <para>The
 appendMessagesTo attribute is mainly meant for debugging purposes. It
 will append all request and response message to a XML element.
-Usually you would set this using the default command to &#34;/output&#34;,
+Usually you would set this using the default command to "/output",
 during development, to see what is happening, and remove that default
 command, once the function works. 
 </para>
 
 <@xmlcode>
-&#60;!-- remove the next statement after debugging is finished --&#62;
-&#60;default attribute=&#34;appendMessagesTo&#34; value=&#34;/output&#34;/&#62;
+<!-- remove the next statement after debugging is finished -->
+<default attribute="appendMessagesTo" value="/output"/>
 
-&#60;!-- The input and output of these calls will be shown in the output --&#62;
-&#60;call ...&#62;
-&#60;call ...&#62;
+<!-- The input and output of these calls will be shown in the output -->
+<call ...>
+<call ...>
 </@xmlcode>
 
 <para>You might also set
-it to something like &#34;/output/log&#34;, but the one should
-first append a &#34;log&#34; element to the output, e.g.</para>
+it to something like "/output/log", but the one should
+first append a "log" element to the output, e.g.</para>
 <@xmlcode>
-&#60;!-- remove the next two statements after debugging is finished --&#62;
-&#60;output name=&#34;log&#34;&#62;
-&#60;default attribute=&#34;appendMessagesTo&#34; value=&#34;/output/log&#34;/&#62;
+<!-- remove the next two statements after debugging is finished -->
+<output name="log">
+<default attribute="appendMessagesTo" value="/output/log"/>
 </@xmlcode>
 
 <para>Note that when
@@ -647,7 +647,9 @@ error.</para>
 <sect1><title>delete
 command</title>
 <para>This command delete a specific node in a XML expression.</para>
-<para>&#60;delete node=&#34;<replaceable>xmlExpression</replaceable>&#34;/&#62;</para>
+<@xmlcode>
+<delete node="<replaceable>xmlExpression</replaceable>"/>
+</@xmlcode>
 
 </sect1>
 
@@ -660,8 +662,9 @@ return a SOAP:Fault to the caller. Currently it is only possible to
 specify a faultcode and a faultstring (called the message). In future
 it might be possible to add additional fields (such as faultactor and
 details).</para>
-<para>&#60;fault code=&#34;<replaceable>fixedCode</replaceable>&#34;
-message=&#34;<replaceable>textExpression</replaceable>&#34;/&#62;</para>
+<@xmlcode>
+<fault code="<replaceable>fixedCode</replaceable>" message="<replaceable>textExpression</replaceable>"/>
+</@xmlcode>
 </sect1>
 
 
@@ -671,15 +674,18 @@ command</title>
 <para>This is a very simple command, that just pause the execution of a
 script for a given interval in milliseconds. This is mainly useful
 for testing and debugging purposes.</para>
-<para>&#60;sleep millis=&#34;<replaceable>milliseconds</replaceable>&#34;/&#62;</para>
+<@xmlcode>
+<sleep millis="<replaceable>milliseconds</replaceable>"/>
+</@xmlcode>
 </sect1>
 
 
 
-<sect1><title>createXmlVar
-command</title>
-<para>&#60;createXmlVar var=&#34;<replaceable>varname</replaceable>&#34;
-value=&#34;<replaceable>xml-expression</replaceable>&#34;/&#62;</para>
+<sect1><title>createXmlVar command</title>
+<@xmlcode>
+<createXmlVar var="<replaceable>varname</replaceable>" value="<replaceable>xml-expression</replaceable>"/>
+</@xmlcode>
+
 <para>This command defines a new XML variable
 that can be used in XML expressions. In an older version this command
 was called xml. This could be confusing, and the new name seems more
@@ -693,10 +699,11 @@ problem.</para>
 
 <sect1><title>stripPrefixes
 command</title>
-<para>&#60;stripPrefixes xml=&#34;<replaceable>xml-expression</replaceable>&#34;
-| childrenOf=&#34;<replaceable>xml-expression</replaceable>&#34;</para>
-<para>	[recursive=&#34;true|false&#34;]</para>
-<para>/&#62;</para>
+<@xmlcode>
+<stripPrefixes xml="<replaceable>xml-expression</replaceable>" | childrenOf="<replaceable>xml-expression</replaceable>"
+	[recursive="true|false"]
+/>
+</@xmlcode>
 <para>This command strips a XML expression of
 the namespace prefixes. The xml-expression is either indicated by the
 xml or the childrenOf attribute. Exactly one of these attributes
@@ -715,22 +722,23 @@ should be present:</para>
 of all prefixes and possibly leave the toplevel node unchanged (since
 one usually doesn't reference this by name).</para>
 
-<para>&#60;stripPrefixes childrenOf=&#34;/input&#34;/&#62;</para>
+<@xmlcode>
+<stripPrefixes childrenOf="/input"/>
+</@xmlcode>
 </sect1>
 
 
 
-<sect1><title>switch
-command</title>
+<sect1><title>switch command</title>
 <@xmlcode>
-&#60;switch expression=&#34;<replaceable>text-expression</replaceable>&#34;/&#62;
-  &#60;case value=&#34;<replaceable>value</replaceable>&#34;&#62;
-    &#60;!-- any script --&#62;
-  &#60;/case&#62;
-  &#60;!-- any more cases --&#62;
-  [&#60;otherwise&#62;
-    &#60;!-- any script --&#62;
-  &#60;/otherwise&#62;
+<switch expression="<replaceable>text-expression</replaceable>"/>
+  <case value="<replaceable>value</replaceable>">
+    <!-- any script -->
+  </case>
+  <!-- any more cases -->
+  [<otherwise>
+    <!-- any script -->
+  </otherwise>
 </@xmlcode>
 
 <para>This construct is similar to the
@@ -738,22 +746,21 @@ switch/case statement found in many programming languages.</para>
 <para>The example below shows a simple usage.
 </para>
 <@xmlcode>
-&#60;implementation type=&#34;RelayCall&#34;&#62; 
-  &#60;switch expression=&#34;/input&#34;&#62; 
-    &#60;case value=&#34;1&#34;&#62;&#60;output text=&#34;one&#34;/&#62;&#60;/case&#62;
-    &#60;case value=&#34;2&#34;&#62;&#60;output text=&#34;two&#34;/&#62;&#60;/case&#62;
-    &#60;case value=&#34;3&#34;&#62;&#60;output text=&#34;three&#34;/&#62;&#60;/case&#62;
-    &#60;case value=&#34;4&#34;&#62;&#60;output text=&#34;four&#34;/&#62;&#60;/case&#62;
-    &#60;case value=&#34;5&#34;&#62;&#60;output text=&#34;five&#34;/&#62;&#60;/case&#62;
-    &#60;case value=&#34;6&#34;&#62;&#60;output text=&#34;sixe&#34;/&#62;&#60;/case&#62;
-    &#60;case value=&#34;7&#34;&#62;&#60;output text=&#34;seven&#34;/&#62;&#60;/case&#62;
-    &#60;case value=&#34;8&#34;&#62;&#60;output text=&#34;eight&#34;/&#62;&#60;/case&#62;
-    &#60;case value=&#34;9&#34;&#62;&#60;output text=&#34;nine&#34;/&#62;&#60;/case&#62;
-    &#60;case value=&#34;10&#34;&#62;&#60;output text=&#34;ten&#34;/&#62;&#60;/case&#62;
- 
-&#60;otherwise&#62;&#60;output text=&#34;unknown number&#34;/&#62;&#60;/otherwise&#62;
-  &#60;/switch&#62; 
-&#60;/implementation&#62;
+<implementation type="RelayCall"> 
+  <switch expression="/input"> 
+    <case value="1"><output text="one"/></case>
+    <case value="2"><output text="two"/></case>
+    <case value="3"><output text="three"/></case>
+    <case value="4"><output text="four"/></case>
+    <case value="5"><output text="five"/></case>
+    <case value="6"><output text="sixe"/></case>
+    <case value="7"><output text="seven"/></case>
+    <case value="8"><output text="eight"/></case>
+    <case value="9"><output text="nine"/></case>
+    <case value="10"><output text="ten"/></case>
+    <otherwise><output text="unknown number"/></otherwise>
+  </switch> 
+</implementation>
 </@xmlcode>
 <para>In the example
 above, each case just contains a simple output statement, but a case
@@ -761,34 +768,32 @@ element (and the otherwise element), may contain any script as
 described in this manual. A more complicated example is shown below,
 where switch statements are nested:</para>
 <@xmlcode>
-&#60;implementation type=&#34;RelayCall&#34;&#62; 
-  &#60;switch expression=&#34;/input/language&#34;&#62; 
-    &#60;case value=&#34;en&#34;&#62; 
-      &#60;output name=&#34;language&#34; text=&#34;english&#34;/&#62; 
-      &#60;switch expression=&#34;/input/value&#34;&#62; 
-        &#60;case value=&#34;1&#34;&#62;&#60;output name=&#34;translation&#34; text=&#34;one&#34;/&#62;&#60;/case&#62; 
-        &#60;case value=&#34;2&#34;&#62;&#60;output name=&#34;translation&#34; text=&#34;two&#34;/&#62;&#60;/case&#62; 
-        &#60;case value=&#34;3&#34;&#62;&#60;output name=&#34;translation&#34; text=&#34;three&#34;/&#62;&#60;/case&#62; 
-    &#60;otherwise&#62;&#60;output name=&#34;translation&#34; text=&#34;unknown&#34;/&#62;&#60;/otherwise&#62; 
-      &#60;/switch&#62;
-    &#60;/case&#62; 
-
-    &#60;case
-value=&#34;nl&#34;&#62; 
-      &#60;output name=&#34;language&#34; text=&#34;dutch&#34;/&#62; 
-      &#60;switch expression=&#34;/input/value&#34;&#62; 
-        &#60;case value=&#34;1&#34;&#62;&#60;output name=&#34;translation&#34; text=&#34;een&#34;/&#62;&#60;/case&#62; 
-        &#60;case value=&#34;2&#34;&#62;&#60;output name=&#34;translation&#34; text=&#34;twee&#34;/&#62;&#60;/case&#62; 
-        &#60;case value=&#34;3&#34;&#62;&#60;output name=&#34;translation&#34; text=&#34;drie&#34;/&#62;&#60;/case&#62; 
-       &#60;otherwise&#62;&#60;output name=&#34;translation&#34; text=&#34;onbekend&#34;/&#62;&#60;/otherwise&#62; 
-      &#60;/switch&#62;
-    &#60;/case&#62; 
-    &#60;otherwise&#62;
-      &#60;output name=&#34;language&#34; text=&#34;unknown&#34;/&#62; 
-      &#60;output name=&#34;translation&#34; text=&#34;unknown&#34;/&#62; 
-    &#60;/otherwise&#62;
-  &#60;/switch&#62; 
-&#60;/implementation&#62;
+<implementation type="RelayCall"> 
+  <switch expression="/input/language"> 
+    <case value="en"> 
+      <output name="language" text="english"/> 
+      <switch expression="/input/value"> 
+        <case value="1"><output name="translation" text="one"/></case> 
+        <case value="2"><output name="translation" text="two"/></case> 
+        <case value="3"><output name="translation" text="three"/></case> 
+        <otherwise><output name="translation" text="unknown"/></otherwise> 
+      </switch>
+    </case> 
+    <case value="nl"> 
+      <output name="language" text="dutch"/> 
+      <switch expression="/input/value"> 
+        <case value="1"><output name="translation" text="een"/></case> 
+        <case value="2"><output name="translation" text="twee"/></case> 
+        <case value="3"><output name="translation" text="drie"/></case> 
+       <otherwise><output name="translation" text="onbekend"/></otherwise> 
+      </switch>
+    </case> 
+    <otherwise>
+      <output name="language" text="unknown"/> 
+      <output name="translation" text="unknown"/> 
+    </otherwise>
+  </switch> 
+</implementation>
 </@xmlcode>
 </sect1>
 
@@ -796,8 +801,10 @@ value=&#34;nl&#34;&#62;
 
 <sect1><title>var
 command</title>
-<para>&#60;var name=&#34;<replaceable>varname</replaceable>&#34;
-value=&#34;<replaceable>text-expression</replaceable>&#34;/&#62;</para>
+<@xmlcode>
+<var name="<replaceable>varname</replaceable>" value="<replaceable>text-expression</replaceable>"/>
+</@xmlcode>
+
 <para>This command defines a text variable,
 similar to the xml command that
 defines a XML variable. 
@@ -817,13 +824,14 @@ HttpConnector.</para>
 <sect1><title>http
 command</title>
 <@xmlcode>
-&#60;http application=&#34;<replaceable>host-config-expression</replaceable>&#34; url=&#34;<replaceable>url-expression</replaceable>&#34;
-  [resultVar=&#34;<replaceable>var</replaceable>&#34;] 
-  [prettyPrint=&#34;true|false&#34;]
-  [body=&#34;<replaceable>xml-expression</replaceable>&#34;]
-&#62;
-  [&#60;header key=&#34;&#34; value=&#34;&#34;&#62; ...]
-&#60;/http&#62;
+<http application="<replaceable>host-config-expression</replaceable>" 
+  url="<replaceable>url-expression</replaceable>"
+  [resultVar="<replaceable>var</replaceable>"] 
+  [prettyPrint="true|false"]
+  [body="<replaceable>xml-expression</replaceable>"]
+>
+  [<header key="" value=""> ...]
+</http>
 </@xmlcode>
 
 <para>This command http will make a HTTP call to web server. The web
@@ -836,8 +844,8 @@ properties file only once, and use this in many method
 implementations with different url's.</para>
 <para>The application attribute is an
 expression, instead of a fixed text. This makes it possible to use an
-application like &#34;JF+${dollar}{omg}&#34;, which would translate into,
-e.g.  &#34;JFFAT&#34; or &#34;JFPRD&#34;, depending on a FAT or
+application like "JF+${dollar}{omg}", which would translate into,
+e.g.  "JFFAT" or "JFPRD", depending on a FAT or
 PRD environment.</para>
 <para>The result of the call is stored in a
 xml variable and can be used in next steps of the script. If now
@@ -850,7 +858,7 @@ if the XML is prettified using whitespace. The default is false,
 because this will be more efficient, and easier to handle if one uses
 httpclient.wire logging.</para>
 <para>The body is the xml that is to be
-sent. If no body is specified the expression &#34;/input/../..&#34;
+sent. If no body is specified the expression "/input/../.."
 is used. This will send the original input, including the
 SOAP:Envelope.</para>
 <para>Optionally, one can specify one or
@@ -863,8 +871,9 @@ body in the output. This output will currently be wrapped with
 generated Envelope, Header and body from Cordys. 
 </para>
 <@xmlcode>
-&#60;http application=&#34;TST&#34; url=&#34;demo/echo.php&#34; body=&#34;<replaceable>/input/../..</replaceable>&#34;/&#62;
-&#60;output xml=&#34;/TST&#34;/&#62;
+<http application="TST" url="demo/echo.php" 
+  body="<replaceable>/input/../..</replaceable>"/>
+<output xml="/TST"/>
 </@xmlcode>
 
 <para>In the HttpConnector.properties file
@@ -879,17 +888,19 @@ one should enter something like:</para>
 <sect1><title>http-relay
 command</title>
 <@xmlcode>
-&#60;http-relay
-application=&#34;<replaceable>host-config-expression</replaceable>&#34;
-url=&#34;<replaceable>url-expression</replaceable>&#34;
-  [prettyPrint=&#34;true|false&#34;]
-  [body=&#34;<replaceable>xml-expression</replaceable>&#34;]
-  [wsa=&#34;true&#34; replyTo=&#34;<replaceable>url-expression</replaceable>&#34; [faultTo=&#34;<replaceable>url-expression</replaceable>&#34;]
-     [wrapperName=&#34;<replaceable>element-name</replaceable>&#34;] [wrapperNamespabe=&#34;<replaceable>namespace</replaceable>&#34;]
+<http-relay
+  application="<replaceable>host-config-expression</replaceable>"
+  url="<replaceable>url-expression</replaceable>"
+  [prettyPrint="true|false"]
+  [body="<replaceable>xml-expression</replaceable>"]
+  [wsa="true" replyTo="<replaceable>url-expression</replaceable>" 
+    [faultTo="<replaceable>url-expression</replaceable>"]
+    [wrapperName="<replaceable>element-name</replaceable>"]
+    [wrapperNamespabe="<replaceable>namespace</replaceable>"]
   ]
-&#62;
-  [&#60;header key=&#34;&#34; value=&#34;&#34;&#62; ...]
-&#60;/http-relay&#62;
+>
+  [<header key="" value=""> ...]
+</http-relay>
 </@xmlcode>
 
 <para>This http-relay command is identical to the http command with two
@@ -917,9 +928,9 @@ settings, which are also the defaults of the http-callback command.</para>
 <sect1><title>http-callback
 command</title>
 <@xmlcode>
-&#60;http-callback
-[wrapperName=&#34;<replaceable>element-name</replaceable>&#34;]
-[wrapperNamespabe=&#34;<replaceable>namespace</replaceable>&#34;]/&#62;
+<http-callback
+[wrapperName="<replaceable>element-name</replaceable>"]
+[wrapperNamespabe="<replaceable>namespace</replaceable>"]/>
 </@xmlcode>
 
 
@@ -938,9 +949,9 @@ http-callback command.</para>
 <chapter><title>Examples</title>
 <sect1><title>Hello World</title>
 <@xmlcode>
-&#60;implementation type=&#34;RelayCall&#34;&#62;
-  &#60;output text=&#34;Hello World!&#34;/&#62;
-&#60;/implementation&#62;
+<implementation type="RelayCall">
+  <output text="Hello World!"/>
+</implementation>
 </@xmlcode>
 </sect1>
 
@@ -948,9 +959,9 @@ http-callback command.</para>
 
 <sect1><title>Echo</title>
 <@xmlcode>
-&#60;implementation type=&#34;RelayCall&#34;&#62;
-  &#60;output xml=&#34;/input&#34;/&#62;
-&#60;/implementation&#62;
+<implementation type="RelayCall">
+  <output xml="/input"/>
+</implementation>
 </@xmlcode>
 </sect1>
 
@@ -962,27 +973,27 @@ http-relay command with the wsa attribute set to op true in
 combination of a http-callback command for handling the response.</para>
 <para>For the call one would use something like</para>
 <@xmlcode>
-&#60;implementation type=&#34;RelayCall&#34;&#62;
-  &#60;http-relay application=&#34;APP&#34;
-url=&#34;...&#34; <emphasis>wsa=&#34;true&#34; replyTo=&#34;${dollar}{esbUrl}&#34;</emphasis>/&#62;
-&#60;/implementation&#62;
+<implementation type="RelayCall">
+  <http-relay application="APP"
+url="..." <emphasis>wsa="true" replyTo="${dollar}{esbUrl}"</emphasis>/>
+</implementation>
 </@xmlcode>
 <para>If one would send a message to this service it should have a WS-A
 ReplyTo element. (It should have othe WS-A mandatory elements (like
 MessageId) as well, but these are just passed though by the
 http-relay command).</para>
 <@xmlcode>
-&#60;SOAP:Envelope
-xmlns:SOAP=&#34;http://schemas.xmlsoap.org/soap/envelope/&#34;&#62;
-  &#60;SOAP:Header&#62;
-    <emphasis>&#60;wsa:ReplyTo xmlns:wsa=&#34;http://www.w3.org/2005/08/addressing&#34;&#62;</emphasis>
+<SOAP:Envelope
+xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP:Header>
+    <emphasis><wsa:ReplyTo xmlns:wsa="http://www.w3.org/2005/08/addressing"></emphasis>
     <emphasis>http://192.168.10.11/someService</emphasis>
-    <emphasis>&#60;/wsa:ReplyTo&#62;</emphasis>
-  &#60;/SOAP:Header&#62;
-  &#60;SOAP:Body&#62;
-    &#60;AsyncRequest xmlns=&#34;urn:test&#34;&#62;....&#60;/AsyncRequest&#62;
-  &#60;/SOAP:Body&#62;
-&#60;/SOAP:Envelope&#62;
+    <emphasis></wsa:ReplyTo></emphasis>
+  </SOAP:Header>
+  <SOAP:Body>
+    <AsyncRequest xmlns="urn:test">....</AsyncRequest>
+  </SOAP:Body>
+</SOAP:Envelope>
 </@xmlcode>
 
 <para>The http-relay command will wrap this ReplyTo element in a manner
@@ -993,25 +1004,25 @@ WS-A  element ReferenceParameters, of which the contents will be
 passed back in the response, according to the WS-A standard.</para>
 
 <@xmlcode>
-&#60;SOAP:Envelope xmlns:wsa=&#34;http://www.w3.org/2005/08/addressing&#34;
- xmlns:SOAP=&#34;http://schemas.xmlsoap.org/soap/envelope/&#34;&#62;
-  &#60;SOAP:Header &#62;
-    &#60;!-- cordys specific headers removed --&#62;
-    &#60;<emphasis>wsa:ReferenceParameters </emphasis>xmlns:wsa=&#34;http://www.w3.org/2005/08/addressing&#34;&#62;
-	&#60;<emphasis>kisst:CallbackWrapper</emphasis> xmlns:kisst=&#34;http://kisst.org/cordys/http&#34;&#62;
-	  &#60;ReplyTo xmlns=&#34;http://www.w3.org/2005/08/addressing&#34;&#62;
+<SOAP:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing"
+ xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP:Header >
+    <!-- cordys specific headers removed -->
+    <<emphasis>wsa:ReferenceParameters </emphasis>xmlns:wsa="http://www.w3.org/2005/08/addressing">
+	<<emphasis>kisst:CallbackWrapper</emphasis> xmlns:kisst="http://kisst.org/cordys/http">
+	  <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
 		<emphasis>http://192.168.10.11/someService</emphasis>
-	  &#60;/ReplyTo&#62;
-	&#60;/<emphasis>kisst:CallbackWrapper</emphasis>&#62;
-    &#60;/<emphasis>wsa:ReferenceParameters</emphasis>&#62;
-     &#60;wsa:ReplyTo xmlns:wsa=&#34;http://www.w3.org/2005/08/addressing&#34;&#62;
+	  </ReplyTo>
+	</<emphasis>kisst:CallbackWrapper</emphasis>>
+    </<emphasis>wsa:ReferenceParameters</emphasis>>
+     <wsa:ReplyTo xmlns:wsa="http://www.w3.org/2005/08/addressing">
       <emphasis>http://esb.company.com/cordys/wcpgateway?org=...</emphasis>
-    &#60;/wsa:ReplyTo&#62;
-  &#60;/SOAP:Header&#62;
-  &#60;SOAP:Body&#62;
-    &#60;AsyncRequest xmlns=&#34;urn:test&#34;&#62;....&#60;/AsyncRequest&#62;
-  &#60;/SOAP:Body&#62;
-&#60;/SOAP:Envelope&#62;
+    </wsa:ReplyTo>
+  </SOAP:Header>
+  <SOAP:Body>
+    <AsyncRequest xmlns="urn:test">....</AsyncRequest>
+  </SOAP:Body>
+</SOAP:Envelope>
 </@xmlcode>
 
 <para>When the webservice sends back the response (which may be days
@@ -1020,28 +1031,28 @@ ESB machine. For this response to be handled a second method needs to
 be created, which will know how to handle this response. The method
 can be very simple and will look as follows:</para>
 <@xmlcode>
-&#60;implementation type=&#34;RelayCall&#34;&#62;
-  &#60;http-callback /&#62;
-&#60;/implementation&#62;
+<implementation type="RelayCall">
+  <http-callback />
+</implementation>
 </@xmlcode>
 
 <para>The response should include the contents of the
 ReferenceParameters of the original request and should  thus look
 something like this:</para>
 <@xmlcode>
-&#60;SOAP:Envelope
-xmlns:SOAP=&#34;http://schemas.xmlsoap.org/soap/envelope/&#34;&#62;
-  &#60;SOAP:Header&#62;
-    &#60;CallbackWrapper xmlns=&#34;http://kisst.org/cordys/http&#34;&#62;
-        &#60;ReplyTo xmlns=&#34;http://www.w3.org/2005/08/addressing&#34;&#62;
+<SOAP:Envelope
+xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP:Header>
+    <CallbackWrapper xmlns="http://kisst.org/cordys/http">
+        <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
 		<emphasis>http://192.168.10.11/someService</emphasis>
-        &#60;/ReplyTo&#62;
-    &#60;/CallbackWrapper&#62;
-  &#60;/SOAP:Header&#62;
-  &#60;SOAP:Body&#62;
-    &#60;AsyncResponse xmlns=&#34;urn:test&#34;&#62;....&#60;/AsyncResponse&#62;
-  &#60;/SOAP:Body&#62;
-&#60;/SOAP:Envelope&#62;
+        </ReplyTo>
+    </CallbackWrapper>
+  </SOAP:Header>
+  <SOAP:Body>
+    <AsyncResponse xmlns="urn:test">....</AsyncResponse>
+  </SOAP:Body>
+</SOAP:Envelope>
 </@xmlcode>
 
 <para>The http-callback command will then make a http call to
@@ -1118,7 +1129,7 @@ setting might be useful.</para>
 
 <sect1><title>http.ignoreReturnCode
 configuration</title>
-<para>If this setting is true, a returncode &#62;= 300 will not be
+<para>If this setting is true, a returncode >= 300 will not be
 considered an error. The default value is false. This setting may be
 removed in the future. It was inspired by the problems when HTTP 202
 was considered an error, which caused major problems, but it seems
@@ -1173,11 +1184,11 @@ that commit should be considered a new release</para>
 	bit more efficient.</para></listitem>
 	<listitem><para>The application attribute in the http commands is made an
 	expression, instead of a fixed text. This makes it possible to use
-	an application like &#34;JF+${dollar}{omg}&#34;, which would translate
-	into, e.g.  &#34;JFFAT&#34; or &#34;JFPRD&#34;, depending on a
+	an application like "JF+${dollar}{omg}", which would translate
+	into, e.g.  "JFFAT" or "JFPRD", depending on a
 	FAT or PRD environment.</para></listitem>
 	<listitem><para>Added predefined variable ${dollar}{plus} which is defined as the
-	string &#34;+&#34;, for escaping this special character.</para></listitem>
+	string "+", for escaping this special character.</para></listitem>
 </itemizedlist>
 </sect1>
 </chapter>
