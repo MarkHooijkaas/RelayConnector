@@ -27,10 +27,12 @@ public class HttpBase {
     private final HttpConnector connector;
     private final XmlExpression body;
     private final boolean prettyPrint;
+    private final int timeout;
 	
 	public HttpBase(CompilationContext compiler, final int node) {
 		connector=(HttpConnector) compiler.getRelayConnector();
 		prettyPrint = compiler.getSmartBooleanAttribute(node, "prettyPrint", false);
+		timeout = Integer.parseInt(compiler.getSmartAttribute(node, "timeout", "30000"));
 		body=new XmlExpression(compiler, Node.getAttribute(node, "body", "/input/../.."));
 	}
 
@@ -47,6 +49,7 @@ public class HttpBase {
 	protected PostMethod createPostMethod(String url, int bodyNode) {
     	String xml=Node.writeToString(bodyNode, prettyPrint);
 	    PostMethod method = new PostMethod(url); // TODO: handle slashes /
+	    method.getParams().setSoTimeout(timeout);
 		try {
 			method.setRequestEntity(new StringRequestEntity(xml, "text/xml", "UTF-8"));
 		}

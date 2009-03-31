@@ -7,8 +7,7 @@
 <#macro xmlcode>
 <#assign txt><@xml_escape><#nested></@xml_escape></#assign>
 <programlisting>
-${txt?replace("&lt;emphasis&gt;","<emphasis>")?replace("&lt;/emphasis&gt;","</emphasis>")?replace("&lt;replaceable&gt;","<replaceable>")?replace("&lt;/replaceable&gt;","</replaceable>")}
-</programlisting>
+${txt?replace("&lt;emphasis&gt;","<emphasis>")?replace("&lt;/emphasis&gt;","</emphasis>")?replace("&lt;replaceable&gt;","<replaceable>")?replace("&lt;/replaceable&gt;","</replaceable>")}</programlisting>
 </#macro>
 
 <!-- <book xmlns="http://docbook.org/ns/docbook">-->

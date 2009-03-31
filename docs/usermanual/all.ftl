@@ -53,9 +53,9 @@ For each script two basic variables always exist:</para>
 	compose the output XML response message</para></listitem>
 </itemizedlist>
 <para>Additional variables will contain the result of method calls that
-the script has executed (see Chapter 4.6). Additionally it is
+the script has executed (see <xref linkend="call"/>). Additionally it is
 possible to define new variables by hand (see the xml
-command in Chapter 4.10), but it is not sure if this feature is
+command in <xref linkend="createXmlVar"/>), but it is not sure if this feature is
 really needed. 
 </para>
 <para>Each variable has a name and the value of the entire XML or one of
@@ -79,7 +79,7 @@ be not compatible with the current syntax.</para>
 </itemizedlist>
 
 
-<sect2><title>XML expressions</title>
+<sect2 id="xml-expressions"><title>XML expressions</title>
 <para>A XML expression starts with a XML
 variable name (thus with a leading slash), selecting an existing XML
 variable, or a children using a path like construction.  See the
@@ -97,7 +97,7 @@ the surrounding element.</para>
 
 <para>There is support for namespaces. First
 one must map a prefix to the correct namespace using the xmlns
-command (see chapter 4.3). Next one can use this prefix within the
+command (see <xref linkend="xmlns"/>). Next one can use this prefix within the
 xml expression.</para>
 
 <para>If the syntax .. is used in a path, the
@@ -408,13 +408,13 @@ the following attributes support this mechanism:</para>
 
 
 
-<sect1><title>xmlns command</title>
+<sect1 id="xmlns"><title>xmlns command</title>
 <@xmlcode>
 <xmlns prefix="<replaceable>prefix</replaceable>" namespace="<replaceable>namespace</replaceable>"/></para>
 </@xmlcode>
 <para>This function defines a certain prefix
 to be used to relate to a certain namespace. These prefixes can then
-be used in subsequent XML expressions, see chapter 2.2.1.</para>
+be used in subsequent XML expressions, see <xref linkend="xml-expressions"/>.</para>
 <para>It is considered to be an error to
 define the same prefix twice.</para>
 <para>In the example below the prefix "ns"
@@ -487,7 +487,7 @@ postfix "Response".</para>
 
 
 
-<sect1><title>call command</title>
+<sect1  id="call"><title>call command</title>
 <@xmlcode>
 <call method="<replaceable>method-name"|</replaceable>methodExpression<replaceable>="expr"
 </replaceable>
@@ -580,7 +580,7 @@ value in milliseconds. If the method call does not answer within this
 timeout period, the script will stop with a SOAP Fault. If no timeout
 attribute is specified a system wide default timeout is used. This
 value is 20 seconds by default, but a different value may be
-configured (see Chapter 7). 
+configured (see <xref linkend="configuration"/>). 
 </para>
 </sect2>
 
@@ -681,7 +681,7 @@ for testing and debugging purposes.</para>
 
 
 
-<sect1><title>createXmlVar command</title>
+<sect1 id="createXmlVar"><title>createXmlVar command</title>
 <@xmlcode>
 <createXmlVar var="<replaceable>varname</replaceable>" value="<replaceable>xml-expression</replaceable>"/>
 </@xmlcode>
@@ -828,6 +828,7 @@ command</title>
   url="<replaceable>url-expression</replaceable>"
   [resultVar="<replaceable>var</replaceable>"] 
   [prettyPrint="true|false"]
+  [timeout="<replaceable>millisecs</replaceable>"]
   [body="<replaceable>xml-expression</replaceable>"]
 >
   [<header key="" value=""> ...]
@@ -857,6 +858,9 @@ the response in the methods output.</para>
 if the XML is prettified using whitespace. The default is false,
 because this will be more efficient, and easier to handle if one uses
 httpclient.wire logging.</para>
+<para>The timeout variable will control how long the call will wait for an answer.
+If no timeout is specified this will default to 30000 (i.e. 30 seconds). 
+A timeout of zero means waiting indefinitely.</para>
 <para>The body is the xml that is to be
 sent. If no body is specified the expression "/input/../.."
 is used. This will send the original input, including the
@@ -879,7 +883,9 @@ generated Envelope, Header and body from Cordys.
 <para>In the HttpConnector.properties file
 one should enter something like:</para>
 
-<para>http.host.TST.url=http://10.10.10.103/test/</para>
+<@xmlcode>
+http.host.TST.url=http://10.10.10.103/test/
+</@xmlcode>
 
 </sect1>
 
@@ -892,6 +898,7 @@ command</title>
   application="<replaceable>host-config-expression</replaceable>"
   url="<replaceable>url-expression</replaceable>"
   [prettyPrint="true|false"]
+  [timeout="<replaceable>millisecs</replaceable>"]
   [body="<replaceable>xml-expression</replaceable>"]
   [wsa="true" replyTo="<replaceable>url-expression</replaceable>" 
     [faultTo="<replaceable>url-expression</replaceable>"]
@@ -929,8 +936,9 @@ settings, which are also the defaults of the http-callback command.</para>
 command</title>
 <@xmlcode>
 <http-callback
-[wrapperName="<replaceable>element-name</replaceable>"]
-[wrapperNamespabe="<replaceable>namespace</replaceable>"]/>
+  [timeout="<replaceable>millisecs</replaceable>"]
+  [wrapperName="<replaceable>element-name</replaceable>"]
+  [wrapperNamespabe="<replaceable>namespace</replaceable>"]/>
 </@xmlcode>
 
 
@@ -1066,7 +1074,7 @@ response.</para>
 
 
 
-<chapter><title>Configuration</title>
+<chapter id="configuration"><title>Configuration</title>
 <para>Currently only some simple configuration is supported. In the
 future the entire configuration system might be changed to a more
 powerful system. 
