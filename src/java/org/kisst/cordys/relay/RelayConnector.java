@@ -24,6 +24,7 @@ public class RelayConnector extends ApplicationConnector {
 	private String dnOrganization;
 	private final HashMap<String, Script> scriptCache=new HashMap<String, Script>();
 	public Properties properties=null;
+	private Module[] modules=new Module[0];
 	
     /**
      * This method gets called when the processor is started. It reads the
@@ -39,17 +40,29 @@ public class RelayConnector extends ApplicationConnector {
         try {
     		conf.init(getConfiguration());
             connector= Connector.getInstance(CONNECTOR_NAME);
-            // The connection pool must be initialized, before connector.open is called,
-            // because as soon as open is called, messages can be received 
-            // and the pool must be ready.
+
+            String moduleList=conf.get("modules");
+            if (moduleList!=null && moduleList.trim().length()>0) {
+            	String[] moduleNames=moduleList.split(",");
+            	modules=new Module[moduleNames.length];
+            	for (int i=0; i<modules.length; i++) {
+            		try {
+						modules[i]=(Module) Class.forName(moduleNames[i].trim()).newInstance();
+					} catch (Exception e) {
+						throw new RuntimeException("Could not load module class "+moduleNames[i]);
+					}
+            	}
+            }
+        	for (int i=0; i<modules.length; i++)
+        		modules[i].init(this);
+        	            
             if (!connector.isOpen())
             {
                 connector.open();
             }
-        	//logger.debug("RelayConnector opened");
         }
         catch (DirectoryException e) { throw new RuntimeException(e);	}
-        catch (ExceptionGroup e) { throw new RuntimeException(e);	}
+        catch (ExceptionGroup e) { throw new RuntimeException(e);	} 
     }
 
 	public ApplicationTransaction createTransaction(SOAPTransaction stTransaction) {
@@ -64,11 +77,14 @@ public class RelayConnector extends ApplicationConnector {
 	public void reset() {
 		conf.load();
 		scriptCache.clear();
+    	for (int i=0; i<modules.length; i++)
+    		modules[i].reset();
 	}
 
 	public void close(Processor processor)
     {
-    	//logger.log(Severity.INFO, "RelayConnector closed");
+		for (int i=0; i<modules.length; i++)
+			modules[i].destroy();
     }    
 
 
