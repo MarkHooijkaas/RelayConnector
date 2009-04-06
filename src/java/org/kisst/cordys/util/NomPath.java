@@ -7,7 +7,7 @@ import com.eibus.xml.nom.Node;
 public class NomPath {
 	private final String[] elements;
 	private final String[] namespaces;
-	
+
 	public NomPath(CompilationContext compiler, String str) {
 		while (str.endsWith("/"))
 			str=str.substring(0, str.length()-1);
@@ -29,7 +29,7 @@ public class NomPath {
 				}
 			}
 		}
-		
+
 	}
 
 	public int findNode(int node) {
@@ -43,7 +43,7 @@ public class NomPath {
 				else {
 					String namespace = namespaces[i];
 					if (namespace==null)
-						node=Node.getElement(node, name);
+						node=NomUtil.getElementByLocalName(node, name);
 					else
 						node=NomUtil.getElement(node, namespace, name);
 				}
