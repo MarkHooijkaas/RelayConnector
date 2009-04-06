@@ -3,6 +3,7 @@ package org.kisst.cordys.script.xml;
 
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
+import org.kisst.cordys.util.NomPath;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.xml.nom.Node;
@@ -14,12 +15,17 @@ public class ElementAppender implements XmlAppender {
 	private final XmlAppender[] parts;
 	private final boolean reduceXmlns;
 	private final boolean resolveXmlns;
+	private final NomPath target;
 
 	public ElementAppender(CompilationContext compiler, int node) {
 		this.name=Node.getAttribute(node,"name");
 		this.prefix=Node.getAttribute(node,"prefix");
 		this.resolveXmlns=NomUtil.getBooleanAttribute(node, "resolveXmlns", true);
 		this.reduceXmlns=NomUtil.getBooleanAttribute(node, "reduceXmlns", true);
+		if (Node.getAttribute(node,"target")==null)
+			target=null;
+		else
+			target=new NomPath(compiler, Node.getAttribute(node,"target"));
 
 		String namespaceAttr=Node.getAttribute(node,"namespace");
 		if (prefix!=null && namespaceAttr==null && resolveXmlns)
@@ -68,6 +74,8 @@ public class ElementAppender implements XmlAppender {
 	}
 
 	public void append(ExecutionContext context, int toNode) {
+		if (target!=null)
+			toNode=target.findNode(toNode);
 		if (name!=null)
 			toNode=Node.createElement(name, toNode);
 		if (namespace!=null)

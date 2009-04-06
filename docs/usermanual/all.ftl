@@ -184,6 +184,7 @@ share this syntax.</para>
 	[text="<replaceable>text-expression</replaceable>"]
 	[xml="<replaceable>xml-expression</replaceable>"] 
 	[childrenOf="<replaceable>xml-expression</replaceable>"]
+	[target="<replaceable>xml-expression</replaceable>"] 
 >
   <!-- any of the following elements in any order, as many times as needed -->
   <element 
@@ -193,6 +194,7 @@ share this syntax.</para>
 	[text="<replaceable>text-expression</replaceable>"]
 	[xml="<replaceable>xml-expression</replaceable>"] 
 	[childrenOf="<replaceable>xml-expression</replaceable>"]
+	[target="<replaceable>xml-expression</replaceable>"] 
   >
     <!-- nested elements, attributes, etc if needed -->
   </element>
@@ -320,7 +322,6 @@ appended.
       Static text can also be added in the element
     </demo>
 </@xmlcode>
-<para>Note that t</para>
 
 
 <para>The element,
@@ -334,12 +335,20 @@ purpose would be to add a new element. However it can be very useful
 to add the content of an XML variable to an existing element, without
 adding a new element.</para>
 
-<para>The element,
-text and cdata
-elements also have optional prefix
-and namespace attributes. The
-exact behavior is quite complex, but should be intuitive for the
-common cases.</para>
+<para>The element, and include elements also have an optional target attribute. 
+This can be used to add XML to entirely different parts of the XML tree.
+The special case for which this attribute has been created is to access the SOAP:Header
+in a call command. See the following example:
+</para>
+<@xmlcode>
+    <call namespace="..." method="...">
+      <element name="MySoapHeader" target="../../Header" text="somedata"/>
+    </call>
+</@xmlcode>
+
+
+<para>The element, text and cdata elements also have optional prefix and namespace attributes. 
+The exact behavior is quite complex, but should be intuitive for the common cases.</para>
 <itemizedlist>
 	<listitem><para>If a prefix
 	attribute is present, the name of the node is prefixed with this

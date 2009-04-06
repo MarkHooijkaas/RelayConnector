@@ -4,12 +4,14 @@ import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.ExpressionParser;
 import org.kisst.cordys.script.expression.XmlExpression;
+import org.kisst.cordys.util.NomPath;
 
 import com.eibus.xml.nom.Node;
 
 public class IncludeAppender implements XmlAppender {
 	private final XmlExpression xmlExpression;
 	private final XmlExpression childrenOfExpression;
+	private final NomPath target;
 
 	/* TODO: figure out how I have planned this
 	private final boolean recursive;
@@ -21,6 +23,10 @@ public class IncludeAppender implements XmlAppender {
 	public IncludeAppender(CompilationContext compiler, int node) {
 		xmlExpression = (XmlExpression) ExpressionParser.parse(compiler, Node.getAttribute(node, "xml"));
 		childrenOfExpression = (XmlExpression) ExpressionParser.parse(compiler, Node.getAttribute(node, "childrenOf"));
+		if (Node.getAttribute(node,"target")==null)
+			target=null;
+		else
+			target=new NomPath(compiler, Node.getAttribute(node,"target"));
 		/*
 		recursive = NomUtil.getBooleanAttribute(node, "recursive", true);
 		prefix= Node.getAttribute(node, "prefix");
@@ -33,6 +39,8 @@ public class IncludeAppender implements XmlAppender {
 	}
 	
 	public void append(ExecutionContext context, int toNode) {
+		if (target!=null)
+			toNode=target.findNode(toNode);
 		if (xmlExpression!=null) {
 			int srcNode=xmlExpression.getNode(context);
 			Node.duplicateAndAppendToChildren(srcNode, srcNode, toNode);
