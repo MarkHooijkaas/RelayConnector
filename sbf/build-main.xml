@@ -89,7 +89,10 @@
 		<setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}" proxyuser="${proxy.user}" proxypassword="${proxy.pass}"/>
 	</target>
 
-
+	<target name="setup-ehcache" depends="init,proxy">
+		<get src="http://repo2.maven.org/maven2/net/sf/ehcache/ehcache/1.5.0/ehcache-1.5.0.jar" dest="lib/ehcache-1.5.0.jar"/>
+	</target>
+	
 	<target name="setup-commons" depends="init,proxy">
 		<get src="http://repo2.maven.org/maven2/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar" dest="lib/commons-httpclient-3.1.jar"/>
 		<get src="http://repo2.maven.org/maven2/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar" dest="lib/commons-logging-1.0.4.jar"/>
@@ -132,7 +135,7 @@
 		</javac>
 	</target>
 
-	<target name="setup" depends="setup-copy,setup-scp,setup-commons,setup-log4j,setup-freemarker,setup-tasks"/>
+	<target name="setup" depends="setup-copy,setup-scp,setup-commons,setup-log4j,setup-freemarker,setup-tasks,setup-ehcache"/>
 	
 	<target name="clean" depends="init">
   		<delete dir="${builddir}" />
