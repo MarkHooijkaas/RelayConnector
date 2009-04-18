@@ -2,6 +2,7 @@ package org.kisst.cordys.script.commands;
 
 import java.util.Date;
 
+import org.kisst.cordys.relay.MethodCache;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.Expression;
@@ -13,8 +14,6 @@ import org.kisst.cordys.util.SoapUtil;
 import com.eibus.connector.nom.Connector;
 import com.eibus.connector.nom.SOAPMessageListener;
 import com.eibus.directory.soap.DirectoryException;
-import com.eibus.exception.ExceptionGroup;
-import com.eibus.exception.TimeoutException;
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
@@ -132,30 +131,26 @@ public class MethodCall {
 	
 	@SuppressWarnings("deprecation")
 	protected void callMethod(final ExecutionContext context, int method) {
-		try {
-			if (appendMessagesTo!=null) {
-				int logNode=appendMessagesTo.getNode(context);
-				Node.duplicateAndAppendToChildren(method, method, logNode);
-			}
-			if (logger.isInfoEnabled())
-				logger.log(Severity.INFO, "sending request\n"+Node.writeToString(method, true));
-			Connector connector = context.getRelayConnector().getConnector();
-			if (async) {
-				context.createXmlSlot(resultVar, methodName, new Date().getTime()+timeout);
-				connector.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {
-					public boolean onReceive(int message)
-					{
-						handleResponse(context, message);
-						return false; // Node should not yet be destroyed by Callback caller!!
-					}
-				});
-			}
-			else {
-				handleResponse(context, connector.sendAndWait(Node.getParent(method),timeout));
-			}
+		if (appendMessagesTo!=null) {
+			int logNode=appendMessagesTo.getNode(context);
+			Node.duplicateAndAppendToChildren(method, method, logNode);
 		}
-		catch (TimeoutException e) { throw new RuntimeException("Timeout when calling method "+methodName,e); }
-		catch (ExceptionGroup e) { throw new RuntimeException("Error when calling method "+methodName,e); }
+		if (logger.isInfoEnabled())
+			logger.log(Severity.INFO, "sending request\n"+Node.writeToString(method, true));
+		MethodCache caller = context.getRelayConnector().responseCache;
+		if (async) {
+			context.createXmlSlot(resultVar, methodName, new Date().getTime()+timeout);
+			caller.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {
+				public boolean onReceive(int message)
+				{
+					handleResponse(context, message);
+					return false; // Node should not yet be destroyed by Callback caller!!
+				}
+			});
+		}
+		else {
+			handleResponse(context, caller.sendAndWait(Node.getParent(method),timeout));
+		}
 	}
 
 	private void handleResponse(ExecutionContext context, int response) {

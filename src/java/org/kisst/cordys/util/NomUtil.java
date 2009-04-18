@@ -147,4 +147,18 @@ public class NomUtil {
 			Node.setAttribute(dest, name, Node.getAttribute(src, name));
 		}
 	}
+	
+	/**
+	 * returns the universal name, looking like {<namespace>}<name>
+	 * See http://www.jclark.com/xml/xmlns.htm
+	 * 
+	 * @param node
+	 * @return
+	 */
+	public static String getUniversalName(int node) {
+		String name=Node.getLocalName(node);
+		String namespace=Node.getNamespaceURI(node);
+		return "{"+namespace+"}"+name;
+	}
+
 }

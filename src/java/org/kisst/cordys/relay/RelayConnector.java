@@ -25,6 +25,7 @@ public class RelayConnector extends ApplicationConnector {
 	private final HashMap<String, Script> scriptCache=new HashMap<String, Script>();
 	public Properties properties=null;
 	private Module[] modules=new Module[0];
+	public final MethodCache responseCache=new MethodCache();
 	
     /**
      * This method gets called when the processor is started. It reads the
@@ -41,6 +42,7 @@ public class RelayConnector extends ApplicationConnector {
     		conf.init(getConfiguration());
             connector= Connector.getInstance(CONNECTOR_NAME);
 
+            responseCache.init(conf.properties);
             String moduleList=conf.get("modules");
             if (moduleList!=null && moduleList.trim().length()>0) {
             	String[] moduleNames=moduleList.split(",");
@@ -76,6 +78,7 @@ public class RelayConnector extends ApplicationConnector {
 
 	public void reset() {
 		conf.load();
+		responseCache.reset(conf.properties);
 		scriptCache.clear();
     	for (int i=0; i<modules.length; i++)
     		modules[i].reset();
