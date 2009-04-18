@@ -17,6 +17,13 @@ ${txt?replace("&lt;emphasis&gt;","<emphasis>")?replace("&lt;/emphasis&gt;","</em
 <subtitle>buildnumber ${buildnumber}</subtitle>
 
 
-<#include "all.ftl">
+<#include "intro.ftl">
+<#include "concepts.ftl">
+<#include "xml.ftl">
+<#include "commands.ftl">
+<#include "http.ftl">
+<#include "config.ftl">
+<#include "examples.ftl">
+<#include "history.ftl">
 
 </book>
