@@ -25,6 +25,7 @@ that commit should be considered a new release</para>
 	FAT or PRD environment.</para></listitem>
 	<listitem><para>Added predefined variable ${dollar}{plus} which is defined as the
 	string "+", for escaping this special character.</para></listitem>
+	<listitem><para>Added a caching mechanism for internal calls</para></listitem>
 </itemizedlist>
 </sect1>
 </chapter>

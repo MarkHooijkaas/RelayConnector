@@ -70,8 +70,7 @@ very unlikely that this will be needed in the future.</para>
 
 
 
-<sect1><title>http.wireLogging
-configuration</title>
+<sect1><title>http.wireLogging configuration</title>
 <para>This setting can be used to very easily set some debugging
 logging, while not getting clobbered with irrelevant debugging
 logging. It can be set to various logLevels. The two most important
@@ -88,5 +87,38 @@ flexible log4j configuration.</para>
 <para>Note: One can change this logging dynamically by resetting the
 SOAP processor. However, if one was to remove this variable after it
 had been set before, the log4j will still use the old setting.</para>
+</sect1>
+
+
+<sect1><title>caching configuration</title>
+<para> 
+The caching configuration is meant to be simple if you just want to add one or a few caches.
+However it is also possible to use all the power of the ehcache caching framework.
+The following main configuration variables are available:
+<itemizedlist>
+	<listitem><para><varname>relay.caches</varname> a list af simple defined caches</para></listitem>
+	<listitem><para><varname>relay.cachemanager.file</varname> The filename containing a special ehcache config file</para></listitem>
+	<listitem><para><varname>relay.cachemanager.url</varname> The url containing a special ehcache config file</para></listitem>
+</itemizedlist>
+The variable <varname>relay.caches</varname> should be a comma separated list (whitespaces do not matter).
+For each cachename defined in <varname>relay.caches</varname>, one should define the following extra variables:
+<itemizedlist>
+	<listitem><para><varname>relay.cache.<replaceable>name</replaceable>.timeToLiveSeconds</varname></para></listitem>
+	<listitem><para><varname>relay.cache.<replaceable>name</replaceable>.size</varname></para></listitem>
+</itemizedlist>
+Additionaly one may define caches in either <varname>relay.cachemanager.file</varname> or <varname>relay.cachemanager.url</varname>
+using a standard ehcache configuration file. (if both variables are defined, the file variable is used).
+</para>
+
+<para>
+For all caches one needs to define the following extra variables:
+<itemizedlist>
+	<listitem><para><varname>relay.cache.<replaceable>name</replaceable>.method</varname> a universal name with name space between { and } followed by the name of the method to be cached</para></listitem>
+	<listitem><para><varname>relay.cache.<replaceable>name</replaceable>.keypath</varname> the path where the key can be found, relative to the method element</para></listitem>
+</itemizedlist>
+
+
+</para>
+
 </sect1>
 </chapter>

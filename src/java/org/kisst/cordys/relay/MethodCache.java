@@ -53,8 +53,8 @@ public class MethodCache {
 			catch (ExceptionGroup e) { throw new RuntimeException(e); }
 			catch (DirectoryException e) { throw new RuntimeException(e); }
 		}
-		String filename=props.getProperty("relay.cache.manager.file");
-		String url=props.getProperty("relay.cache.manager.url");
+		String filename=props.getProperty("relay.cachemanager.file");
+		String url=props.getProperty("relay.cachemanager.url");
 		String cacheList = props.getProperty("relay.caches");
 		if (filename!=null)
 			manager = new CacheManager(filename);
@@ -161,7 +161,7 @@ public class MethodCache {
 			String name=cacheNames[i].trim();
 			String prefix="relay.cache."+name;
 			int maxSize=Integer.parseInt(props.getProperty(prefix+".size"));
-			long seconds=0;
+			long seconds=Long.parseLong(props.getProperty(prefix+".timeToLiveSeconds"));;
 			Cache memoryOnlyCache = new Cache(name, maxSize, false, false, seconds, seconds);
 			manager.addCache(memoryOnlyCache);
 			//Cache test = singletonManager.getCache("testCache");
