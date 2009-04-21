@@ -23,8 +23,7 @@ public class CDataAppender implements XmlAppender {
 		if (name!=null) 
 			Node.createCDataElement(name, textExpression.getString(context), toNode);
 		else {
-			int cdata=Node.getDocument(toNode).createCData(textExpression.getString(context));
-			Node.appendToChildren(cdata, toNode);
+			Node.setCDataElement(toNode, "", textExpression.getString(context));
 		}
 	}
 }
