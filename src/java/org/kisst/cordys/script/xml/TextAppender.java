@@ -30,7 +30,6 @@ public class TextAppender implements XmlAppender {
 		if (name!=null) 
 			Node.createTextElement(name, text, toNode);
 		else 
-			Node.setDataElement(toNode, "", text);
-			//Node.getDocument(toNode).createText(text, toNode);
+			Node.getDocument(toNode).createText(text, toNode);
 	}
 }
