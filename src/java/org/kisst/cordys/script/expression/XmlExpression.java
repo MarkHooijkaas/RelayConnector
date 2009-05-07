@@ -4,8 +4,6 @@ import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.util.NomPath;
 
-import com.eibus.xml.nom.Node;
-
 public class XmlExpression  implements Expression {
 	private final String name;
 	private final NomPath path;
@@ -31,7 +29,11 @@ public class XmlExpression  implements Expression {
 	}
 	
 	public String getString(ExecutionContext context) {
-		return Node.getData(getNode(context));
+		int node=context.getXmlVar(name);
+		if (path==null)
+			return null; // TODO: can this happen?
+		else
+			return path.getText(node);
 	}
 
 	public int getNode(ExecutionContext context) {

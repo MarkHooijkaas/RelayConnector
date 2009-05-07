@@ -32,6 +32,15 @@ public class NomPath {
 
 	}
 
+	public String getText(int node) {
+		// TODO: better handling of an attribute
+		node=findNode(node);
+		String name=elements[elements.length-1];
+		if (name.startsWith("@"))
+			return Node.getAttribute(node, name.substring(1));
+		return Node.getData(node);
+	}
+	
 	public int findNode(int node) {
 		if (elements==null)
 			return node;
@@ -40,6 +49,9 @@ public class NomPath {
 			if (name.length()>0) {
 				if (name.equals(".."))
 					node=Node.getParent(node);
+				else if (name.startsWith("@")) {
+					// skip this is an attribute
+				}
 				else {
 					String namespace = namespaces[i];
 					if (namespace==null)
