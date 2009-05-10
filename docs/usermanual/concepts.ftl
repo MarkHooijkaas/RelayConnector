@@ -60,10 +60,23 @@ example below.</para>
   <!-- appends a part of the input message to output -->
   <output xml="/input/tuple/old"/>
 </@xmlcode>
+<para>
+It is possible to select an attribute by using an @ symbol for the attribute name as last element of a path.
+For example
+<@xmlcode>
+  <!-- appends a part of the input message to output -->
+  <output name="street" text="/input/address/@street"/>
+  <output name="city" text="/input/address/@city"/>
+</@xmlcode>
+The code above will work on input xml in the form of:
+<@xmlcode>
+  <address street="..." city="..."/>
+</@xmlcode>
+</para>
+
 <para>These expressions are still very
 limited. There is no support for recurring elements with the same
-name, for selecting attributes or for selecting all children without
-the surrounding element.</para>
+name or for selecting all children without the surrounding element.</para>
 
 <para>There is support for namespaces. First
 one must map a prefix to the correct namespace using the xmlns
