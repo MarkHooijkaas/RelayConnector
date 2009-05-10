@@ -33,6 +33,8 @@
 				<pathelement path="${libdir}/commons-httpclient-3.1.jar" />
 				<pathelement path="${libdir}/freemarker-2.3.15.jar" />
 				<pathelement path="${libdir}/log4j-1.2.13.jar" />
+				<pathelement path="${libdir}/ehcache-1.5.0.jar" />
+				<pathelement path="${libdir}/groovy-all-1.6.2.jar" />
 			</classpath>
 		</javac>
 	</target>
@@ -107,6 +109,12 @@
 		<get src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/freemarker/freemarker/2.3.15/freemarker-2.3.15.jar" dest="lib/freemarker-2.3.15.jar"/>
 	</target>
 
+	<target name="setup-groovy" depends="init,proxy">
+		<get src="http://repo1.maven.org/maven2/org/codehaus/groovy/groovy-all/1.6.2/groovy-all-1.6.2.jar" dest="lib/groovy-all-1.6.2.jar"/>
+	</target>
+
+	<target name="setup-downloads" depends="setup-commons,setup-log4j,setup-freemarker,setup-tasks,setup-ehcache,setup-groovy"/>
+
 
 	<target name="setup-copy" depends="init" if="cordys.dir">
 		<mkdir dir="lib/cordys" />
@@ -135,7 +143,7 @@
 		</javac>
 	</target>
 
-	<target name="setup" depends="setup-copy,setup-scp,setup-commons,setup-log4j,setup-freemarker,setup-tasks,setup-ehcache"/>
+	<target name="setup" depends="setup-copy,setup-scp,setup-downloads"/>
 	
 	<target name="clean" depends="init">
   		<delete dir="${builddir}" />

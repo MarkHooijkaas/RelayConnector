@@ -65,10 +65,14 @@ public class MethodCache {
 			catch (CacheException e) { throw new RuntimeException(e); }
 			catch (MalformedURLException e) { throw new RuntimeException(e); }
 		}
-		if (cacheList !=null && manager==null)
+		else if (cacheList !=null)
 			manager=getDefaultManager();
-		fillUserDefinedCaches(props);
-		mapMethods(props);
+		else
+			 manager=null;
+		if (manager!=null) {
+			fillUserDefinedCaches(props);
+			mapMethods(props);
+		}
 	}
 
 	public void reset(Properties properties) {
@@ -156,6 +160,8 @@ public class MethodCache {
 
 	private void fillUserDefinedCaches(Properties props) {
 		String cacheList = props.getProperty("relay.caches");
+		if (cacheList==null)
+			return;
 		String[] cacheNames=cacheList.split(",");
 		for (int i=0; i<cacheNames.length; i++) {
 			String name=cacheNames[i].trim();

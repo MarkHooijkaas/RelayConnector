@@ -7,5 +7,7 @@
       <pathelement location="lib/commons-httpclient-3.1.jar"/>
       <pathelement location="lib/commons-logging-1.0.4.jar"/>
       <pathelement location="lib/commons-codec-1.2.jar"/>
+      <pathelement location="lib/ehcache-1.5.0.jar"/>
+      <pathelement location="lib/groovy-all-1.6.2.jar"/>
 	</jarfiles>
 </project>

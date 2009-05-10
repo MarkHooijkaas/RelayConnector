@@ -11,6 +11,8 @@ public class ExpressionParser {
 		str=str.trim();
 		// TODO: much better parser: This will break in many situations
 		// e.g. + embedded in strings, and many other nested scenarios
+		if (str.startsWith("@groovy:"))
+			return new GroovyExpression(compiler, str.substring(8));
 		if (str.indexOf('+')>=0)
 			return new ConcatExpression(compiler, str);
 		if (str.startsWith("/"))
