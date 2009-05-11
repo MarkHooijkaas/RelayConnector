@@ -20,6 +20,8 @@ public class CompilationContext {
 	private final Stack<String> parsePath = new Stack<String>();
 	private final HashMap<String,String> defaultAttributes = new HashMap<String,String>();  
 	private final HashMap<String,String> prefixes = new HashMap<String,String>();  
+
+	public final GroovyScript groovy=new GroovyScript();
 	
 	public CompilationContext(RelayConnector connector, MethodDefinition def)
     {
