@@ -25,6 +25,7 @@ public class CommandList {
 		basicCommands.addCommand("fault",  new GenericCommand(FaultStep.class));
 		basicCommands.addCommand("stripPrefixes",  new GenericCommand(StripPrefixesStep.class));
 		basicCommands.addCommand("switch",  new GenericCommand(SwitchStep.class));
+		basicCommands.addCommand("replaceText",  new GenericCommand(ReplaceTextStep.class));
 	}
 
 	public static CommandList getBasicCommands() {

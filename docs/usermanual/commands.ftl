@@ -420,15 +420,73 @@ where switch statements are nested:</para>
 
 
 
-<sect1><title>var
-command</title>
+<sect1><title>var command</title>
 <@xmlcode>
 <var name="<replaceable>varname</replaceable>" value="<replaceable>text-expression</replaceable>"/>
 </@xmlcode>
 
-<para>This command defines a text variable,
-similar to the xml command that
-defines a XML variable. 
+<para>This command defines a text variable, similar to the xml command that defines a XML variable. 
+</para>
+</sect1>
+
+<sect1><title>replaceText command</title>
+<@xmlcode>
+<replaceText 
+  start="<replaceable>xmlexpression</replaceable>" 
+  [elementsNamed="<replaceable>elementName</replaceable>"]
+  expression="<replaceable>expr</replaceable>"/>
+</@xmlcode>
+
+<para>
+This command replaces the text content of one element or of all (child) elements with a certain name.
+This command is a special solution for changing a recurring element, because there is currently no iteration possibility.
+</para>
+
+<para>
+The start attribute denotes some xml node to start with. 
+If the attribute elementsNamed is ommited only the text of this element is changed.
+If the attribute elementsNamed is specified, all direct and indirect children are searched. 
+If any element is found with the specified name (with or without any prefix), it will be changed.
+The new text of any changed element will be determined by the expression attribute. 
+In this expression, one can use the special variable ${r"${it}"}, which contains the old text of the element.
+</para>
+
+<para>
+A simple script shows how this might work
+<@xmlcode>
+<implementation type="RelayCall">
+  <output xml="/input"/>
+  <replaceText start="/output" elementsNamed="name" expression="Hello + ${r"${it}"}	"/>
+</implementation>
+</@xmlcode>
+If one would the above method with the following input
+<@xmlcode>
+<ReplaceTest xmlns="http://schemas.kisst.org/cordys/relay/test">
+  <name>Mark</name>
+  <e>
+    <name>Joost</name>
+    <name>Edde</name>
+    <name>Mark</name>
+  </e>
+</ReplaceTest>
+</@xmlcode>
+
+the method will return 
+<@xmlcode>
+<data>
+  <ReplaceTestResponse xmlns="http://schemas.kisst.org/cordys/relay/test">
+    <ReplaceTest xmlns="http://schemas.kisst.org/cordys/relay/test">
+      <name>HelloMark</name>
+      <e>
+        <name>HelloJoost</name>
+        <name>HelloEdde</name>
+        <name>HelloMark</name>
+      </e>
+    </ReplaceTest>
+  </ReplaceTestResponse>
+</data>
+</@xmlcode>
+Note that elements at various depths are replaced.
 </para>
 </sect1>
 </chapter>
