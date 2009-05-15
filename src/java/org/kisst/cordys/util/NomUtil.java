@@ -30,7 +30,7 @@ public class NomUtil {
 	
 	public static String nodeToString(int node) {
 		String s="<"+Node.getLocalName(node);
-		for (int a=0; a<Node.getNumAttributes(node); a++) {
+		for (int a=1; a<=Node.getNumAttributes(node); a++) {
 			String attrName=Node.getAttributeName(node, a);
 			s+=" "+attrName+"=\""+Node.getAttribute(node, attrName)+"\"";
 		}
