@@ -7,6 +7,7 @@ import org.kisst.cordys.script.expression.XmlExpression;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.xml.nom.Node;
+import com.eibus.xml.nom.NodeType;
 
 
 public class StripPrefixesStep implements Step {
@@ -40,6 +41,8 @@ public class StripPrefixesStep implements Step {
 	}
 
 	private void stripNode(int node) {
+		if (Node.getType(node)!=NodeType.ELEMENT)
+			return;
 		String name=Node.getName(node);
 		int pos=name.indexOf(":");
 		if (pos>=0)
@@ -49,6 +52,8 @@ public class StripPrefixesStep implements Step {
 	}
 
 	private void stripChildren(int node) {
+		if (Node.getType(node)!=NodeType.ELEMENT)
+			return;
 		node=Node.getFirstElement(node);
 		while (node!=0) {
 			stripNode(node);

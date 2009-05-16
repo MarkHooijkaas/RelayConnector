@@ -8,6 +8,7 @@ import org.kisst.cordys.script.expression.ExpressionParser;
 import org.kisst.cordys.script.expression.XmlExpression;
 
 import com.eibus.xml.nom.Node;
+import com.eibus.xml.nom.NodeType;
 
 public class ReplaceTextStep implements Step {
 	private final XmlExpression start;
@@ -27,6 +28,8 @@ public class ReplaceTextStep implements Step {
 	}
 
 	private void replace(ExecutionContext context, int node) {
+		if (Node.getType(node)!=NodeType.ELEMENT)
+			return;
 		if (elementsNamed==null || elementsNamed.equals(Node.getLocalName(node))) {
 			context.setTextVar("it", Node.getData(node));
 			Node.setDataElement(node, "", expr.getString(context));
