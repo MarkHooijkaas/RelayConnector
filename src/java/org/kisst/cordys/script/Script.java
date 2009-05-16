@@ -8,7 +8,7 @@ import com.eibus.soap.MethodDefinition;
 import com.eibus.xml.nom.Node;
 
 public class Script implements Step {
-	private final CompilationContext compiler;
+	//private final CompilationContext compiler;
 	private final String name;
 	private final Step[] steps;
 	
@@ -17,7 +17,7 @@ public class Script implements Step {
 	}
 	
 	public Script(CompilationContext context, int scriptNode) {
-		this.compiler=context;
+		//this.compiler=context;
 		steps = new Step[Node.getNumChildren(scriptNode)];
 		int i=0;
     	int node = Node.getFirstChild(scriptNode);
@@ -43,7 +43,7 @@ public class Script implements Step {
 	}
 
 	public void execute(RelayConnector connector, BodyBlock request, BodyBlock response) {
-		ExecutionContext context=new ExecutionContext(connector, request, response, compiler.groovy);
+		ExecutionContext context=new ExecutionContext(connector, request, response);
 		try {
 			executeStep(context);
 		}

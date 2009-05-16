@@ -1,7 +1,5 @@
 package org.kisst.cordys.script;
 
-import groovy.lang.GroovyObject;
-
 import java.util.Date;
 import java.util.HashMap;
 
@@ -34,14 +32,12 @@ public class ExecutionContext {
 	private final HashMap<String,TextVar> textvars = new HashMap<String,TextVar>();
 	private final HashMap<String,XmlVar>  xmlvars  = new HashMap<String,XmlVar>();
 	private final Document doc;
-	private final GroovyObject groovy;
 	private RuntimeException asynchronousError=null;
 	private boolean allreadyDestroyed=false;
 
-	public ExecutionContext(RelayConnector connector, BodyBlock request, BodyBlock response, GroovyScript script) {
+	public ExecutionContext(RelayConnector connector, BodyBlock request, BodyBlock response) {
 		this.relayConnector=connector; 
 		this.organization=connector.getOrganization();
-		this.groovy=script.compile();
 
 		user=request.getSOAPTransaction().getUserCredentials().getOrganizationalUser();
     	int inputNode = request.getXMLNode();
@@ -127,9 +123,4 @@ public class ExecutionContext {
 		this.asynchronousError = asynchronousError;
 		this.notifyAll();
 	} 
-	
-	
-	public Object evalGroovyExpression(String exprName) {
-		return ""+groovy.invokeMethod(exprName, null);
-	}
 }
