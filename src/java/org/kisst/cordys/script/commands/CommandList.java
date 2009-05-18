@@ -27,6 +27,7 @@ public class CommandList {
 		basicCommands.addCommand("switch",  new GenericCommand(SwitchStep.class));
 		basicCommands.addCommand("replaceText",  new GenericCommand(ReplaceTextStep.class));
 		basicCommands.addCommand("groovy",  new GenericCommand(GroovyStep.class));
+		basicCommands.addCommand("getConfigValue",  new GenericCommand(GetConfigValueStep.class));
 	}
 
 	public static CommandList getBasicCommands() {

@@ -489,4 +489,32 @@ the method will return
 Note that elements at various depths are replaced.
 </para>
 </sect1>
+
+<sect1><title>getConfigValue command</title>
+<@xmlcode>
+<getConfigValue key="<replaceable>expression</replaceable>" resultVar="<replaceable>varName</replaceable>"/>
+</@xmlcode>
+<para>
+This command can be used to retrieve a value from the configuration file. 
+If you use a fixed name as key that this command is essentialy the same as:
+<@xmlcode>
+  <var name="<replaceable>varName</replaceable>" value="$ {<replaceable>key</replaceable>}" />
+</@xmlcode>
+The big difference is that in the getConfigValue, the key can be any expression.
+This means one can use this command to get a dynamically determined key from the config file.
+One of the main purposes of this command is to use it as a very simple Map mechanism.
+For example with the following step:
+<@xmlcode>
+<getConfigValue key="config.greeting. + /input/languauge" resultVar="greeting"/>
+</@xmlcode>
+One could define different greetings in the configuration file as follows:
+<@xmlcode>
+config.greeting.nl = Goedendag
+config.greeting.en = Hello
+config.greeting.de = Guten Tag
+</@xmlcode>
+This way one can easily add new languages in the configuration file.
+</para>
+
+</sect1>
 </chapter>
