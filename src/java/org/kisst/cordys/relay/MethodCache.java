@@ -19,7 +19,6 @@ import org.kisst.cordys.util.NomUtil;
 import com.eibus.connector.nom.CancelRequestException;
 import com.eibus.connector.nom.Connector;
 import com.eibus.connector.nom.SOAPMessageListener;
-import com.eibus.directory.soap.DirectoryException;
 import com.eibus.exception.ExceptionGroup;
 import com.eibus.exception.TimeoutException;
 import com.eibus.util.logger.CordysLogger;
@@ -45,13 +44,9 @@ public class MethodCache {
 	private CacheManager manager=null;
 	private Connector connector=null;
 	
-	public void init(Properties props) {
+	public void init(Connector connector2, Properties props) {
 		if (connector==null) {
-			try {
-				connector= Connector.getInstance("CachedMethodCaller");
-			} 
-			catch (ExceptionGroup e) { throw new RuntimeException(e); }
-			catch (DirectoryException e) { throw new RuntimeException(e); }
+			connector= connector2; 
 		}
 		String filename=props.getProperty("relay.cachemanager.file");
 		String url=props.getProperty("relay.cachemanager.url");
@@ -77,7 +72,7 @@ public class MethodCache {
 
 	public void reset(Properties properties) {
 		destroy();
-		init(properties);
+		init(connector, properties);
 	}
 
 	public void destroy() {
@@ -121,10 +116,15 @@ public class MethodCache {
 	
 	
 	public int sendAndWait(int method, long timeout) {
+		int response=0;
+		if (manager!=null)
+			response=getResponse(method);
 		try {
-			int response = connector.sendAndWait(method,timeout);
-			if (response!=0)
-				putResponse(method, response);
+			if (response==0) {
+				response = connector.sendAndWait(method,timeout);
+				if (response!=0)
+					putResponse(method, response);
+			}
 			return response;
 		}
 		catch (CancelRequestException e) {throw new RuntimeException(e); }
@@ -133,6 +133,14 @@ public class MethodCache {
 	}
 		
 	public void sendAndCallback(final int method, final SOAPMessageListener callback) {
+		if (manager!=null) {
+			int response=0;
+			response=getResponse(method);
+			if (response!=0) {
+				callback.onReceive(response);
+				return;
+			}
+		}
 		try {
 			connector.sendAndCallback(method,new SOAPMessageListener() {
 				@SuppressWarnings("deprecation")

@@ -42,7 +42,7 @@ public class RelayConnector extends ApplicationConnector {
     		conf.init(getConfiguration());
             connector= Connector.getInstance(CONNECTOR_NAME);
 
-            responseCache.init(conf.properties);
+            responseCache.init(connector, conf.properties);
             String moduleList=conf.get("modules");
             if (moduleList!=null && moduleList.trim().length()>0) {
             	String[] moduleNames=moduleList.split(",");

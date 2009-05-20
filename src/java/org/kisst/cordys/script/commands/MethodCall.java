@@ -149,7 +149,7 @@ public class MethodCall {
 			});
 		}
 		else {
-			handleResponse(context, caller.sendAndWait(Node.getParent(method),timeout));
+			handleResponse(context, caller.sendAndWait(method,timeout));
 		}
 	}
 
