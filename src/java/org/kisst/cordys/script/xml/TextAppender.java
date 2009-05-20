@@ -10,14 +10,15 @@ import com.eibus.xml.nom.Node;
 
 public class TextAppender implements XmlAppender {
 	private final String name;
+	private final String expressionText;
 	private final Expression textExpression;
 
 	// Special constructor needed to ignore the name attribute 
 	public TextAppender(CompilationContext compiler, int node, String name) {
 		this.name=name;
-		String text=Node.getAttribute(node, "text");
-		if (text!=null)
-			textExpression = ExpressionParser.parse(compiler, text);
+		expressionText=Node.getAttribute(node, "text");
+		if (expressionText!=null)
+			textExpression = ExpressionParser.parse(compiler, expressionText);
 		else
 			textExpression = new ConstantExpression(Node.getData(node));
 		
@@ -27,9 +28,11 @@ public class TextAppender implements XmlAppender {
 	}
 	public void append(ExecutionContext context, int toNode) {
 		String text=textExpression.getString(context);
+		if (text==null)
+			throw new RuntimeException("expression ["+expressionText+"] evaluated to null");
 		if (name!=null) 
 			Node.createTextElement(name, text, toNode);
 		else 
-			Node.getDocument(toNode).createText(text, toNode);
+			Node.setDataElement(toNode, "", text);
 	}
 }
