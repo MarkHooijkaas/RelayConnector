@@ -498,7 +498,7 @@ Note that elements at various depths are replaced.
 This command can be used to retrieve a value from the configuration file. 
 If you use a fixed name as key that this command is essentialy the same as:
 <@xmlcode>
-  <var name="<replaceable>varName</replaceable>" value="$ {<replaceable>key</replaceable>}" />
+  <var name="<replaceable>varName</replaceable>" value="${dollar}{<replaceable>key</replaceable>}" />
 </@xmlcode>
 The big difference is that in the getConfigValue, the key can be any expression.
 This means one can use this command to get a dynamically determined key from the config file.

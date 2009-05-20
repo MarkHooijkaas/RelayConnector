@@ -123,6 +123,22 @@ rule is to split around + signs, it is not possible to use a literal
 predefined variable ${dollar}{plus}, e.g. to use "C++" in a
 expression, one could encode this as "C+${dollar}{plus}+${dollar}{plus}". 
 </para>
+
+<para>
+Variables can be used using the ${dollar}{<replaceable>varname</replaceable>} syntax. 
+The varname might be a variable being declared earlier in the script, 
+using the &lt;var&gt; command (or possibly other commands).
+If this variable does not exist, the properties file is used to look for any property with that name.
+If neither exists, the scripts aborts with an error, unless a default value is specified.
+A default value can be specified using ?: after the varname, e.g.:
+<@xmlcode>
+<implementation type="RelayCall">
+  <output text="[Hello ]+ ${dollar}{config.username?:World}"/>
+</implementation>
+</@xmlcode>
+The default value is also used if a variable has been described in the script, 
+but is has a null value (I can't think of a situation where this may happen).
+</para>
 </sect2>
 </sect1>
 
