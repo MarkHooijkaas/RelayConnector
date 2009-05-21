@@ -8,24 +8,20 @@ import org.kisst.cordys.relay.RelayConfiguration;
 import org.kisst.cordys.relay.RelayConnector;
 import org.kisst.cordys.script.commands.CommandList;
 
-import com.eibus.soap.MethodDefinition;
 import com.eibus.xml.nom.Node;
 
-public class CompilationContext {
-	private final RelayConnector relayConnector;
-	private final MethodDefinition definition;
+public class CompilationContext implements PrefixContext {
 	private final CommandList commands;
+	private final TopScript script;
 	private final HashSet<String> txtvars=new HashSet<String>();
 	private final HashSet<String> xmlvars=new HashSet<String>();
 	private final Stack<String> parsePath = new Stack<String>();
 	private final HashMap<String,String> defaultAttributes = new HashMap<String,String>();  
-	private final HashMap<String,String> prefixes = new HashMap<String,String>();  
 
-	public CompilationContext(RelayConnector connector, MethodDefinition def)
+	public CompilationContext(TopScript script)
     {
-		this.relayConnector=connector; 
-		this.definition=def;
-		this.commands=CommandList.getBasicCommands();
+		this.script=script;
+		this.commands=new CommandList();
 	    
 	    declareXmlVar("input");
 		declareXmlVar("output");
@@ -58,19 +54,6 @@ public class CompilationContext {
 		return txtvars.contains(name); 
 	}
 
-	public String getMethodDn() {
-		return definition.getMethodDN().toString();
-	}
-	public String getMethodName() {
-		return definition.getMethodName();
-	}
-	public String getMethodNamespace() {
-		return definition.getNamespace();
-	}
-	public String getFullMethodName() {
-		return getMethodNamespace()+"/"+getMethodName();
-	}
-	
 	public void pushActivity(String descr) {
 		parsePath.push(descr);
 	}
@@ -98,17 +81,8 @@ public class CompilationContext {
 		return Boolean.parseBoolean(str); // TODO: more strict checking
 	}
 
-	public RelayConnector getRelayConnector() { return relayConnector; }
-	public RelayConfiguration getConfiguration() { return relayConnector.conf; }
-	
-	public void addPrefix(String prefix, String namespace) {
-		if (prefixes.containsKey(prefix))
-			throw new RuntimeException("prefix "+prefix+" allready defined when trying to set new namespace "+namespace);
-		prefixes.put(prefix,namespace);
-	}
-	public String resolvePrefix(String prefix) {
-		if (! prefixes.containsKey(prefix))
-			throw new RuntimeException("unknown prefix "+prefix);
-		return prefixes.get(prefix);
-	}
+	public void addPrefix(String prefix, String namespace) { script.addPrefix(prefix, namespace); }
+	public String resolvePrefix(String prefix) { return script.resolvePrefix(prefix); }
+	public RelayConfiguration getConfiguration() { return script.getConfiguration(); }
+	public RelayConnector getRelayConnector() { return script.getRelayConnector(); }
 }

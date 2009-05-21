@@ -3,7 +3,7 @@ package org.kisst.cordys.relay;
 import java.util.HashMap;
 import java.util.Properties;
 
-import org.kisst.cordys.script.Script;
+import org.kisst.cordys.script.TopScript;
 
 import com.eibus.connector.nom.Connector;
 import com.eibus.directory.soap.DirectoryException;
@@ -11,7 +11,6 @@ import com.eibus.exception.ExceptionGroup;
 import com.eibus.management.IManagedComponent;
 import com.eibus.soap.ApplicationConnector;
 import com.eibus.soap.ApplicationTransaction;
-import com.eibus.soap.MethodDefinition;
 import com.eibus.soap.Processor;
 import com.eibus.soap.SOAPTransaction;
 
@@ -22,7 +21,7 @@ public class RelayConnector extends ApplicationConnector {
 	public final RelayConfiguration conf=new RelayConfiguration(null);
 	private Connector connector;
 	private String dnOrganization;
-	private final HashMap<String, Script> scriptCache=new HashMap<String, Script>();
+	final HashMap<String, TopScript> scriptCache=new HashMap<String, TopScript>();
 	public Properties properties=null;
 	private Module[] modules=new Module[0];
 	public final MethodCache responseCache=new MethodCache();
@@ -101,15 +100,4 @@ public class RelayConnector extends ApplicationConnector {
 
 	public Connector getConnector() { return connector; }
 	public String getOrganization() { return dnOrganization; }
-	
-	public Script getScript(MethodDefinition def) {
-		String methodName=def.getNamespace()+"/"+def.getMethodName();
-		Script script=scriptCache.get(methodName);
-		if (script==null) {
-			script=new Script(this, def);
-			if (conf.getCacheScripts())
-				scriptCache.put(methodName, script);
-		}
-		return script;
-	}
 }

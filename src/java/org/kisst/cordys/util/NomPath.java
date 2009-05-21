@@ -1,6 +1,6 @@
 package org.kisst.cordys.util;
 
-import org.kisst.cordys.script.CompilationContext;
+import org.kisst.cordys.script.PrefixContext;
 
 import com.eibus.xml.nom.Node;
 
@@ -8,7 +8,7 @@ public class NomPath {
 	private final String[] elements;
 	private final String[] namespaces;
 
-	public NomPath(CompilationContext compiler, String str) {
+	public NomPath(PrefixContext prefixContext, String str) {
 		while (str.endsWith("/"))
 			str=str.substring(0, str.length()-1);
 		while (str.startsWith("/"))
@@ -24,7 +24,7 @@ public class NomPath {
 			for(int i=0; i<elements.length; i++) {
 				int pos=elements[i].indexOf(":");
 				if (pos>=0) {
-					namespaces[i]=compiler.resolvePrefix(elements[i].substring(0,pos));
+					namespaces[i]=prefixContext.resolvePrefix(elements[i].substring(0,pos));
 					elements[i]=elements[i].substring(pos+1);
 				}
 			}

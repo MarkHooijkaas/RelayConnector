@@ -29,12 +29,13 @@ public class CommandList {
 		basicCommands.addCommand("groovy",  new GenericCommand(GroovyStep.class));
 		basicCommands.addCommand("getConfigValue",  new GenericCommand(GetConfigValueStep.class));
 	}
+	public static void addBasicCommand(String name, Command type) {	basicCommands.addCommand(name, type); }
 
-	public static CommandList getBasicCommands() {
-		return basicCommands;
+
+	public CommandList() {
+		this.parent=basicCommands;
 	}
-
-	public CommandList(CommandList parent) {
+	private CommandList(CommandList parent) {
 		this.parent=parent;
 	}
 	private final CommandList parent;

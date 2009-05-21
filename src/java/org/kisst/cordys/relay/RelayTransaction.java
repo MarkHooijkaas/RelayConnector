@@ -1,6 +1,6 @@
 package org.kisst.cordys.relay;
 
-import org.kisst.cordys.script.Script;
+import org.kisst.cordys.script.TopScript;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;
@@ -40,8 +40,8 @@ public class RelayTransaction  implements ApplicationTransaction
     	}
 		MethodDefinition def = request.getMethodDefinition();
     	try {
-    		Script script=connector.getScript(def);
-    		script.execute(connector, request, response);
+    		TopScript script=getScript(def);
+    		script.execute(request, response);
     	}
     	catch (SoapFaultException e) {
     		e.createResponse(response);
@@ -51,4 +51,16 @@ public class RelayTransaction  implements ApplicationTransaction
     	}
         return true; // connector has to send the response
     }
+    
+	private TopScript getScript(MethodDefinition def) {
+		String methodName=def.getNamespace()+"/"+def.getMethodName();
+		TopScript script=connector.scriptCache.get(methodName);
+		if (script==null) {
+			script=new TopScript(connector, def);
+			if (connector.conf.getCacheScripts())
+				connector.scriptCache.put(methodName, script);
+		}
+		return script;
+	}
+
 }
