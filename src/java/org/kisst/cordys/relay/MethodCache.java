@@ -132,6 +132,7 @@ public class MethodCache {
 		catch (ExceptionGroup e) { throw new RuntimeException(e); }
 	}
 		
+	@SuppressWarnings("deprecation")
 	public void sendAndCallback(final int method, final SOAPMessageListener callback) {
 		if (manager!=null) {
 			int response=0;
