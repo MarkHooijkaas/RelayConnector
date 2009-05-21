@@ -1,0 +1,25 @@
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP:Body>
+    <DeleteRecursive xmlns="http://schemas.cordys.com/1.0/ldap" sync_id="0">
+      <tuple sync_id="0">
+        <old>
+          <entry dn="cn=${name},cn=method sets,${org}">
+            <cn>
+              <string>${name}</string>
+            </cn>
+            <objectclass>
+              <string>top</string>
+              <string>busmethodset</string>
+            </objectclass>
+            <labeleduri>
+              <string>${namespace}</string>
+            </labeleduri>
+            <implementationclass>
+              <string>${type}</string>
+            </implementationclass>
+          </entry>
+        </old>
+      </tuple>
+    </DeleteRecursive>
+  </SOAP:Body>
+</SOAP:Envelope>

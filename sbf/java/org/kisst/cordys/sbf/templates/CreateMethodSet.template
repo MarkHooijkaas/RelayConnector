@@ -1,0 +1,25 @@
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP:Body>
+    <Update xmlns="http://schemas.cordys.com/1.0/ldap" sync_id="0">
+      <tuple sync_id="0">
+        <new>
+          <entry dn="cn=${name},cn=method sets,${org}">
+            <objectclass>
+              <string>top</string>
+              <string>busmethodset</string>
+            </objectclass>
+            <cn>
+              <string>${name}</string>
+            </cn>
+            <labeleduri>
+              <string>${namespace}</string>
+            </labeleduri>
+            <implementationclass>
+              <string>${type}</string>
+            </implementationclass>
+          </entry>
+        </new>
+      </tuple>
+    </Update>
+  </SOAP:Body>
+</SOAP:Envelope>
