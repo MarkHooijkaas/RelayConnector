@@ -1,5 +1,7 @@
 package org.kisst.cordys.util;
 
+import java.util.ArrayList;
+
 import com.eibus.xml.nom.Node;
 
 public class NomNode {
@@ -25,5 +27,14 @@ public class NomNode {
 		}
 		return result;
 	}
-	
+
+	public Object getAt(String path) {
+		ArrayList<Object> result=new ArrayList<Object>();
+		NomPath p=new NomPath(null, path); // Note: no prefixes possible yet
+		p.fillNodeList(node, 0, result, false);
+		if (p.isAlwaysSingle())
+			return result.get(0);
+		else
+			return result;
+	}
 }
