@@ -1,6 +1,7 @@
 package org.kisst.cordys.relay;
 
 import com.eibus.soap.BodyBlock;
+import com.eibus.xml.nom.Node;
 
 
 /** 
@@ -36,10 +37,15 @@ public class SoapFaultException extends RuntimeException {
 	 * @param response the respose BodyBlock 
 	 */
 	public void createResponse(BodyBlock response) {
-		response.createSOAPFault(faultcode,faultstring);
+		int node=response.createSOAPFault(faultcode,faultstring);
+		String details=getDetails();
+		if (details!=null) {
+			Node.createTextElement("details", details, node);
+		}
 	}
 	
-	public String getFaultcode() { return faultcode; } 
+	public String getDetails()     { return null; }
+	public String getFaultcode()   { return faultcode; } 
 	public String getFaultstring() { return faultstring; } 
 }	
 

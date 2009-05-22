@@ -1,7 +1,7 @@
 package org.kisst.cordys.http;
 
-import org.kisst.cordys.relay.CompileException;
 import org.kisst.cordys.script.CompilationContext;
+import org.kisst.cordys.script.CompilationException;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
 import org.kisst.cordys.script.expression.Expression;
@@ -28,7 +28,7 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 
 		replyToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "replyTo"));
 		if (wsa && replyToExpression==null)
-			throw new CompileException("when wsa attribute is true a replyTo attribute is mandatory");
+			throw new CompilationException(compiler, "when wsa attribute is true a replyTo attribute is mandatory");
 		faultToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "faultTo"));
 	}
 
