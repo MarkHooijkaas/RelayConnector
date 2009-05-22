@@ -5,7 +5,6 @@ import java.util.HashMap;
 import org.kisst.cordys.relay.RelayConfiguration;
 import org.kisst.cordys.relay.RelayConnector;
 
-import com.eibus.soap.BodyBlock;
 import com.eibus.soap.MethodDefinition;
 
 public class TopScript extends Script {
@@ -20,25 +19,11 @@ public class TopScript extends Script {
 		this.definition=def;
     	this.name=getFullMethodName();
 		CompilationContext compiler=new CompilationContext(this);
-		boolean done=false;
-		try {
-			compile(compiler, def.getImplementation());
-			done=true;
-		}
-		finally {
-			if (! done)
-				compiler.getTrace(); // TODO: how to return to caller, including??
-		}
-	}
-
-	public void execute(BodyBlock request, BodyBlock response) {
-		ExecutionContext context=new ExecutionContext(relayConnector, request, response);
-		try {
-			executeStep(context);
-		}
-		finally {
-			context.destroy();
-		}
+    	try {
+    		compile(compiler, def.getImplementation());
+    	}
+    	catch (CompilationException e) { throw e; }
+    	catch (Exception e) { throw new CompilationException(compiler, e.getMessage(), e); }
 	}
 
 	public void addPrefix(String prefix, String namespace) {

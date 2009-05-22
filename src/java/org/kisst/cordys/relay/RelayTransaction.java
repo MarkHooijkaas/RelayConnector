@@ -1,5 +1,9 @@
 package org.kisst.cordys.relay;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.TopScript;
 
 import com.eibus.soap.ApplicationTransaction;
@@ -39,12 +43,22 @@ public class RelayTransaction  implements ApplicationTransaction
     		logger.log(Severity.INFO, "Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), true));
     	}
 		MethodDefinition def = request.getMethodDefinition();
+		ExecutionContext context=new ExecutionContext(connector, request, response);
     	try {
     		TopScript script=getScript(def);
-    		script.execute(request, response);
+    		script.executeStep(context);
     	}
     	catch (SoapFaultException e) {
     		e.createResponse(response);
+    	}
+    	catch (Exception e) {
+    		int node=response.createSOAPFault("UnknownError",e.toString());
+    		StringWriter sw = new StringWriter();
+    		e.printStackTrace(new PrintWriter(sw));
+    		String details= sw.toString();
+    		if (details!=null) {
+    			Node.createTextElement("details", details, node);
+    		}
     	}
     	if (logger.isInfoEnabled()) {
     		logger.log(Severity.INFO, "Replied with response:\n"+Node.writeToString(Node.getParent(Node.getParent(response.getXMLNode())), true));

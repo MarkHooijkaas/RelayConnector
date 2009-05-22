@@ -5,7 +5,7 @@ import org.kisst.cordys.relay.SoapFaultException;
 
 
 /** 
- * This Exception class is used to indicate an error in a Method definition.
+ * This Exception class is used to indicate an error in a Script execution.
  * 
  */
 public class ExecutionException extends SoapFaultException {

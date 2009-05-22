@@ -5,7 +5,7 @@ import org.kisst.cordys.relay.SoapFaultException;
 
 
 /** 
- * This Exception class is used to indicate an error in a Method definition.
+ * This Exception class is used to indicate an error in a Script compilation.
  * 
  */
 public class CompilationException extends SoapFaultException {
@@ -13,8 +13,13 @@ public class CompilationException extends SoapFaultException {
 
 	private final CompilationContext compiler;
 
+	public CompilationException(CompilationContext compiler, String faultstring, Throwable e) {
+		super("Method.Compilation.Error",faultstring, e);
+		this.compiler=compiler;
+	}
+
 	public CompilationException(CompilationContext compiler, String faultstring) {
-		super("Method.Compile.Error",faultstring);
+		super("Method.Compilation.Error",faultstring);
 		this.compiler=compiler;
 	}
 	
