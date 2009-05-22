@@ -12,15 +12,23 @@ public class TopScript extends Script {
 	private final RelayConnector relayConnector;
 	private final MethodDefinition definition;
 	private final String name;
-	private final HashMap<String,String> prefixes = new HashMap<String,String>();  
-
+	private final HashMap<String,String> prefixes = new HashMap<String,String>();
+	
 	public TopScript(RelayConnector connector, MethodDefinition def) {
 		super(def.getImplementation());
 		this.relayConnector=connector; 
 		this.definition=def;
     	this.name=getFullMethodName();
-		CompilationContext compiler=new CompilationContext(this); 
-		compile(compiler, def.getImplementation());
+		CompilationContext compiler=new CompilationContext(this);
+		boolean done=false;
+		try {
+			compile(compiler, def.getImplementation());
+			done=true;
+		}
+		finally {
+			if (! done)
+				compiler.getTrace(); // TODO: how to return to caller, including??
+		}
 	}
 
 	public void execute(BodyBlock request, BodyBlock response) {
@@ -51,5 +59,4 @@ public class TopScript extends Script {
 	public String getFullMethodName() {	return getMethodNamespace()+"/"+getMethodName(); }
 	public RelayConnector getRelayConnector() { return relayConnector; }
 	public RelayConfiguration getConfiguration() { return relayConnector.conf; }
-
 }

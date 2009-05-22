@@ -10,13 +10,13 @@ import org.kisst.cordys.script.commands.CommandList;
 
 import com.eibus.xml.nom.Node;
 
-public class CompilationContext implements PrefixContext {
+public class CompilationContext extends Traceable implements PrefixContext {
 	private final CommandList commands;
 	private final TopScript script;
 	private final HashSet<String> txtvars=new HashSet<String>();
 	private final HashSet<String> xmlvars=new HashSet<String>();
 	private final Stack<String> parsePath = new Stack<String>();
-	private final HashMap<String,String> defaultAttributes = new HashMap<String,String>();  
+	private final HashMap<String,String> defaultAttributes = new HashMap<String,String>();
 
 	public CompilationContext(TopScript script)
     {
