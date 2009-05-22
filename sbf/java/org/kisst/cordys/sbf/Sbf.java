@@ -105,19 +105,17 @@ public class Sbf {
 			}
 			catch (java.io.IOException e) { throw new RuntimeException(e);  }
 		}
-		url     =(String) properties.get("cordys.gateway.url");
-		String host     =(String) properties.get("cordys.gateway.host");
-		String realm    =(String) properties.get("cordys.gateway.realm");
-		int port     =80;
+		url      =(String) properties.get("cordys.gateway.url");
 		username=(String) properties.get("cordys.gateway.username");
 		password=(String) properties.get("cordys.gateway.password");
 		organization =(String) properties.get("cordys.organization");
+		//url="http://"+host+":"+port+"/cordys/com.eibus.web.soap.Gateway.wcp?organization="+organization;
 		if (url.indexOf("Gateway.wcp")<=0) {
-			if (url.endsWith("cordys"))
+			if (! url.endsWith("/"))
 				url+="/";
 			url+="com.eibus.web.soap.Gateway.wcp?organization="+organization;
 		}
-		client.getState().setCredentials(new AuthScope(host,port,realm),new UsernamePasswordCredentials(username, password));
+		client.getState().setCredentials(AuthScope.ANY,	new UsernamePasswordCredentials(username, password));
 
 	}
 }
