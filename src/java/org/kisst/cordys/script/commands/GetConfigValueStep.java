@@ -1,5 +1,6 @@
 package org.kisst.cordys.script.commands;
 
+import org.kisst.cordys.relay.RelayModule;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
@@ -19,6 +20,6 @@ public class GetConfigValueStep implements Step {
 	}
 
 	public void executeStep(final ExecutionContext context) {
-		context.setTextVar(resultVar, context.getRelayConnector().conf.get(expr.getString(context)));
+		context.setTextVar(resultVar, RelayModule.getSettings().get(expr.getString(context)));
 	}
 }

@@ -1,26 +1,18 @@
 package org.kisst.cfg4j;
 
-public class IntSetting extends SingleSetting {
-  private int value;
+import java.util.Properties;
 
-  public IntSetting(MultiSetting parent, String name) {
-	super(parent,name);
+public class IntSetting extends Setting {
+  private final int value;
+
+  public IntSetting(Setting parent, String name, Properties props, int defaultValue) {
+	super(parent, name);
+	String value=props.getProperty(fullName, null);
+	if (value==null)
+		this.value=defaultValue;
+	else
+		this.value=Integer.parseInt(value);
   }
-
-  public IntSetting(MultiSetting parent, String name, int defaultValue) {
-	this(parent, name); 
-	// TODO: remember default value?
-	set(defaultValue);
-  }
-
-  public void set(String value) { set(Integer.parseInt( value)); }
   public String asString() { return Integer.toString(value); }
-
   public int get() { return this.value; }
-  public void set(int value) { 
-	//MultiSetting.logger.debug("Setting "+fullName+" to "+value);
-	this.value=value; 
-	isSet=true;
-  }
-
 }

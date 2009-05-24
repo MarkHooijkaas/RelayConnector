@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 
-import org.kisst.cordys.relay.RelayConfiguration;
 import org.kisst.cordys.relay.RelayConnector;
 import org.kisst.cordys.script.commands.CommandList;
 
@@ -83,6 +82,5 @@ public class CompilationContext extends Traceable implements PrefixContext {
 
 	public void addPrefix(String prefix, String namespace) { script.addPrefix(prefix, namespace); }
 	public String resolvePrefix(String prefix) { return script.resolvePrefix(prefix); }
-	public RelayConfiguration getConfiguration() { return script.getConfiguration(); }
 	public RelayConnector getRelayConnector() { return script.getRelayConnector(); }
 }

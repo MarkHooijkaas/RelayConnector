@@ -1,19 +1,16 @@
 package org.kisst.cfg4j;
 
-import java.util.Properties;
 
 public abstract class Setting {
-  public final MultiSetting parent;
-  public final String fullName;
-  public final String name;
-  public boolean required;
-  protected boolean isSet;
+  //private final MultiSetting parent;
+  protected final String fullName;
+  protected final String name;
+  //private final boolean required;
 
-  public Setting(MultiSetting parent, String name) {
-	this.parent=parent;
+  public Setting(Setting parent, String name) {
+	//this.parent=parent;
 	this.name=name;
-	this.required=true;
-	this.isSet=false;
+	//this.required=required;
 	if(parent==null) 
 	  fullName=name;
 	else {
@@ -21,21 +18,12 @@ public abstract class Setting {
 			fullName=name;
 		else
 			fullName=parent.fullName+"."+name;
-	  parent.add(this);
 	}
   }
   
-  public boolean ok() { return this.isSet || ! this.required; }
+  //public boolean ok() { return ! this.required; }
 
 
 
-  public void set(Properties props) {
-	  String value=props.getProperty(fullName);
-	  if (value!=null)
-		  set(value);
-  }
-
-
-  abstract public void set(String value);
   abstract public String asString();
 }

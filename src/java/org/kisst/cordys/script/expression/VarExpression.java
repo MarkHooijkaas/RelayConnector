@@ -1,5 +1,6 @@
 package org.kisst.cordys.script.expression;
 
+import org.kisst.cordys.relay.RelayModule;
 import org.kisst.cordys.relay.SoapFaultException;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
@@ -32,7 +33,7 @@ public class VarExpression implements Expression {
 		if (compiler.textVarExists(varname))
 			value=null; // null indicates it still needs to be determined from a variable
 		else {
-			String configvalue=compiler.getConfiguration().get(varname, null);
+			String configvalue=RelayModule.getSettings().get(varname, null);
 			// Note: if compiled script is cached, and configuration is reloaded,
 			// the script cache is cleared, so it is safe to remember here, even if script is cached
 			if (configvalue!=null)

@@ -2,7 +2,6 @@ package org.kisst.cordys.script;
 
 import java.util.HashMap;
 
-import org.kisst.cordys.relay.RelayConfiguration;
 import org.kisst.cordys.relay.RelayConnector;
 
 import com.eibus.soap.MethodDefinition;
@@ -43,5 +42,4 @@ public class TopScript extends Script {
 	public String getMethodNamespace() { return definition.getNamespace();	}
 	public String getFullMethodName() {	return getMethodNamespace()+"/"+getMethodName(); }
 	public RelayConnector getRelayConnector() { return relayConnector; }
-	public RelayConfiguration getConfiguration() { return relayConnector.conf; }
 }

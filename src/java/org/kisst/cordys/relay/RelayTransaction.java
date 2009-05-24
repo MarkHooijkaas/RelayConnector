@@ -71,7 +71,7 @@ public class RelayTransaction  implements ApplicationTransaction
 		TopScript script=connector.scriptCache.get(methodName);
 		if (script==null) {
 			script=new TopScript(connector, def);
-			if (connector.conf.getCacheScripts())
+			if (RelayModule.getSettings().cacheScripts.get())
 				connector.scriptCache.put(methodName, script);
 		}
 		return script;

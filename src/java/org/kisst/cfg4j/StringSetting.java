@@ -1,24 +1,14 @@
 package org.kisst.cfg4j;
 
-public class StringSetting extends SingleSetting {
-  private String value=null;
+import java.util.Properties;
 
-  public StringSetting(MultiSetting parent, String name) {
+public class StringSetting extends Setting {
+  private final String value;
+
+  public StringSetting(Setting parent, String name, Properties props, String defaultValue) {
 	super(parent,name);
+	this.value=props.getProperty(fullName, defaultValue);
   }
-
-  public StringSetting(MultiSetting parent, String name, String defaultValue) {
-	this(parent, name);
-	// TODO: remember default value?
-	set(defaultValue);
-  }
-
   public String get() { return this.value; }
-  public void set(String value) { 
-	//MultiSetting.logger.debug("Setting "+fullName+" to "+value);
-	this.value=value;
-	this.isSet=true;
-  }
-
   public String asString() { return value; }
 }

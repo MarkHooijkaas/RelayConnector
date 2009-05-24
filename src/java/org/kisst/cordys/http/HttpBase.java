@@ -24,20 +24,14 @@ public class HttpBase {
     	client.getParams().setAuthenticationPreemptive(true);
     }
 	
-    private final HttpConnector connector;
     private final XmlExpression body;
     private final boolean prettyPrint;
     private final int timeout;
 	
 	public HttpBase(CompilationContext compiler, final int node) {
-		connector=(HttpConnector) compiler.getRelayConnector();
 		prettyPrint = compiler.getSmartBooleanAttribute(node, "prettyPrint", false);
 		timeout = Integer.parseInt(compiler.getSmartAttribute(node, "timeout", "30000"));
 		body=new XmlExpression(compiler, Node.getAttribute(node, "body", "/input/../.."));
-	}
-
-	protected HttpConnector.Settings getSettings() {
-		return connector.settings;
 	}
 
 	protected int createBody(final ExecutionContext context) {
@@ -60,7 +54,7 @@ public class HttpBase {
 	private HttpResponse retrieveResponse(PostMethod method, int statusCode) {
 		try {
 			HttpResponse result=new HttpResponse(statusCode, method.getResponseBody());
-			if (statusCode >= 300 && ! connector.settings.http.ignoreReturnCode.get()) {
+			if (statusCode >= 300 && ! HttpModule.getSettings().ignoreReturnCode.get()) {
 				throw new HttpSoapFaultException(result);
 			}
 			return result;

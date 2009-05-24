@@ -1,12 +1,11 @@
 package org.kisst.cfg4j;
 
-public class PasswordSetting extends StringSetting {
-  public PasswordSetting(MultiSetting parent, String name) {
-	super(parent,name);
-  }
+import java.util.Properties;
 
-  public PasswordSetting(MultiSetting parent, String name, String defaultValue) {
-	  super(parent, name, defaultValue);
+public class PasswordSetting extends StringSetting {
+
+  public PasswordSetting(ExpandableSetting parent, String name, Properties props, String defaultValue) {
+	  super(parent, name, props, defaultValue);
   }
 
   public String asString() { return "[secret password]"; }

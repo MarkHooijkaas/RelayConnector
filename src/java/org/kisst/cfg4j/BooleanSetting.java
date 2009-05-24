@@ -1,38 +1,24 @@
 package org.kisst.cfg4j;
 
+import java.util.Properties;
 
-public class BooleanSetting extends SingleSetting {
-  private boolean value;
 
-  public BooleanSetting(MultiSetting parent, String name) {
-	super(parent,name);
+public class BooleanSetting extends Setting {
+  private final boolean value;
+
+  public BooleanSetting(Setting parent, String name, Properties props, boolean defaultValue) {
+	super(parent, name);
+	String value=props.getProperty(fullName, null);
+	if (value==null)
+		this.value=defaultValue;
+	else if ("true".equals(value))
+		this.value=true;
+	else if ("false".equals(value))
+		this.value=false;
+	else
+		throw new RuntimeException("property "+fullName+" should be true or false, not "+value);
   }
-
-  public BooleanSetting(MultiSetting parent, String name, boolean defaultValue) {
-	this(parent, name);
-	set(defaultValue);
-  }
-
-  public void set(String str) {
-	if (str==null) {
-	  set(false); // TODO: set false, or ignore
-	  return; 
-	}
-	str=str.toUpperCase();
-	boolean result=false;
-	if (str.equals("TRUE")) result=true;
-	if (str.equals("ON")) result=true;
-	if (str.equals("1")) result=true;
-	set(result);
-  }
-
   public boolean get() { return this.value; }
-  public void set(boolean value) { 
-	//MultiSetting.logger.debug("Setting "+fullName+" to "+value);
-	this.value=value; 
-    this.isSet=true;
-  }
-
   public String asString() { return Boolean.toString(value); }
 
 }

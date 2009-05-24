@@ -3,6 +3,7 @@ package org.kisst.cordys.script.commands;
 import java.util.Date;
 
 import org.kisst.cordys.relay.MethodCache;
+import org.kisst.cordys.relay.RelayModule;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.Expression;
@@ -59,7 +60,7 @@ public class MethodCall {
 		async=compiler.getSmartBooleanAttribute(node, "async", false);
 		showSoap=compiler.getSmartBooleanAttribute(node, "showSoap", false);
 		ignoreSoapFault=compiler.getSmartBooleanAttribute(node, "ignoreSoapFault", false);
-		logSoapFault=parseSeverity(compiler.getSmartAttribute(node, "logSoapFault", compiler.getConfiguration().settings.logSoapFaults.get()));
+		logSoapFault=parseSeverity(compiler.getSmartAttribute(node, "logSoapFault", RelayModule.getSettings().logSoapFaults.get()));
 		appender=new ElementAppender(compiler, node);
 		String appendMessagesToString = compiler.getSmartAttribute(node, "appendMessagesTo", null);
 		if (appendMessagesToString==null)
@@ -87,7 +88,7 @@ public class MethodCall {
 		compiler.declareXmlVar(resultVar);
 		String timeoutString=Node.getAttribute(node, "timeout");
 		if (timeoutString==null)
-			timeout=compiler.getConfiguration().getTimeout();
+			timeout=RelayModule.getSettings().timeout.get();
 		else
 			timeout=Long.parseLong(timeoutString);
 	}
