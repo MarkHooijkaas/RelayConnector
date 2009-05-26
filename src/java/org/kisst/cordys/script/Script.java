@@ -22,6 +22,8 @@ public class Script implements Step{
     	int node = Node.getFirstChild(scriptNode);
     	while (node != 0) {
     		try {
+    			if (compiler.debugTraceEnabled())
+    				compiler.traceDebug("compiling "+NomUtil.nodeToString(node));
     			steps[i]=compiler.compile(node);
     		}
     		catch (Exception e) {
@@ -29,16 +31,21 @@ public class Script implements Step{
     			Throwable t=e;
     			while (t.getCause()!=null)
     				t=t.getCause();
-    			throw new RuntimeException("Error when parsing "+s+", original error: "+t.getMessage(),e);
+    			throw new CompilationException(compiler, "Error when parsing "+s+", original error: "+t.getMessage(),e);
     		}
     		node = Node.getNextSibling(node);
     		i++;
     	}
 	}
-	
+
 	public void executeStep(ExecutionContext context) {
-		for (int i=0; i<steps.length; i++)
-			if (steps[i]!=null) // Allow null steps
+		for (int i=0; i<steps.length; i++) {
+			if (steps[i]!=null) {// skip null steps 
+				if (context.debugTraceEnabled())
+					context.traceDebug("executing "+steps[i].toString());
 				steps[i].executeStep(context);
+			}
+		}
 	}
 }
+
