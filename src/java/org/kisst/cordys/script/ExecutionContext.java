@@ -11,7 +11,7 @@ import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Document;
 import com.eibus.xml.nom.Node;
 
-public class ExecutionContext extends Traceable {
+public class ExecutionContext extends RelayTrace {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(ExecutionContext.class);
 	
 	private static class XmlVar {

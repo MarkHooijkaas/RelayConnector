@@ -9,7 +9,7 @@ import org.kisst.cordys.script.commands.CommandList;
 
 import com.eibus.xml.nom.Node;
 
-public class CompilationContext extends Traceable implements PrefixContext {
+public class CompilationContext extends RelayTrace implements PrefixContext {
 	private final CommandList commands;
 	private final TopScript script;
 	private final HashSet<String> txtvars=new HashSet<String>();

@@ -29,15 +29,15 @@ public class TraceStep implements Step {
 		else
 			throw new RuntimeException("opional target attribute should be all, compiler or execution");
 		if (traceCompilation) {
-			compiler.setDebug(newvalue);
-			compiler.trace("Setting compilation trace to "+newvalue);
+			compiler.setDebugTrace(newvalue);
+			compiler.traceDebug("Setting compilation trace to "+newvalue);
 		}
 	}
 
 	public void executeStep(ExecutionContext context) {
 		if (traceExecution) {
-			context.setDebug(newvalue);
-			context.trace("Setting execution trace to "+newvalue);
+			context.setDebugTrace(newvalue);
+			context.traceDebug("Setting execution trace to "+newvalue);
 		}
 	}
 }

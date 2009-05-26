@@ -82,8 +82,12 @@
                     <implementation><xsl:value-of select="$CLASSFILE"/></implementation>
                     <sharejvm>true</sharejvm>
                     <spycategory />
-                    <loggercategory />
-                    <classpath>
+                    <loggercategory>
+                      <categorygroup displayname="RelayTrace">
+                         <category>org.kisst.cordys.script.RelayTrace</category>
+                      </categorygroup>
+                   </loggercategory>     
+                   <classpath>
                       <xsl:for-each select="project/jarfiles/pathelement">
                         <location>/<xsl:value-of select="$ORG"/>/<xsl:value-of select="$PROJECT"/>-<xsl:value-of select="$VERSION"/>/<xsl:call-template name="basename"><xsl:with-param name="path" select="@location"/></xsl:call-template></location>
                       </xsl:for-each>
