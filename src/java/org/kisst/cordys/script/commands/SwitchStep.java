@@ -21,8 +21,17 @@ public class SwitchStep implements Step {
     		script=new Script(compiler, node);
     	}
     	private boolean evaluate(final ExecutionContext context, String casevalue) {
-    		if (value!=null && ! value.equals(casevalue))
+    		if (value!=null && ! value.equals(casevalue)) {
+    			if (context.debugTraceEnabled()) 
+   					context.traceDebug("case did not match for "+value );
     			return false;
+    		}
+			if (context.debugTraceEnabled()) {
+				if (value==null)
+					context.traceDebug("case match for otherwise");
+				else
+					context.traceDebug("case match for "+value );
+			}
     		script.executeStep(context);
     		return true;
     	}
@@ -48,15 +57,13 @@ public class SwitchStep implements Step {
 		if (context.debugTraceEnabled())
 			context.traceDebug("switch on value "+casevalue );
 		for (int i=0; i<cases.length; i++) {
-			if (context.debugTraceEnabled())
-				context.traceDebug("checking case "+cases[i].value );
 			boolean done=cases[i].evaluate(context, casevalue);
 			if (done) {
-				context.traceDebug("case matched");
+				context.traceDebug("end switch");
 				return;
 			}
 		}
-		context.traceDebug("end switch");
+		context.traceDebug("end switch without match");
 
 	}
 }

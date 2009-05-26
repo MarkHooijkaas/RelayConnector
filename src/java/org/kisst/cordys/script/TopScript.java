@@ -11,13 +11,14 @@ public class TopScript extends Script {
 	private final MethodDefinition definition;
 	private final String name;
 	private final HashMap<String,String> prefixes = new HashMap<String,String>();
+	private final CompilationContext compiler;
 	
 	public TopScript(RelayConnector connector, MethodDefinition def) {
 		super(def.getImplementation());
 		this.relayConnector=connector; 
 		this.definition=def;
     	this.name=getFullMethodName();
-		CompilationContext compiler=new CompilationContext(this);
+		compiler=new CompilationContext(this);
     	try {
     		compile(compiler, def.getImplementation());
     	}

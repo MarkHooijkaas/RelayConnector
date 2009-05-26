@@ -61,7 +61,7 @@ public class RelayTransaction  implements ApplicationTransaction
         	context.destroy();
         	String trace=context.getTrace();
         	if (trace != null) {
-    			Node.createTextElement("details", trace, response.getXMLNode());
+    			Node.createTextElement("trace", trace, response.getXMLNode());
         	}
     	}
         return true; // connector has to send the response
