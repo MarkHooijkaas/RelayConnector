@@ -9,14 +9,10 @@ import org.kisst.cordys.script.TopScript;
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;
 import com.eibus.soap.MethodDefinition;
-import com.eibus.util.logger.CordysLogger;
-import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
 public class RelayTransaction  implements ApplicationTransaction
 {
-	private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTransaction.class);
-
 	private final RelayConnector connector;
 	
 	public RelayTransaction(RelayConnector connector) {
@@ -39,14 +35,15 @@ public class RelayTransaction  implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
-    	if (logger.isInfoEnabled()) {
-    		logger.log(Severity.INFO, "Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), true));
-    	}
 		MethodDefinition def = request.getMethodDefinition();
 		ExecutionContext context=new ExecutionContext(connector, request, response);
     	try {
+        	if (context.infoTraceEnabled())
+        		context.traceInfo("Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), true));
     		TopScript script=getScript(def);
     		script.executeStep(context);
+        	if (context.infoTraceEnabled())
+        		context.traceInfo("Replied with response:\n"+Node.writeToString(Node.getParent(Node.getParent(response.getXMLNode())), true));
     	}
     	catch (SoapFaultException e) {
     		e.createResponse(response);
@@ -60,8 +57,12 @@ public class RelayTransaction  implements ApplicationTransaction
     			Node.createTextElement("details", details, node);
     		}
     	}
-    	if (logger.isInfoEnabled()) {
-    		logger.log(Severity.INFO, "Replied with response:\n"+Node.writeToString(Node.getParent(Node.getParent(response.getXMLNode())), true));
+    	finally {
+        	context.destroy();
+        	String trace=context.getTrace();
+        	if (trace != null) {
+    			Node.createTextElement("details", trace, response.getXMLNode());
+        	}
     	}
         return true; // connector has to send the response
     }

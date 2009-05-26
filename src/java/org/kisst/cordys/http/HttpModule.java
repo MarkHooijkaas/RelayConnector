@@ -26,7 +26,7 @@ public class HttpModule implements Module {
     	settings=new HttpSettings(null,"http",properties);
     	if (settings.wireLogging.get()!=null) {
     		setLogger("httpclient.wire", settings.wireLogging.get());
-    		setLogger("org.kisst.cordys.relay.RelayTransaction", settings.wireLogging.get()); // TODO: better settings mechanism
+    		setLogger("org.kisst.cordys.relay.RelayTrace", settings.wireLogging.get()); // TODO: better settings mechanism
     	}
 	}
 
