@@ -6,6 +6,7 @@ import org.kisst.cordys.relay.MethodCache;
 import org.kisst.cordys.relay.RelayModule;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
+import org.kisst.cordys.script.RelayTrace;
 import org.kisst.cordys.script.expression.Expression;
 import org.kisst.cordys.script.expression.ExpressionParser;
 import org.kisst.cordys.script.expression.XmlExpression;
@@ -15,12 +16,11 @@ import org.kisst.cordys.util.SoapUtil;
 import com.eibus.connector.nom.Connector;
 import com.eibus.connector.nom.SOAPMessageListener;
 import com.eibus.directory.soap.DirectoryException;
-import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
 public class MethodCall {
-	private static final CordysLogger logger=CordysLogger.getCordysLogger(MethodCall.class);
+	//private static final CordysLogger logger=CordysLogger.getCordysLogger(MethodCall.class);
 	
 	private final String namespace;
 	private final String methodName;
@@ -60,7 +60,7 @@ public class MethodCall {
 		async=compiler.getSmartBooleanAttribute(node, "async", false);
 		showSoap=compiler.getSmartBooleanAttribute(node, "showSoap", false);
 		ignoreSoapFault=compiler.getSmartBooleanAttribute(node, "ignoreSoapFault", false);
-		logSoapFault=parseSeverity(compiler.getSmartAttribute(node, "logSoapFault", RelayModule.getSettings().logSoapFaults.get()));
+		logSoapFault=RelayTrace.parseSeverity(compiler.getSmartAttribute(node, "logSoapFault", RelayModule.getSettings().logSoapFaults.get()));
 		appender=new ElementAppender(compiler, node);
 		String appendMessagesToString = compiler.getSmartAttribute(node, "appendMessagesTo", null);
 		if (appendMessagesToString==null)
@@ -93,17 +93,6 @@ public class MethodCall {
 			timeout=Long.parseLong(timeoutString);
 	}
 	
-	private Severity parseSeverity(String sev) {
-		if (sev==null)           return null;
-		if (sev.equals("NONE"))  return null;
-		if (sev.equals("DEBUG")) return Severity.DEBUG;
-		if (sev.equals("INFO"))  return Severity.INFO;
-		if (sev.equals("WARN"))  return Severity.WARN;
-		if (sev.equals("ERROR")) return Severity.ERROR;
-		if (sev.equals("FATAL")) return Severity.FATAL;
-		throw new RuntimeException("unknown LogLevel ["+sev+"] should be NONE, DEBUG, INFO, WARN, ERROR or FATAL");
-	}
-
 	protected int createMethod(final ExecutionContext context) {
 		String effectiveNamespace = namespace;
 		if (effectiveNamespace == null )
@@ -136,8 +125,8 @@ public class MethodCall {
 			int logNode=appendMessagesTo.getNode(context);
 			Node.duplicateAndAppendToChildren(method, method, logNode);
 		}
-		if (logger.isInfoEnabled())
-			logger.log(Severity.INFO, "sending request\n"+Node.writeToString(method, true));
+		if (context.infoTraceEnabled())
+			context.traceInfo("sending request\n"+Node.writeToString(method, true));
 		MethodCache caller = context.getRelayConnector().responseCache;
 		if (async) {
 			context.createXmlSlot(resultVar, methodName, new Date().getTime()+timeout);
@@ -157,8 +146,8 @@ public class MethodCall {
 	private void handleResponse(ExecutionContext context, int response) {
 		boolean ok=false;
 		try {
-			if (logger.isInfoEnabled())
-				logger.log(Severity.INFO, "received response\n"+Node.writeToString(response, true));
+			if (context.infoTraceEnabled())
+				context.traceInfo("received response\n"+Node.writeToString(response, true));
 			if (appendMessagesTo!=null) {
 				int logNode=appendMessagesTo.getNode(context);
 				Node.duplicateAndAppendToChildren(response, response, logNode);
@@ -166,7 +155,7 @@ public class MethodCall {
 			int responseBody=SoapUtil.getContent(response);
 			if (SoapUtil.isSoapFault(responseBody)) {
 				if (logSoapFault!=null)
-					logger.log(logSoapFault, "Calling method "+methodName+" returned Fault: "+Node.writeToString(responseBody, true));
+					context.trace(logSoapFault, "Calling method "+methodName+" returned Fault: "+Node.writeToString(responseBody, true));
 				if (! ignoreSoapFault) {
 					if (async) {
 						context.setAsynchronousError(new RelaySoapFaultException(responseBody));
