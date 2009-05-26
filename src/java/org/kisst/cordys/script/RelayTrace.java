@@ -33,8 +33,8 @@ public class RelayTrace {
 	} 
 
 	public void setTrace(Severity level) {	traceLevel=level; }
-	public boolean debugTraceEnabled() { return traceLevel.isGreaterOrEqual(Severity.DEBUG) || logger.isDebugEnabled(); }
-	public boolean infoTraceEnabled()  { return traceLevel.isGreaterOrEqual(Severity.INFO ) || logger.isInfoEnabled(); }
+	public boolean debugTraceEnabled() { return (traceLevel!=null && traceLevel.isGreaterOrEqual(Severity.DEBUG)) || logger.isDebugEnabled(); }
+	public boolean infoTraceEnabled()  { return (traceLevel!=null && traceLevel.isGreaterOrEqual(Severity.INFO )) || logger.isInfoEnabled(); }
 	public String getTrace() {
 		if (trace==null)
 			return null;

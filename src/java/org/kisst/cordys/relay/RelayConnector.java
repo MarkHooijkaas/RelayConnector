@@ -40,6 +40,7 @@ public class RelayConnector extends ApplicationConnector {
      */
     public void open(Processor processor)
     {
+    	addModule(new RelayModule());
         dnOrganization=processor.getOrganization();
         try {
     		init(getConfiguration());
