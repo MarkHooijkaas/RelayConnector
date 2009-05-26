@@ -17,6 +17,8 @@ public class SleepStep implements Step {
 
 	public void executeStep(ExecutionContext context) {
 		String m=millis.getString(context);
+		if (context.debugTraceEnabled())
+			context.traceDebug("sleeping for "+m+" millisecs");
 		long m2=Long.parseLong(m);
 		try {
 			Thread.sleep(m2);

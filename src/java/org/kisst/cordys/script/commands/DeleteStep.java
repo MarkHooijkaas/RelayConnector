@@ -16,6 +16,9 @@ public class DeleteStep implements Step {
 	}
 
 	public void executeStep(final ExecutionContext context) {
-		Node.delete(expr.getNode(context));
+		int node=expr.getNode(context);
+		if (context.debugTraceEnabled())
+			context.traceDebug("deleting xml node "+Node.writeToString(node, false));
+		Node.delete(node);
 	}
 }

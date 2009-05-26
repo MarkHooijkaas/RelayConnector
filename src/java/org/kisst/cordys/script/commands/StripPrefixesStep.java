@@ -35,28 +35,31 @@ public class StripPrefixesStep implements Step {
 
 	public void executeStep(ExecutionContext context) {
 		if (xml!=null)
-			stripNode(xml.getNode(context));
+			stripNode(context, xml.getNode(context));
 		if (childrenOf!=null)
-			stripChildren(childrenOf.getNode(context));
+			stripChildren(context, childrenOf.getNode(context));
 	}
 
-	private void stripNode(int node) {
+	private void stripNode(ExecutionContext context, int node) {
 		if (Node.getType(node)!=NodeType.ELEMENT)
 			return;
 		String name=Node.getName(node);
 		int pos=name.indexOf(":");
-		if (pos>=0)
+		if (pos>=0) {
+			if (context.debugTraceEnabled())
+				context.traceDebug("Stripping prefix from node "+Node.getName(node));
 			Node.setName(node, name.substring(pos+1));
+		}
 		if (recursive)
-			stripChildren(node);
+			stripChildren(context, node);
 	}
 
-	private void stripChildren(int node) {
+	private void stripChildren(ExecutionContext context, int node) {
 		if (Node.getType(node)!=NodeType.ELEMENT)
 			return;
 		node=Node.getFirstElement(node);
 		while (node!=0) {
-			stripNode(node);
+			stripNode(context, node);
 			node=Node.getNextSibling(node);
 		}
 	}

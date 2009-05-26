@@ -20,6 +20,12 @@ public class GetConfigValueStep implements Step {
 	}
 
 	public void executeStep(final ExecutionContext context) {
-		context.setTextVar(resultVar, RelayModule.getSettings().get(expr.getString(context)));
+		String key=expr.getString(context);
+		if (context.debugTraceEnabled())
+			context.traceDebug("looking up config value"+key);
+		String value=RelayModule.getSettings().get(key);
+		if (context.debugTraceEnabled())
+			context.traceDebug("setting "+resultVar+" to value "+value);
+		context.setTextVar(resultVar, value);
 	}
 }

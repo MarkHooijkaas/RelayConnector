@@ -32,7 +32,10 @@ public class ReplaceTextStep implements Step {
 			return;
 		if (elementsNamed==null || elementsNamed.equals(Node.getLocalName(node))) {
 			context.setTextVar("it", Node.getData(node));
-			Node.setDataElement(node, "", expr.getString(context));
+			String newValue=expr.getString(context);
+			if (context.debugTraceEnabled())
+				context.traceDebug("replacing text from "+Node.getName(node)+" to value "+newValue);
+			Node.setDataElement(node, "", newValue);
 		}
 		if (elementsNamed!=null) {
 			int child=Node.getFirstElement(node);

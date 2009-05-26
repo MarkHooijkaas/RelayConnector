@@ -26,6 +26,8 @@ public class CreateXmlVarStep implements Step {
 			expression = new XmlExpression(compiler, expr);
 			appender= null;
 		}
+		if (compiler.debugTraceEnabled())
+			compiler.traceDebug("Declaring xml var "+name);
 	}
 
 	public void executeStep(final ExecutionContext context) {
@@ -37,6 +39,9 @@ public class CreateXmlVarStep implements Step {
 		else
 			// make a deep copy
 			node = Node.clone(expression.getNode(context), true);
+		if (context.debugTraceEnabled())
+			context.traceDebug("setting xml var "+name+" to "+Node.writeToString(node, false));
 		context.setXmlVar(name,node);
+
 	}
 }

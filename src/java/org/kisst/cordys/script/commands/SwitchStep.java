@@ -45,10 +45,18 @@ public class SwitchStep implements Step {
 
 	public void executeStep(final ExecutionContext context) {
 		String casevalue=expr.getString(context);
+		if (context.debugTraceEnabled())
+			context.traceDebug("switch on value "+casevalue );
 		for (int i=0; i<cases.length; i++) {
+			if (context.debugTraceEnabled())
+				context.traceDebug("checking case "+cases[i].value );
 			boolean done=cases[i].evaluate(context, casevalue);
-			if (done)
+			if (done) {
+				context.traceDebug("case matched");
 				return;
+			}
 		}
+		context.traceDebug("end switch");
+
 	}
 }

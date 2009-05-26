@@ -19,6 +19,9 @@ public class VarStep implements Step {
 	}
 
 	public void executeStep(final ExecutionContext context) {
-		context.setTextVar(name, expr.getString(context));
+		String value=expr.getString(context);
+		if (context.debugTraceEnabled())
+			context.traceDebug("setting text var "+name+" to value "+value );
+		context.setTextVar(name, value);
 	}
 }

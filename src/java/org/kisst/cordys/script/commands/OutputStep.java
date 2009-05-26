@@ -19,8 +19,11 @@ public class OutputStep implements Step {
 
 	public void executeStep(ExecutionContext context) {
 		int node=context.getXmlVar("output");
-		if (rename!=null)
+		if (rename!=null) {
+			if (context.debugTraceEnabled())
+				context.traceDebug("renaming output node to "+rename);
 			Node.setName(node, rename);
+		}
 		appender.append(context, node);
 	}
 }

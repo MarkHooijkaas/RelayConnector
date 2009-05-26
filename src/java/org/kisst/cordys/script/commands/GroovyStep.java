@@ -26,6 +26,8 @@ public class GroovyStep implements Step {
 		try {
 			// Does each new invocation need a new instance?
 			// probably, considering the bindings
+			if (context.debugTraceEnabled())
+				context.traceDebug("executing Groovy script class "+scriptClass.getName());
 			Script script = (Script) scriptClass.newInstance();
 			script.getBinding().setVariable("context", context);
 			script.getBinding().setVariable("input",  new NomNode(context.getXmlVar("input")));

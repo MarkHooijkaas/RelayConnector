@@ -20,6 +20,9 @@ public class FaultStep implements Step {
 	}
 
 	public void executeStep(ExecutionContext context) {
-		throw new SoapFaultException(code, messageExpression.getString(context));
+		String str=messageExpression.getString(context);
+		if (context.debugTraceEnabled())
+			context.traceDebug("throwing SoapFaulException "+code+": "+str);
+		throw new SoapFaultException(code, str);
 	}
 }
