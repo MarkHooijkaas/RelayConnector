@@ -47,29 +47,29 @@ public class NomPath {
 				}
 				if ("..".equals(e)) {
 					parts[i].isParent=true;
-					break;
+					continue;
 				}
 				if ("**".equals(e)) {
 					parts[i].superstar=true;
 					alwaysSingle=false;
-					break;
+					continue;
 				}
 				if ("*".equals(e)) {
 					parts[i].singlestar=true;
 					parts[i].optional=true;
 					alwaysSingle=false;
-					break;
+					continue;
 				}
 				if ("+".equals(e)) {
 					parts[i].singlestar=true;
 					alwaysSingle=false;
-					break;
+					continue;
 				}
 				if ("text()".equals(e)) {
 					if (! parts[i].isLast)
 						throw new RuntimeException("text() should be last element in path "+original);
 					parts[i].isText=true;
-					break;
+					continue;
 				}
 				if (e.startsWith("@")) {
 					if (! parts[i].isLast)
