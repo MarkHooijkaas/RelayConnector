@@ -23,6 +23,7 @@ public class MethodCall {
 	//private static final CordysLogger logger=CordysLogger.getCordysLogger(MethodCall.class);
 	
 	private final String namespace;
+	private final Expression namespaceExpression;
 	private final String methodName;
 	private final Expression methodExpression;
 	private final boolean async;
@@ -52,10 +53,21 @@ public class MethodCall {
 			methodExpression=ExpressionParser.parse(compiler,expr);
 		else
 			methodExpression=null;
-		
-		namespace=compiler.getSmartAttribute(node, "namespace", null);
-		if (namespace==null)
-			throw new RuntimeException("attribute namespace should be set or a default should be defined");
+
+		expr=Node.getAttribute(node, "namespaceExpression");
+		if (expr!=null)
+			namespaceExpression=ExpressionParser.parse(compiler,expr);
+		else
+			namespaceExpression=null;
+		if (namespaceExpression==null)
+			namespace=compiler.getSmartAttribute(node, "namespace", null);
+		else
+			namespace=Node.getAttribute(node, "namespace");
+		if (namespace==null && namespaceExpression==null)
+			throw new RuntimeException("attribute namespace or namespaceExpression should be set or a default should be defined");
+		if (namespace!=null && namespaceExpression!=null)
+			throw new RuntimeException("attribute namespace and namespaceExpression should not be set both");
+
 
 		async=compiler.getSmartBooleanAttribute(node, "async", false);
 		showSoap=compiler.getSmartBooleanAttribute(node, "showSoap", false);
@@ -67,21 +79,9 @@ public class MethodCall {
 			appendMessagesTo=null;
 		else
 			appendMessagesTo= new XmlExpression(compiler, appendMessagesToString);
-/*
-		String appendSoapHeadersFromStr = compiler.getSmartAttribute(node, "appendSoapHeadersFrom", null);
-		if (appendSoapHeadersFromStr==null)
-			appendSoapHeadersFrom=null;
-		else
-			appendSoapHeadersFrom= new XmlExpression(compiler, appendSoapHeadersFromStr);
-
-		String appendSoapHeaderStr = compiler.getSmartAttribute(node, "appendSoapHeadersFrom", null);
-		if (appendSoapHeaderStr==null)
-			appendSoapHeader=null;
-		else
-			appendSoapHeader= new XmlExpression(compiler, appendSoapHeadersFromStr);
-*/
 		
 		String tmpName=Node.getAttribute(node, "resultVar");
+		
 		resultVar = tmpName==null? defaultResultVar : tmpName;
 		if (resultVar==null)
 			throw new RuntimeException("resultVar should be defined when using methodExpression");
@@ -94,23 +94,36 @@ public class MethodCall {
 	}
 	
 	protected int createMethod(final ExecutionContext context) {
-		String effectiveNamespace = namespace;
+		String effectiveNamespace = getNamespace(context);
 		if (effectiveNamespace == null )
 			effectiveNamespace = context.getTextVar("namespace");
 		String dnUser=context.getOrganizationalUser();
 		String dnOrganization=context.getOrganization();
 		Connector connector = context.getRelayConnector().getConnector();
 		int method;
+		String m=getMethodName(context);
 		try {
-			String m=methodName;
 			if (m==null)
 				m=methodExpression.getString(context);
 			method = connector.createSOAPMethod(dnUser, dnOrganization, effectiveNamespace, m);
 		} 
-		catch (DirectoryException e) {  throw new RuntimeException("Error when handling method "+methodName,e); }
+		catch (DirectoryException e) {  throw new RuntimeException("Error when handling method "+m,e); }
 		appender.append(context, method);
 		return method;
 
+	}
+
+	protected String getNamespace(final ExecutionContext context)  {
+		if (namespace!=null)
+			return namespace;
+		else 
+			return namespaceExpression.getString(context);
+	}
+	protected String getMethodName(final ExecutionContext context) { 
+		if (methodName!=null)
+			return methodName;
+		else 
+			return methodExpression.getString(context);
 	}
 
 	// TODO: fix possible memory leak if async calls never return a answer
@@ -129,7 +142,7 @@ public class MethodCall {
 			context.traceInfo("sending request\n"+Node.writeToString(method, true));
 		MethodCache caller = context.getRelayConnector().responseCache;
 		if (async) {
-			context.createXmlSlot(resultVar, methodName, new Date().getTime()+timeout);
+			context.createXmlSlot(resultVar, getMethodName(context), new Date().getTime()+timeout);
 			caller.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {
 				public boolean onReceive(int message)
 				{
@@ -155,7 +168,7 @@ public class MethodCall {
 			int responseBody=SoapUtil.getContent(response);
 			if (SoapUtil.isSoapFault(responseBody)) {
 				if (logSoapFault!=null)
-					context.trace(logSoapFault, "Calling method "+methodName+" returned Fault: "+Node.writeToString(responseBody, true));
+					context.trace(logSoapFault, "Calling method "+getMethodName(context)+" returned Fault: "+Node.writeToString(responseBody, true));
 				if (! ignoreSoapFault) {
 					if (async) {
 						context.setAsynchronousError(new RelaySoapFaultException(responseBody));

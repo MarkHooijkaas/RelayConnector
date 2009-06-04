@@ -110,9 +110,8 @@ postfix "Response".</para>
 
 <sect1  id="call"><title>call command</title>
 <@xmlcode>
-<call method="<replaceable>method-name"|</replaceable>methodExpression<replaceable>="expr"
-</replaceable>
-  [namespace="<replaceable>namespace"]</replaceable>*
+<call method="<replaceable>method-name"|</replaceable>methodExpression="<replaceable>expr</replaceable>"
+  [namespace="<replaceable>namespace"]</replaceable>|</replaceable>namespaceExpression="<replaceable>expr</replaceable>"]
   [async="true|false"]*
   [showSoap="true|false"]*
   [ignoreSoapFault="true|false"]*
@@ -136,8 +135,7 @@ postfix "Response".</para>
 command will execute a method call <replaceable>method-name </replaceable>in
 <replaceable>namespace</replaceable>. The
 response of this call will be stored in a variable <replaceable>result-var-name</replaceable>.
-If the resultVar
-attribute is not set,
+If the resultVar attribute is not set,
 this will default to <replaceable>method-name</replaceable>.
  Instead of specifying a fixed method-name, one can also specify a
 dynamic methodExpression, in order to call a different method
@@ -263,6 +261,8 @@ error.</para>
 
 </sect2>
 </sect1>
+
+
 
 
 <sect1><title>delete
