@@ -1,7 +1,10 @@
 package org.kisst.cordys.script;
 
+import java.util.ArrayList;
+
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
+import com.eibus.xml.nom.Node;
 
 /**
  * This class supports tracing all details of method calls, for debugging purposes.
@@ -12,7 +15,7 @@ import com.eibus.util.logger.Severity;
 public class RelayTrace {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTrace.class);
 
-	private StringBuffer trace;
+	private ArrayList<String> trace;
 	private Severity traceLevel=null;
 
 	public void traceDebug(String msg) { 
@@ -28,20 +31,30 @@ public class RelayTrace {
 			// otherwise an ERROR would fill the trace 
 			return;
 		if (trace==null)
-			trace=new StringBuffer();
-		trace.append(msg+"\n");
+			trace=new ArrayList<String>();
+		trace.add(msg);
 	} 
 
+	public boolean traceAvailable() { return trace!=null; }
 	public void setTrace(Severity level) {	traceLevel=level; }
 	public boolean debugTraceEnabled() { return (traceLevel!=null && Severity.DEBUG.isGreaterOrEqual(traceLevel)) || logger.isDebugEnabled(); }
-	public boolean infoTraceEnabled()  { return (traceLevel!=null && Severity.INFO. isGreaterOrEqual(traceLevel)) || logger.isInfoEnabled(); 
-	}
+	public boolean infoTraceEnabled()  { return (traceLevel!=null && Severity.INFO. isGreaterOrEqual(traceLevel)) || logger.isInfoEnabled(); }
 	public String getTrace() {
 		if (trace==null)
 			return null;
-		return trace.toString();
+		StringBuffer buf=new StringBuffer();
+		for (String s:trace)
+			buf.append(s).append('\n');
+		return buf.toString();
 	}
-	
+
+	public void addToNode(int node) {
+		if (trace==null)
+			return;
+		for (String s:trace)
+			Node.createTextElement("item", s, node);
+	}
+
 	public static Severity parseSeverity(String sev) {
 		if (sev==null)           return null;
 		if (sev.equals("NONE"))  return null;

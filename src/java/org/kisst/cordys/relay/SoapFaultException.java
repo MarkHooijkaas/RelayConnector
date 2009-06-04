@@ -1,5 +1,8 @@
 package org.kisst.cordys.relay;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import com.eibus.soap.BodyBlock;
 import com.eibus.xml.nom.Node;
 
@@ -38,13 +41,23 @@ public class SoapFaultException extends RuntimeException {
 	 */
 	public void createResponse(BodyBlock response) {
 		int node=response.createSOAPFault(faultcode,faultstring);
-		String details=getDetails();
-		if (details!=null) {
-			Node.createTextElement("details", details, node);
+		int detailsNode=0;
+		if (hasDetails()) {
+			detailsNode=Node.createElement("details", node);
+			fillDetails(detailsNode);
 		}
+		if (RelayModule.getSettings().showStacktrace.get()) {
+			if (detailsNode==0)
+				detailsNode=Node.createElement("details", node);
+    		StringWriter sw = new StringWriter();
+    		printStackTrace(new PrintWriter(sw));
+    		String details= sw.toString();
+   			Node.createTextElement("stacktrace", details, detailsNode);
+   		}
 	}
 	
-	public String getDetails()     { return null; }
+	protected boolean hasDetails()     { return false; }
+	protected void    fillDetails(int node)    { }
 	public String getFaultcode()   { return faultcode; } 
 	public String getFaultstring() { return faultstring; } 
 }	

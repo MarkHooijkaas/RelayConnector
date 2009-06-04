@@ -14,6 +14,7 @@ public class RelaySettings extends CompositeSetting {
 	public final IntSetting timeout;
 	public final BooleanSetting cacheScripts;
 	public final StringSetting logSoapFaults;
+	public final BooleanSetting showStacktrace;
 
 	public RelaySettings(Setting parent, String name, Properties props) { 
 		super(parent, name); 
@@ -21,6 +22,7 @@ public class RelaySettings extends CompositeSetting {
 		timeout=new IntSetting(this, "timeout",props, 20000);
 		cacheScripts=new BooleanSetting(this, "cacheScripts",props,  false);
 		logSoapFaults=new StringSetting(this, "logSoapFaults", props, null);
+		showStacktrace=new BooleanSetting(this, "showStacktrace",props,  false);
 	}
 	public String get(String key) { return properties.getProperty(key); }
 	public String get(String key, String defaultValue) { return properties.getProperty(key,defaultValue); }

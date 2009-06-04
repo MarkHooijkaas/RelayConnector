@@ -50,11 +50,13 @@ public class RelayTransaction  implements ApplicationTransaction
     	}
     	catch (Exception e) {
     		int node=response.createSOAPFault("UnknownError",e.toString());
-    		StringWriter sw = new StringWriter();
-    		e.printStackTrace(new PrintWriter(sw));
-    		String details= sw.toString();
-    		if (details!=null) {
-    			Node.createTextElement("details", details, node);
+    		if (RelayModule.getSettings().showStacktrace.get()) {
+    			StringWriter sw = new StringWriter();
+    			e.printStackTrace(new PrintWriter(sw));
+    			String details= sw.toString();
+    			if (details!=null) {
+    				Node.createTextElement("details", details, node);
+    			}
     		}
     	}
     	finally {
