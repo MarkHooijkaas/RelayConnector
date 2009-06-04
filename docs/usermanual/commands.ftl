@@ -492,7 +492,11 @@ Note that elements at various depths are replaced.
 
 <sect1><title>getConfigValue command</title>
 <@xmlcode>
-<getConfigValue key="<replaceable>expression</replaceable>" resultVar="<replaceable>varName</replaceable>"/>
+<getConfigValue 
+  key="<replaceable>expression</replaceable>" 
+  resultVar="<replaceable>varName</replaceable>"
+  [default="<replaceable>expression</replaceable>"]
+/>
 </@xmlcode>
 <para>
 This command can be used to retrieve a value from the configuration file. 
@@ -515,6 +519,12 @@ config.greeting.de = Guten Tag
 </@xmlcode>
 This way one can easily add new languages in the configuration file.
 </para>
+<para>
+The default attribute can be used to specify a default value to be used if the key can not be found.
+If no default attribute is present, and the key can not be found, an error will be thrown.
+</para>
+
+
 
 </sect1>
 </chapter>
