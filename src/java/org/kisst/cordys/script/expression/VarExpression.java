@@ -50,7 +50,7 @@ public class VarExpression implements Expression {
 
 	public String getString(ExecutionContext context) {
 		if (value==null) {
-			String result = context.getTextVar(name);
+			String result = context.getTextVar(varname);
 			if (result!=null)
 				return result;
 			if (defaultValue!=null)
