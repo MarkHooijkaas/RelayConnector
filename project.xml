@@ -1,7 +1,7 @@
 <project>
     <org>kisst.org</org>
     <name>RelayConnector</name>
-    <version>0.2</version>
+    <version>1.0</version>
     <class>org.kisst.cordys.relay.RelayConnector</class>    
 	<jarfiles pathid="jarfiles">
       <pathelement location="lib/commons-logging-1.0.4.jar"/>

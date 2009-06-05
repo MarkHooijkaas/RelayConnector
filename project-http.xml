@@ -1,7 +1,7 @@
 <project>
     <org>kisst.org</org>
     <name>HttpConnector</name>
-    <version>0.1</version>
+    <version>1.0</version>
     <class>org.kisst.cordys.http.HttpConnector</class>
 	<jarfiles pathid="jarfiles">
       <pathelement location="lib/commons-httpclient-3.1.jar"/>
