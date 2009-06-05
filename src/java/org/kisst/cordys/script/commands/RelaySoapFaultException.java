@@ -1,5 +1,7 @@
 package org.kisst.cordys.script.commands;
 
+import java.io.UnsupportedEncodingException;
+
 import org.kisst.cordys.relay.SoapFaultException;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
@@ -44,9 +46,11 @@ public class RelaySoapFaultException extends SoapFaultException {
 		int cordysResponse=responseBlock.getXMLNode();
 		int response=0;
 		try {
-			response = Node.getDocument(cordysResponse).load(fullMessage);
+			response = Node.getDocument(cordysResponse).parseString(fullMessage);
 			SoapUtil.mergeResponses(response, cordysResponse);
-		} catch (XMLException e) { throw new RuntimeException(e); }
+		}
+		catch (XMLException e) { throw new RuntimeException(e); } 
+		catch (UnsupportedEncodingException e) { throw new RuntimeException(e); }
 		finally {
 			if (response!=0)
 				Node.delete(response);
