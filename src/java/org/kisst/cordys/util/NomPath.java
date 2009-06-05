@@ -119,6 +119,8 @@ public class NomPath {
 					node=NomUtil.getElementByLocalName(node, name);
 				else
 					node=NomUtil.getElement(node, part.namespace, name);
+				if (node==0 && ! part.optional)
+					throw new RuntimeException("non-optional element "+name+" does not exist in Path expression "+original);
 			}
 		}
 		return node;

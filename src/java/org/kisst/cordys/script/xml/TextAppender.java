@@ -29,7 +29,8 @@ public class TextAppender implements XmlAppender {
 	public void append(ExecutionContext context, int toNode) {
 		String text=textExpression.getString(context);
 		if (text==null)
-			throw new RuntimeException("expression ["+expressionText+"] evaluated to null");
+			// TODO: what would be correct behaviour if a null pointer is to be added? 
+			text=""; // was: throw new RuntimeException("expression ["+expressionText+"] evaluated to null");
 		if (name!=null) 
 			Node.createTextElement(name, text, toNode);
 		else 
