@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Properties;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
@@ -13,6 +12,7 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 
+import org.kisst.cfg4j.Props;
 import org.kisst.cordys.util.NomPath;
 import org.kisst.cordys.util.NomUtil;
 
@@ -44,13 +44,13 @@ public class MethodCache {
 	private CacheManager manager=null;
 	private Connector connector=null;
 	
-	public void init(Connector connector2, Properties props) {
+	public void init(Connector connector2, Props props) {
 		if (connector==null) {
 			connector= connector2; 
 		}
-		String filename=props.getProperty("relay.cachemanager.file");
-		String url=props.getProperty("relay.cachemanager.url");
-		String cacheList = props.getProperty("relay.caches");
+		String filename=props.getString("relay.cachemanager.file",null);
+		String url=props.getString("relay.cachemanager.url",null);
+		String cacheList = props.getString("relay.caches", null);
 		if (filename!=null)
 			manager = new CacheManager(filename);
 		else if (url!=null) {
@@ -70,9 +70,9 @@ public class MethodCache {
 		}
 	}
 
-	public void reset(Properties properties) {
+	public void reset(Props props) {
 		destroy();
-		init(connector, properties);
+		init(connector, props);
 	}
 
 	public void destroy() {
@@ -167,30 +167,30 @@ public class MethodCache {
 		return new CacheManager(conf);
 	}
 
-	private void fillUserDefinedCaches(Properties props) {
-		String cacheList = props.getProperty("relay.caches");
+	private void fillUserDefinedCaches(Props props) {
+		String cacheList = props.getString("relay.caches", null);
 		if (cacheList==null)
 			return;
 		String[] cacheNames=cacheList.split(",");
 		for (int i=0; i<cacheNames.length; i++) {
 			String name=cacheNames[i].trim();
 			String prefix="relay.cache."+name;
-			int maxSize=Integer.parseInt(props.getProperty(prefix+".size"));
-			long seconds=Long.parseLong(props.getProperty(prefix+".timeToLiveSeconds"));;
+			int maxSize=props.getInt(prefix+".size", -1);
+			long seconds=props.getLong(prefix+".timeToLiveSeconds", -1);
 			Cache memoryOnlyCache = new Cache(name, maxSize, false, false, seconds, seconds);
 			manager.addCache(memoryOnlyCache);
 			//Cache test = singletonManager.getCache("testCache");
 		}
 	}
 
-	private void mapMethods(Properties props) {
+	private void mapMethods(Props props) {
 		String[] cacheNames=manager.getCacheNames();
 		for (int i=0; i<cacheNames.length; i++) {
 			String name=cacheNames[i].trim();
 			String prefix="relay.cache."+name;
-			String methodName=props.getProperty(prefix+".method");
+			String methodName=props.getString(prefix+".method", null);
 			if (methodName!=null) {
-				String keypath=props.getProperty(prefix+".keypath");
+				String keypath=props.getString(prefix+".keypath", null);
 				caches.put(methodName, new CacheInfo(keypath,manager.getCache(name)));
 			}
 			else {

@@ -3,19 +3,16 @@ package org.kisst.cfg4j;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.Properties;
 
 
-public class MappedSetting<T extends Setting> extends Setting {
-	private final Properties properties;
+public class MappedSetting<T extends Setting> extends CompositeSetting {
 	private final HashMap<String,T> items=new HashMap<String,T>();
 	private final Constructor constructor;
 	
-	public MappedSetting(Setting parent, String name, Properties props, Class<?> clazz) { 
+	public MappedSetting(CompositeSetting parent, String name, Class<?> clazz) { 
 		super(parent, name);
-		this.properties=props;
 		try {
-			constructor=clazz.getConstructor(new Class[] {Setting.class, String.class, Properties.class});
+			constructor=clazz.getConstructor(new Class[] {CompositeSetting.class, String.class});
 		} catch (NoSuchMethodException e) { throw new RuntimeException(e); }
 	}
 
@@ -25,7 +22,7 @@ public class MappedSetting<T extends Setting> extends Setting {
 		T result=items.get(name);
 		if (result==null) {
 			try {
-				result= (T) constructor.newInstance(new Object[] {this, name, properties});
+				result= (T) constructor.newInstance(new Object[] {this, name});
 			}
 			catch (IllegalArgumentException e) { throw new RuntimeException(e); }
 			catch (InstantiationException e) { throw new RuntimeException(e); }

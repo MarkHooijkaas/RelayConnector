@@ -1,13 +1,12 @@
 package org.kisst.cfg4j;
 
-import java.util.Properties;
 
 public class LongSetting extends Setting {
   private final long value;
 
-  public LongSetting(Setting parent, String name, Properties props, long defaultValue) {
+  public LongSetting(CompositeSetting parent, String name, long defaultValue) {
 	super(parent, name);
-	String value=props.getProperty(fullName, null);
+	String value=parent.getProperties().getProperty(fullName, null);
 	if (value==null)
 		this.value=defaultValue;
 	else

@@ -1,14 +1,13 @@
 package org.kisst.cfg4j;
 
-import java.util.Properties;
 
 
 public class BooleanSetting extends Setting {
   private final boolean value;
 
-  public BooleanSetting(Setting parent, String name, Properties props, boolean defaultValue) {
+  public BooleanSetting(CompositeSetting parent, String name, boolean defaultValue) {
 	super(parent, name);
-	String value=props.getProperty(fullName, null);
+	String value=parent.getProperties().getProperty(fullName, null);
 	if (value==null)
 		this.value=defaultValue;
 	else if ("true".equals(value))

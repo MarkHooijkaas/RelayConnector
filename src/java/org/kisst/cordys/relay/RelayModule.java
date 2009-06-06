@@ -1,6 +1,6 @@
 package org.kisst.cordys.relay;
 
-import java.util.Properties;
+import org.kisst.cfg4j.Props;
 
 public class RelayModule implements Module {
 	private static RelaySettings settings=null;
@@ -11,12 +11,12 @@ public class RelayModule implements Module {
 
 	public String getName() { return "RelayModule";	}
 
-	public void init(Properties properties) {
-    	reset(properties);
+	public void init(Props props) {
+    	reset(props);
 	}
 
-	public void reset(Properties properties) {
-		settings = new RelaySettings(null, "relay", properties);
+	public void reset(Props props) {
+		settings = new RelaySettings(props, "relay");
 	}
 
 	public void destroy() {}

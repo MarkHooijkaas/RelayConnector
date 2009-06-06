@@ -6,8 +6,9 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Properties;
 
+import org.kisst.cfg4j.PropertyLoader;
+import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.TopScript;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
@@ -22,7 +23,6 @@ import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.Processor;
 import com.eibus.soap.SOAPTransaction;
 import com.eibus.util.logger.CordysLogger;
-import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
 public class RelayConnector extends ApplicationConnector {
@@ -53,11 +53,11 @@ public class RelayConnector extends ApplicationConnector {
         try {
     		initConfigLocation(getConfiguration());
             connector= Connector.getInstance(CONNECTOR_NAME);
-            Properties properties=load();
-            responseCache.init(connector, properties);
-            addDynamicModules(properties);
+            Props props=PropertyLoader.load(getConfigStream());
+            responseCache.init(connector, props);
+            addDynamicModules(props);
         	for (int i=0; i<modules.size(); i++)
-        		modules.get(i).init(properties);
+        		modules.get(i).init(props);
         	            
             if (!connector.isOpen())
             {
@@ -68,8 +68,8 @@ public class RelayConnector extends ApplicationConnector {
         catch (ExceptionGroup e) { throw new RuntimeException(e);	} 
     }
 
-	private void addDynamicModules(Properties properties) {
-		String moduleList=(String) properties.get("modules");
+	private void addDynamicModules(Props props) {
+		String moduleList=(String) props.get("modules",null);
 		if (moduleList!=null && moduleList.trim().length()>0) {
 			String[] moduleNames=moduleList.split(",");
 			for (int i=0; i<moduleNames.length; i++) {
@@ -90,15 +90,15 @@ public class RelayConnector extends ApplicationConnector {
 
 	@Override
 	public void reset(Processor processor) {
-        Properties properties=load();
-		reset(properties);
+        Props props=PropertyLoader.load(getConfigStream());
+		reset(props);
 	}
 
-	public void reset(Properties properties) {
-        responseCache.reset(properties);
+	public void reset(Props props) {
+        responseCache.reset(props);
 		scriptCache.clear();
     	for (int i=0; i<modules.size(); i++)
-    		modules.get(i).reset(properties);
+    		modules.get(i).reset(props);
 	}
 
 	public void close(Processor processor)
@@ -132,30 +132,6 @@ public class RelayConnector extends ApplicationConnector {
 	}
 
 	
-	private Properties load()
-	{
-		Properties properties = new Properties();
-		logger.log(Severity.INFO,"(re)loading properties file: "+configLocation);
-		if (configLocation==null || configLocation.trim().length()==0) {
-			logger.debug("configLocation not specified, clearing properties and skipping file");
-		}
-		else {
-			InputStream inp = getConfigStream();
-			try {
-				properties.load(inp);
-			} 
-			catch (java.io.IOException e) { throw new RuntimeException(e);  }
-			finally {
-				try {
-					if (inp!=null) 
-						inp.close();
-				}
-				catch (java.io.IOException e) { throw new RuntimeException(e);  }
-			}
-		}
-		return properties;
-
-	}
 	private InputStream getConfigStream() {
 		if (configLocation.startsWith("xmlstore:")) {
 			return getConfigFileFromXmlStore();

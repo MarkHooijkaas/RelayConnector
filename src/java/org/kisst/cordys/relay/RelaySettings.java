@@ -1,29 +1,21 @@
 package org.kisst.cordys.relay;
 
-import java.util.Properties;
-
 import org.kisst.cfg4j.BooleanSetting;
 import org.kisst.cfg4j.CompositeSetting;
 import org.kisst.cfg4j.IntSetting;
-import org.kisst.cfg4j.Setting;
+import org.kisst.cfg4j.Props;
 import org.kisst.cfg4j.StringSetting;
 
 public class RelaySettings extends CompositeSetting {
-	private Properties properties = new Properties();
 
-	public final IntSetting timeout;
-	public final BooleanSetting cacheScripts;
-	public final StringSetting logSoapFaults;
-	public final BooleanSetting showStacktrace;
+	public final IntSetting timeout=new IntSetting(this, "timeout",20000);
+	public final BooleanSetting cacheScripts=new BooleanSetting(this, "cacheScripts", false);
+	public final StringSetting logSoapFaults=new StringSetting(this, "logSoapFaults", null);
+	public final BooleanSetting showStacktrace=new BooleanSetting(this, "showStacktrace",false);
 
-	public RelaySettings(Setting parent, String name, Properties props) { 
-		super(parent, name); 
-		this.properties=props;
-		timeout=new IntSetting(this, "timeout",props, 20000);
-		cacheScripts=new BooleanSetting(this, "cacheScripts",props,  false);
-		logSoapFaults=new StringSetting(this, "logSoapFaults", props, null);
-		showStacktrace=new BooleanSetting(this, "showStacktrace",props,  false);
+	public RelaySettings(Props props, String name) { 
+		super(props, name); 
 	}
-	public String get(String key) { return properties.getProperty(key); }
-	public String get(String key, String defaultValue) { return properties.getProperty(key,defaultValue); }
+	public String get(String key) { return props.getString(key, null); }
+	public String get(String key, String defaultValue) { return props.getString(key,defaultValue); }
 }

@@ -2,18 +2,19 @@ package org.kisst.cfg4j;
 
 
 public abstract class Setting {
-  //private final MultiSetting parent;
+  protected final CompositeSetting parent;
   protected final String fullName;
   protected final String name;
   //private final boolean required;
 
-  public Setting(Setting parent, String name) {
-	//this.parent=parent;
+  public Setting(CompositeSetting parent, String name) {
+	this.parent=parent;
 	this.name=name;
 	//this.required=required;
 	if(parent==null) 
 	  fullName=name;
 	else {
+		parent.add(this);
 		if (parent.fullName==null)
 			fullName=name;
 		else

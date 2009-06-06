@@ -1,13 +1,12 @@
 package org.kisst.cfg4j;
 
-import java.util.Properties;
 
 public class IntSetting extends Setting {
   private final int value;
 
-  public IntSetting(Setting parent, String name, Properties props, int defaultValue) {
+  public IntSetting(CompositeSetting parent, String name, int defaultValue) {
 	super(parent, name);
-	String value=props.getProperty(fullName, null);
+	String value=parent.getProperties().getProperty(fullName, null);
 	if (value==null)
 		this.value=defaultValue;
 	else
