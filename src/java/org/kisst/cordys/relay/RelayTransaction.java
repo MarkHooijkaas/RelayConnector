@@ -5,11 +5,13 @@ import java.io.StringWriter;
 
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.ExecutionContext;
+import org.kisst.cordys.script.RelayTrace;
 import org.kisst.cordys.script.TopScript;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;
 import com.eibus.soap.MethodDefinition;
+import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
 public class RelayTransaction  implements ApplicationTransaction
@@ -53,6 +55,7 @@ public class RelayTransaction  implements ApplicationTransaction
     		e.createResponse(response, props);
     	}
     	catch (Exception e) {
+    		RelayTrace.logger.log(Severity.ERROR, "Error", e);
     		int node=response.createSOAPFault("UnknownError",e.toString());
     		if (RelaySettings.showStacktrace.get(props)) {
     			StringWriter sw = new StringWriter();
@@ -64,7 +67,8 @@ public class RelayTransaction  implements ApplicationTransaction
     		}
     	}
     	finally {
-        	context.destroy();
+    		if (context!=null)
+    			context.destroy();
     	}
         return true; // connector has to send the response
     }

@@ -17,10 +17,10 @@ public class TopScript extends Script {
 	
 	public TopScript(RelayConnector connector, MethodDefinition def, Props props) {
 		super(def.getImplementation());
+		this.definition=def;
 		this.props=props;
     	this.name=getFullMethodName();
 		this.relayConnector=connector; 
-		this.definition=def;
 		compiler=new CompilationContext(this);
     	try {
     		compile(compiler, def.getImplementation());

@@ -13,7 +13,7 @@ import com.eibus.xml.nom.Node;
  * Furthermore, the trace should be appended to any response or SOAP:Fault that the method returns.
  */
 public class RelayTrace {
-	private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTrace.class);
+	public static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTrace.class);
 
 	private ArrayList<String> trace;
 	private Severity traceLevel=null;

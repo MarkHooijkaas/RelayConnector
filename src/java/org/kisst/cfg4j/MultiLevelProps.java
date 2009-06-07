@@ -54,7 +54,7 @@ public class MultiLevelProps {
 				else if (str.equals("}")) 
 					return;
 				else if (str.startsWith("@override")) {
-					if (!str.endsWith("}"))
+					if (!str.endsWith("{"))
 						throw new RuntimeException("override should have { symbol on same line in config line: "+str);
 					String key=str.substring(9,str.length()-1).trim();
 					LayeredProps subprops=new LayeredProps(props);

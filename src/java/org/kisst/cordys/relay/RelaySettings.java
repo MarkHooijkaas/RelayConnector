@@ -6,7 +6,7 @@ import org.kisst.cfg4j.IntSetting;
 import org.kisst.cfg4j.StringSetting;
 
 public class RelaySettings {
-	private final static CompositeSetting relay=new CompositeSetting(null,"name");
+	private final static CompositeSetting relay=new CompositeSetting(null,"relay");
 
 	public final static IntSetting timeout=new IntSetting(relay, "timeout",20000);
 	public final static BooleanSetting cacheScripts=new BooleanSetting(relay, "cacheScripts", false);
