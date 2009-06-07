@@ -90,6 +90,10 @@ public class RelayConnector extends ApplicationConnector {
 		return new RelayTransaction(this, mlprops.getProps(key));
 	}
 
+    @Override
+	public void reset(Processor processor) { reset(); }
+
+
 	public void reset() {
 	    mlprops =new MultiLevelProps(getConfigStream());
         responseCache.reset(getGlobalProps());
