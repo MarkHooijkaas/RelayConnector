@@ -84,7 +84,10 @@ public class RelayConnector extends ApplicationConnector {
     protected void addModule(Module m) { modules.add(m); }
 
     public ApplicationTransaction createTransaction(SOAPTransaction stTransaction) {
-		return new RelayTransaction(this, getGlobalProps());
+    	int env=stTransaction.getRequestEnvelope();
+    	int req=SoapUtil.getContent(env);
+    	String key=NomUtil.getUniversalName(req);
+		return new RelayTransaction(this, mlprops.getProps(key));
 	}
 
 	public void reset() {
