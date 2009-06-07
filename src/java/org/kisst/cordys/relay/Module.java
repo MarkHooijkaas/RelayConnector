@@ -1,10 +1,10 @@
 package org.kisst.cordys.relay;
 
-import org.kisst.cfg4j.MultiLevelProps;
+import org.kisst.cfg4j.Props;
 
 public interface Module {
 	public String getName();
-	public void init(MultiLevelProps mlprops);
-	public void reset(MultiLevelProps mlprops);
+	public void init(Props props);
+	public void reset(Props props);
 	public void destroy();
 }

@@ -1,7 +1,7 @@
 package org.kisst.cfg4j;
 
 
-public abstract class Setting {
+public class Setting {
   protected final CompositeSetting parent;
   protected final String fullName;
   protected final String name;
@@ -25,6 +25,5 @@ public abstract class Setting {
   //public boolean ok() { return ! this.required; }
 
 
-
-  abstract public String asString();
+  //abstract public String asString();
 }

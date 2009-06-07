@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 
 public class MappedSetting<T extends Setting> extends CompositeSetting {
+	// TODO: This is a cache, but it is reset-proof
 	private final HashMap<String,T> items=new HashMap<String,T>();
 	private final Constructor constructor;
 	
@@ -31,12 +32,5 @@ public class MappedSetting<T extends Setting> extends CompositeSetting {
 			items.put(name, result);
 		}
 		return  result;
-	}
-
-
-	@Override
-	public String asString() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

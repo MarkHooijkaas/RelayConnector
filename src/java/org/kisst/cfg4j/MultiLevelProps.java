@@ -1,7 +1,6 @@
 package org.kisst.cfg4j;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,6 +10,9 @@ public class MultiLevelProps {
 	private final HashMap<String,Props> props=new HashMap<String,Props>();
 	private final LayeredProps globalProps=new LayeredProps(null);
 
+	public MultiLevelProps(InputStream configStream) {
+		load(configStream);
+	}
 	public Props getGlobalProps() { return globalProps; }
 	public Props getProps(String key) {
 		Props result = props.get(key);
@@ -20,7 +22,8 @@ public class MultiLevelProps {
 			return result;
 	}
 
-	public void load(String filename)  {
+	/*
+	private void load(String filename)  {
 		props.clear();
 		FileInputStream inp = null;
 		try {
@@ -34,8 +37,9 @@ public class MultiLevelProps {
 		}
 		catch (IOException e) { throw new RuntimeException(e); }
 	}
+	*/
 
-	public void load(InputStream inp)  {
+	private void load(InputStream inp)  {
 		load(globalProps, new BufferedReader(new InputStreamReader(inp)));
 	}
 

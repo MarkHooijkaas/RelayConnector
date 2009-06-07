@@ -32,7 +32,7 @@ public class VarExpression implements Expression {
 		if (compiler.textVarExists(varname))
 			value=null; // null indicates it still needs to be determined from a variable
 		else {
-			String configvalue=compiler.getSettings().get(varname, null);
+			String configvalue=compiler.getProps().getString(varname, null);
 			// Note: if compiled script is cached, and configuration is reloaded,
 			// the script cache is cleared, so it is safe to remember here, even if script is cached
 			if (configvalue!=null)

@@ -3,6 +3,7 @@ package org.kisst.cordys.relay;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.TopScript;
 
@@ -14,9 +15,11 @@ import com.eibus.xml.nom.Node;
 public class RelayTransaction  implements ApplicationTransaction
 {
 	private final RelayConnector connector;
+	private final Props props;
 	
-	public RelayTransaction(RelayConnector connector) {
+	public RelayTransaction(RelayConnector connector, Props props) {
 		this.connector=connector;
+		this.props=props;
 	}
 
     public boolean canProcess(String callType) {
@@ -47,11 +50,11 @@ public class RelayTransaction  implements ApplicationTransaction
         		context.traceInfo("Replied with response:\n"+Node.writeToString(Node.getParent(Node.getParent(response.getXMLNode())), true));
     	}
     	catch (SoapFaultException e) {
-    		e.createResponse(response);
+    		e.createResponse(response, props);
     	}
     	catch (Exception e) {
     		int node=response.createSOAPFault("UnknownError",e.toString());
-    		if (RelayModule.getGlobalSettings().showStacktrace.get()) {
+    		if (RelaySettings.showStacktrace.get(props)) {
     			StringWriter sw = new StringWriter();
     			e.printStackTrace(new PrintWriter(sw));
     			String details= sw.toString();
@@ -70,8 +73,8 @@ public class RelayTransaction  implements ApplicationTransaction
 		String methodName=def.getNamespace()+"/"+def.getMethodName();
 		TopScript script=connector.scriptCache.get(methodName);
 		if (script==null) {
-			script=new TopScript(connector, def);
-			if (RelayModule.getGlobalSettings().cacheScripts.get())
+			script=new TopScript(connector, def, props);
+			if (RelaySettings.cacheScripts.get(props))
 				connector.scriptCache.put(methodName, script);
 		}
 		return script;

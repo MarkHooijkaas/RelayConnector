@@ -3,8 +3,8 @@ package org.kisst.cordys.script;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.RelayConnector;
-import org.kisst.cordys.relay.RelaySettings;
 
 import com.eibus.soap.BodyBlock;
 import com.eibus.util.logger.CordysLogger;
@@ -117,7 +117,7 @@ public class ExecutionContext extends RelayTrace {
 		}
 	}
 
-	public RelaySettings getSettings() { return script.getSettings(); }
+	public Props getProps() { return script.getProps(); }
 	public RelayConnector getRelayConnector() { return relayConnector; }
 	public String getOrganization() { return organization; }	
 	public String getOrganizationalUser() {	return user; }

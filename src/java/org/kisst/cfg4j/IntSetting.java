@@ -1,17 +1,11 @@
 package org.kisst.cfg4j;
 
-
 public class IntSetting extends Setting {
-  private final int value;
+	private final int defaultValue;
 
-  public IntSetting(CompositeSetting parent, String name, int defaultValue) {
-	super(parent, name);
-	String value=parent.getProperties().getProperty(fullName, null);
-	if (value==null)
-		this.value=defaultValue;
-	else
-		this.value=Integer.parseInt(value);
-  }
-  public String asString() { return Integer.toString(value); }
-  public int get() { return this.value; }
+	public IntSetting(CompositeSetting parent, String name, int defaultValue) {
+		super(parent, name);
+		this.defaultValue=defaultValue;
+	}
+	public int get(Props props) {	return props.getInt(fullName, defaultValue);  }
 }

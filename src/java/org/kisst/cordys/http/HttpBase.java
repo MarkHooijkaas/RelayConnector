@@ -9,6 +9,7 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.XmlExpression;
@@ -27,8 +28,12 @@ public class HttpBase {
     private final XmlExpression body;
     private final boolean prettyPrint;
     private final int timeout;
+    protected final Props props;
+	private boolean ignoreSoapFault;
 	
 	public HttpBase(CompilationContext compiler, final int node) {
+		props=compiler.getProps();
+		ignoreSoapFault=HttpSettings.ignoreReturnCode.get(props);
 		prettyPrint = compiler.getSmartBooleanAttribute(node, "prettyPrint", false);
 		timeout = Integer.parseInt(compiler.getSmartAttribute(node, "timeout", "30000"));
 		body=new XmlExpression(compiler, Node.getAttribute(node, "body", "/input/../.."));
@@ -54,7 +59,7 @@ public class HttpBase {
 	private HttpResponse retrieveResponse(PostMethod method, int statusCode) {
 		try {
 			HttpResponse result=new HttpResponse(statusCode, method.getResponseBody());
-			if (statusCode >= 300 && ! HttpModule.getGlobalSettings().ignoreReturnCode.get()) {
+			if (statusCode >= 300 && ! ignoreSoapFault) {
 				throw new HttpSoapFaultException(result);
 			}
 			return result;

@@ -3,6 +3,8 @@ package org.kisst.cordys.relay;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.kisst.cfg4j.Props;
+
 import com.eibus.soap.BodyBlock;
 import com.eibus.xml.nom.Node;
 
@@ -38,15 +40,16 @@ public class SoapFaultException extends RuntimeException {
 
 	/** Creates the Cordys response XML, which should usually contain a SOAP:Fault
 	 * @param response the respose BodyBlock 
+	 * @param props 
 	 */
-	public void createResponse(BodyBlock response) {
+	public void createResponse(BodyBlock response, Props props) {
 		int node=response.createSOAPFault(faultcode,faultstring);
 		int detailsNode=0;
 		if (hasDetails()) {
 			detailsNode=Node.createElement("details", node);
 			fillDetails(detailsNode);
 		}
-		if (RelayModule.getGlobalSettings().showStacktrace.get()) {
+		if (RelaySettings.showStacktrace.get(props)) {
 			if (detailsNode==0)
 				detailsNode=Node.createElement("details", node);
     		StringWriter sw = new StringWriter();

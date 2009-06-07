@@ -45,7 +45,7 @@ public class HttpBase2 extends HttpBase {
 	protected PostMethod createPostMethod(ExecutionContext context, HttpState state, int bodyNode) {
 		HostSettings host=getHost(context);
 		String url=urlExpression.getString(context);
-	    PostMethod method = createPostMethod(host.url.get()+url, bodyNode); // TODO: handle slashes /
+	    PostMethod method = createPostMethod(host.url.get(props)+url, bodyNode); // TODO: handle slashes /
 		for (HttpHeader h:headers) {
 	    	method.addRequestHeader(h.key, h.value.getString(context));
 		}
@@ -56,9 +56,9 @@ public class HttpBase2 extends HttpBase {
 
 	protected HttpState createState(final ExecutionContext context) {
 		HostSettings host=getHost(context);
-		if (host.username.get() != null) {
+		if (host.username.get(props) != null) {
 			HttpState state=new HttpState();
-			state.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(host.username.get(), host.password.get()));
+			state.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(host.username.get(props), host.password.get(props)));
 			return state;
 		}
 		return null;
@@ -66,7 +66,7 @@ public class HttpBase2 extends HttpBase {
 
 	protected HostSettings getHost(final ExecutionContext context) {
 		//connector.settings.set(connector.conf.properties);
-		return HttpModule.getGlobalSettings().host.get(applicationExpression.getString(context));
+		return HttpSettings.host.get(applicationExpression.getString(context));
 	}	
 
 	protected HttpResponse call(final ExecutionContext context, int bodyNode) {

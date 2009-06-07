@@ -68,4 +68,24 @@ public class LayeredProps implements Props {
 			return Long.parseLong(s);
 	}
 
+	public boolean getBoolean(String name, boolean defaultValue) {
+		String value=getString(name, null);
+		if (value==null)
+			 return defaultValue;
+		else 
+			return getBoolean(name);
+	}
+
+	public boolean getBoolean(String name) {
+		String value=getString(name, null);
+		if (value==null)
+			 throw new RuntimeException("property "+name+" is not optional");
+		if ("true".equals(value))
+			return true;
+		else if ("false".equals(value))
+			return false;
+		else
+			throw new RuntimeException("property "+name+" should be true or false, not "+value);
+	}
+
 }

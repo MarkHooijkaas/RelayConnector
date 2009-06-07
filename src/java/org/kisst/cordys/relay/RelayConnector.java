@@ -37,6 +37,7 @@ public class RelayConnector extends ApplicationConnector {
 	//public Properties properties=null;
 	private ArrayList<Module> modules=new ArrayList<Module>();
 	public final MethodCache responseCache=new MethodCache();
+	private MultiLevelProps mlprops;
 	
     /**
      * This method gets called when the processor is started. It reads the
@@ -53,17 +54,14 @@ public class RelayConnector extends ApplicationConnector {
         try {
     		initConfigLocation(getConfiguration());
             connector= Connector.getInstance(CONNECTOR_NAME);
-            MultiLevelProps mlprops=new MultiLevelProps();
-            mlprops.load(getConfigStream());
-            responseCache.init(connector, mlprops.getGlobalProps());
-            addDynamicModules(mlprops.getGlobalProps());
+            mlprops=new MultiLevelProps(getConfigStream());
+            responseCache.init(connector, getGlobalProps());
+            addDynamicModules(getGlobalProps());
         	for (int i=0; i<modules.size(); i++)
-        		modules.get(i).init(mlprops);
+        		modules.get(i).init(getGlobalProps());
         	            
             if (!connector.isOpen())
-            {
                 connector.open();
-            }
         }
         catch (DirectoryException e) { throw new RuntimeException(e);	}
         catch (ExceptionGroup e) { throw new RuntimeException(e);	} 
@@ -86,20 +84,15 @@ public class RelayConnector extends ApplicationConnector {
     protected void addModule(Module m) { modules.add(m); }
 
     public ApplicationTransaction createTransaction(SOAPTransaction stTransaction) {
-		return new RelayTransaction(this);
+		return new RelayTransaction(this, getGlobalProps());
 	}
 
 	public void reset() {
-	    MultiLevelProps mlprops =new MultiLevelProps();
-        mlprops.load(getConfigStream());
-		reset(mlprops);
-	}
-
-	public void reset(MultiLevelProps mlprops ) {
-        responseCache.reset(mlprops.getGlobalProps());
+	    mlprops =new MultiLevelProps(getConfigStream());
+        responseCache.reset(getGlobalProps());
 		scriptCache.clear();
     	for (int i=0; i<modules.size(); i++)
-    		modules.get(i).reset(mlprops);
+    		modules.get(i).reset(getGlobalProps());
 	}
 
 	public void close(Processor processor)
@@ -193,4 +186,6 @@ public class RelayConnector extends ApplicationConnector {
 		catch (TimeoutException e) { throw new RuntimeException(e); }
 		catch (ExceptionGroup e) { throw new RuntimeException(e); }
 	}
+
+	public Props getGlobalProps() {	return mlprops.getGlobalProps();	}
 }
