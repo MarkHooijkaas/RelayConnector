@@ -1,6 +1,5 @@
 package org.kisst.cordys.script.commands;
 
-import org.kisst.cordys.relay.RelayModule;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.ExecutionException;
@@ -30,7 +29,7 @@ public class GetConfigValueStep implements Step {
 		String key=expr.getString(context);
 		if (context.debugTraceEnabled())
 			context.traceDebug("looking up config value"+key);
-		String value=RelayModule.getSettings().get(key);
+		String value=context.getSettings().get(key);
 		if (value==null) {
 			if (defaultValue==null)
 				throw new ExecutionException(context, "Could not find config value ${"+key+"} and no default set");

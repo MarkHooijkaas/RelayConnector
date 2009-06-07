@@ -54,7 +54,7 @@ public class HttpBase {
 	private HttpResponse retrieveResponse(PostMethod method, int statusCode) {
 		try {
 			HttpResponse result=new HttpResponse(statusCode, method.getResponseBody());
-			if (statusCode >= 300 && ! HttpModule.getSettings().ignoreReturnCode.get()) {
+			if (statusCode >= 300 && ! HttpModule.getGlobalSettings().ignoreReturnCode.get()) {
 				throw new HttpSoapFaultException(result);
 			}
 			return result;

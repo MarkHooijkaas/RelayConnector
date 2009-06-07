@@ -36,11 +36,12 @@ public class RelayTransaction  implements ApplicationTransaction
      */
     public boolean process(BodyBlock request, BodyBlock response) {
 		MethodDefinition def = request.getMethodDefinition();
-		ExecutionContext context=new ExecutionContext(connector, request, response);
+		ExecutionContext context=null;
     	try {
+        	TopScript script=getScript(def);
+        	context=new ExecutionContext(script, connector, request, response);
         	if (context.infoTraceEnabled())
         		context.traceInfo("Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), true));
-    		TopScript script=getScript(def);
     		script.executeStep(context);
         	if (context.infoTraceEnabled())
         		context.traceInfo("Replied with response:\n"+Node.writeToString(Node.getParent(Node.getParent(response.getXMLNode())), true));
@@ -50,7 +51,7 @@ public class RelayTransaction  implements ApplicationTransaction
     	}
     	catch (Exception e) {
     		int node=response.createSOAPFault("UnknownError",e.toString());
-    		if (RelayModule.getSettings().showStacktrace.get()) {
+    		if (RelayModule.getGlobalSettings().showStacktrace.get()) {
     			StringWriter sw = new StringWriter();
     			e.printStackTrace(new PrintWriter(sw));
     			String details= sw.toString();
@@ -70,7 +71,7 @@ public class RelayTransaction  implements ApplicationTransaction
 		TopScript script=connector.scriptCache.get(methodName);
 		if (script==null) {
 			script=new TopScript(connector, def);
-			if (RelayModule.getSettings().cacheScripts.get())
+			if (RelayModule.getGlobalSettings().cacheScripts.get())
 				connector.scriptCache.put(methodName, script);
 		}
 		return script;

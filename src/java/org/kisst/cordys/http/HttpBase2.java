@@ -66,7 +66,7 @@ public class HttpBase2 extends HttpBase {
 
 	protected HostSettings getHost(final ExecutionContext context) {
 		//connector.settings.set(connector.conf.properties);
-		return HttpModule.getSettings().host.get(applicationExpression.getString(context));
+		return HttpModule.getGlobalSettings().host.get(applicationExpression.getString(context));
 	}	
 
 	protected HttpResponse call(final ExecutionContext context, int bodyNode) {

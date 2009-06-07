@@ -46,7 +46,7 @@ public class SoapFaultException extends RuntimeException {
 			detailsNode=Node.createElement("details", node);
 			fillDetails(detailsNode);
 		}
-		if (RelayModule.getSettings().showStacktrace.get()) {
+		if (RelayModule.getGlobalSettings().showStacktrace.get()) {
 			if (detailsNode==0)
 				detailsNode=Node.createElement("details", node);
     		StringWriter sw = new StringWriter();

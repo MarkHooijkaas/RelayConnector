@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.kisst.cordys.relay.RelayConnector;
+import org.kisst.cordys.relay.RelaySettings;
 
 import com.eibus.soap.BodyBlock;
 import com.eibus.util.logger.CordysLogger;
@@ -26,6 +27,7 @@ public class ExecutionContext extends RelayTrace {
 		String str=null;
 		private TextVar(String str) { this.str=str;}
 	}
+	private final TopScript script;
 	private final RelayConnector  relayConnector;
 	private final String organization;
 	private final String user;
@@ -35,7 +37,8 @@ public class ExecutionContext extends RelayTrace {
 	private RuntimeException asynchronousError=null;
 	private boolean allreadyDestroyed=false;
 
-	public ExecutionContext(RelayConnector connector, BodyBlock request, BodyBlock response) {
+	public ExecutionContext(TopScript script, RelayConnector connector, BodyBlock request, BodyBlock response) {
+		this.script=script;
 		this.relayConnector=connector; 
 		this.organization=connector.getOrganization();
 
@@ -114,6 +117,7 @@ public class ExecutionContext extends RelayTrace {
 		}
 	}
 
+	public RelaySettings getSettings() { return script.getSettings(); }
 	public RelayConnector getRelayConnector() { return relayConnector; }
 	public String getOrganization() { return organization; }	
 	public String getOrganizationalUser() {	return user; }

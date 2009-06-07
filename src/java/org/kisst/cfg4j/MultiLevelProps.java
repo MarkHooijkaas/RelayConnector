@@ -5,12 +5,25 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 
-public class PropertyLoader {
-	public static Props loadProperties(String filename)  {
+public class MultiLevelProps {
+	private final HashMap<String,Props> props=new HashMap<String,Props>();
+	private final LayeredProps globalProps=new LayeredProps(null);
+
+	public Props getGlobalProps() { return globalProps; }
+	public Props getProps(String key) {
+		Props result = props.get(key);
+		if (result==null)
+			return globalProps;
+		else
+			return result;
+	}
+
+	public void load(String filename)  {
+		props.clear();
+		FileInputStream inp = null;
 		try {
-			Props props=new LayeredProps(null);
-			FileInputStream inp = null;
 			try {
 				inp = new FileInputStream(filename);
 				load(inp);
@@ -18,16 +31,16 @@ public class PropertyLoader {
 			finally {
 				if (inp!=null) inp.close();
 			}
-			return props;
 		}
 		catch (IOException e) { throw new RuntimeException(e); }
 	}
 
-	public static Props load(InputStream inp )  {
-		BufferedReader input=null;
-		LayeredProps props=new LayeredProps(null);
+	public void load(InputStream inp)  {
+		load(globalProps, new BufferedReader(new InputStreamReader(inp)));
+	}
+
+	private void load(LayeredProps props, BufferedReader input)  {
 		try {
-			input = new BufferedReader(new InputStreamReader(inp));
 			String str;
 			while ((str = input.readLine()) != null) {
 				str=str.trim();
@@ -45,6 +58,5 @@ public class PropertyLoader {
 			}
 		}
 		catch (IOException e) { throw new RuntimeException(e); }
-		return props;
 	}
 }

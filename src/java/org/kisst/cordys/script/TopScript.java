@@ -3,6 +3,8 @@ package org.kisst.cordys.script;
 import java.util.HashMap;
 
 import org.kisst.cordys.relay.RelayConnector;
+import org.kisst.cordys.relay.RelayModule;
+import org.kisst.cordys.relay.RelaySettings;
 
 import com.eibus.soap.MethodDefinition;
 
@@ -12,12 +14,14 @@ public class TopScript extends Script {
 	private final String name;
 	private final HashMap<String,String> prefixes = new HashMap<String,String>();
 	private final CompilationContext compiler;
+	private final RelaySettings settings;
 	
 	public TopScript(RelayConnector connector, MethodDefinition def) {
 		super(def.getImplementation());
+    	this.name=getFullMethodName();
+		this.settings=RelayModule.getSettings(name);
 		this.relayConnector=connector; 
 		this.definition=def;
-    	this.name=getFullMethodName();
 		compiler=new CompilationContext(this);
     	try {
     		compile(compiler, def.getImplementation());
@@ -26,6 +30,7 @@ public class TopScript extends Script {
     	catch (Exception e) { throw new CompilationException(compiler, e.getMessage(), e); }
 	}
 
+	public RelaySettings getSettings() { return this.settings; }
 	public void addPrefix(String prefix, String namespace) {
 		if (prefixes.containsKey(prefix))
 			throw new RuntimeException("prefix "+prefix+" allready defined when trying to set new namespace "+namespace);

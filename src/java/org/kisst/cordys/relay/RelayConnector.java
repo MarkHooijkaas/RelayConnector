@@ -7,7 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.kisst.cfg4j.PropertyLoader;
+import org.kisst.cfg4j.MultiLevelProps;
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.TopScript;
 import org.kisst.cordys.util.NomUtil;
@@ -28,7 +28,7 @@ import com.eibus.xml.nom.Node;
 public class RelayConnector extends ApplicationConnector {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayConnector.class);
     public  static final String CONNECTOR_NAME = "RelayConnector";
-
+    
 	//public final RelayConfiguration conf=new RelayConfiguration();
 	private Connector connector;
 	private String configLocation;
@@ -53,11 +53,12 @@ public class RelayConnector extends ApplicationConnector {
         try {
     		initConfigLocation(getConfiguration());
             connector= Connector.getInstance(CONNECTOR_NAME);
-            Props props=PropertyLoader.load(getConfigStream());
-            responseCache.init(connector, props);
-            addDynamicModules(props);
+            MultiLevelProps mlprops=new MultiLevelProps();
+            mlprops.load(getConfigStream());
+            responseCache.init(connector, mlprops.getGlobalProps());
+            addDynamicModules(mlprops.getGlobalProps());
         	for (int i=0; i<modules.size(); i++)
-        		modules.get(i).init(props);
+        		modules.get(i).init(mlprops);
         	            
             if (!connector.isOpen())
             {
@@ -88,17 +89,17 @@ public class RelayConnector extends ApplicationConnector {
 		return new RelayTransaction(this);
 	}
 
-	@Override
-	public void reset(Processor processor) {
-        Props props=PropertyLoader.load(getConfigStream());
-		reset(props);
+	public void reset() {
+	    MultiLevelProps mlprops =new MultiLevelProps();
+        mlprops.load(getConfigStream());
+		reset(mlprops);
 	}
 
-	public void reset(Props props) {
-        responseCache.reset(props);
+	public void reset(MultiLevelProps mlprops ) {
+        responseCache.reset(mlprops.getGlobalProps());
 		scriptCache.clear();
     	for (int i=0; i<modules.size(); i++)
-    		modules.get(i).reset(props);
+    		modules.get(i).reset(mlprops);
 	}
 
 	public void close(Processor processor)

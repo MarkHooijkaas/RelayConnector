@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Stack;
 
 import org.kisst.cordys.relay.RelayConnector;
+import org.kisst.cordys.relay.RelaySettings;
 import org.kisst.cordys.script.commands.CommandList;
 
 import com.eibus.xml.nom.Node;
@@ -83,4 +84,5 @@ public class CompilationContext extends RelayTrace implements PrefixContext {
 	public void addPrefix(String prefix, String namespace) { script.addPrefix(prefix, namespace); }
 	public String resolvePrefix(String prefix) { return script.resolvePrefix(prefix); }
 	public RelayConnector getRelayConnector() { return script.getRelayConnector(); }
+	public RelaySettings getSettings() { return script.getSettings(); }
 }
