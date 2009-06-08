@@ -40,6 +40,8 @@ public class MultiLevelProps {
 	*/
 
 	private void load(InputStream inp)  {
+		if (inp==null)
+			return;
 		load(globalProps, new BufferedReader(new InputStreamReader(inp)));
 	}
 

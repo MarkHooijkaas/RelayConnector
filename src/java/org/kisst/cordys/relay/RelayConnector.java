@@ -134,6 +134,8 @@ public class RelayConnector extends ApplicationConnector {
 
 	
 	private InputStream getConfigStream() {
+		if (configLocation==null || configLocation.trim().length()==0)
+			return null;
 		if (configLocation.startsWith("xmlstore:")) {
 			return getConfigFileFromXmlStore();
 		}
