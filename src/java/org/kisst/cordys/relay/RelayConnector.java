@@ -54,14 +54,14 @@ public class RelayConnector extends ApplicationConnector {
         try {
     		initConfigLocation(getConfiguration());
             connector= Connector.getInstance(CONNECTOR_NAME);
+            if (!connector.isOpen())
+                connector.open();
+
             mlprops=new MultiLevelProps(getConfigStream());
             responseCache.init(connector, getGlobalProps());
             addDynamicModules(getGlobalProps());
         	for (int i=0; i<modules.size(); i++)
         		modules.get(i).init(getGlobalProps());
-        	            
-            if (!connector.isOpen())
-                connector.open();
         }
         catch (DirectoryException e) { throw new RuntimeException(e);	}
         catch (ExceptionGroup e) { throw new RuntimeException(e);	} 
