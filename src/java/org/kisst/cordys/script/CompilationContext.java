@@ -81,6 +81,13 @@ public class CompilationContext extends RelayTrace implements PrefixContext {
 		return Boolean.parseBoolean(str); // TODO: more strict checking
 	}
 
+	public int getSmartIntAttribute(int node, String name, int defaultValue) {
+		String str= getSmartAttribute(node,name, null);
+		if (str==null)
+			return defaultValue;
+		return Integer.parseInt(str);
+	}
+
 	public void addPrefix(String prefix, String namespace) { script.addPrefix(prefix, namespace); }
 	public String resolvePrefix(String prefix) { return script.resolvePrefix(prefix); }
 	public RelayConnector getRelayConnector() { return script.getRelayConnector(); }

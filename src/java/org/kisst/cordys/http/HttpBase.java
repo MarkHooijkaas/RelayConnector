@@ -35,7 +35,7 @@ public class HttpBase {
 		props=compiler.getProps();
 		ignoreSoapFault=HttpSettings.ignoreReturnCode.get(props);
 		prettyPrint = compiler.getSmartBooleanAttribute(node, "prettyPrint", false);
-		timeout = Integer.parseInt(compiler.getSmartAttribute(node, "timeout", "30000"));
+		timeout = compiler.getSmartIntAttribute(node, "timeout", HttpSettings.timeout.get(props));
 		body=new XmlExpression(compiler, Node.getAttribute(node, "body", "/input/../.."));
 	}
 
