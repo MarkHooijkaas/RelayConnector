@@ -57,29 +57,26 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 		//int to=NomUtil.getElement(header, wsaNamespace, "To");
 		//if (to==0)
 		//      throw new RuntimeException("Missing wsa:To element");
-		int refpar=NomUtil.getElement(header, SoapUtil.wsaNamespace, "ReferenceParameters");
-		if (refpar==0) {
-			refpar=Node.createElement("ReferenceParameters", header);
-			NomUtil.setNamespace(refpar, SoapUtil.wsaNamespace, "wsa", false);
-		}
-		int cb=Node.createElement(wrappperElementName, refpar); // TODO: Check if this node already exists...
-		NomUtil.setNamespace(cb, wrappperElementNamespace, "kisst", false);
-		moveNode(header, "ReplyTo", cb);
-		moveNode(header, "FaultTo", cb);
-		int replyToNode=Node.createTextElement("ReplyTo", replyToExpression.getString(context), header);
-		NomUtil.setNamespace(replyToNode, SoapUtil.wsaNamespace, "wsa", false);
-		if (faultToExpression!=null) {
-			int faultToNode=Node.createElement("FaultTo", header);
-			NomUtil.setNamespace(faultToNode, SoapUtil.wsaNamespace, "wsa", false);
-			Node.setData(faultToNode, faultToExpression.getString(context));
-		}
+		moveNode(header, "ReplyTo", replyToExpression.getString(context));
+		moveNode(header, "FaultTo", "http://www.w3.org/2005/08/addressing/anonymous");
 	}
 
-	private void moveNode(int header, String name, int dest) {
-		int orig = NomUtil.getElement(header, SoapUtil.wsaNamespace, name);
-		if (orig==0)
+	private void moveNode(int header, String name, String newAddress) {
+		int node = NomUtil.getElement(header, SoapUtil.wsaNamespace, name);
+		if (node==0)
 			return;
-		Node.unlink(orig);
-		Node.appendToChildren(orig,dest);
+		int refpar=NomUtil.getElement(node, SoapUtil.wsaNamespace, "ReferenceParameters");
+		if (refpar==0) {
+			refpar=Node.createElement("ReferenceParameters", node);
+			NomUtil.setNamespace(refpar, SoapUtil.wsaNamespace, "wsa", false);
+		}
+		int cb=Node.createElement(wrappperElementName, refpar); 
+		NomUtil.setNamespace(cb, wrappperElementNamespace, "kisst", false);
+		int origaddr = NomUtil.getElementByLocalName(node, "Address");
+		String origaddress =Node.getData(origaddr); 
+		int cbaddr=Node.createTextElement("Address", origaddress, cb);
+		NomUtil.setNamespace(cbaddr, SoapUtil.wsaNamespace, "wsa", false);
+		Node.setDataElement(origaddr, "", newAddress);
+		
 	}
 }
