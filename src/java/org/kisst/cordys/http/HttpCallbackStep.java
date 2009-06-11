@@ -32,10 +32,11 @@ public class HttpCallbackStep extends HttpBase2 implements Step {
 	    	PostMethod method=createPostMethod(url, bodyNode);
 		    		
 	    	HttpResponse response=httpCall(method, null);
-	    	httpResponse = response.getResponseXml(context.getDocument());
-			int cordysResponse=context.getXmlVar("output");
-			SoapUtil.mergeResponses(httpResponse, cordysResponse);
-
+			if (xmlResponse) {
+				httpResponse = response.getResponseXml(context.getDocument());
+				int cordysResponse=context.getXmlVar("output");
+				SoapUtil.mergeResponses(httpResponse, cordysResponse);
+			}
 	    }
 	    finally {
 	    	Node.delete(httpResponse);

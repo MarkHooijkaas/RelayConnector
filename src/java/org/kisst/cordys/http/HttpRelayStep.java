@@ -40,10 +40,11 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 			if (wsa)
 				wsaTransform(context, bodyNode);
 			HttpResponse response=call(context, bodyNode);
-			httpResponse = response.getResponseXml(context.getDocument());
 			int cordysResponse=context.getXmlVar("output");
-
-			SoapUtil.mergeResponses(httpResponse, cordysResponse);
+			if (xmlResponse) {
+				httpResponse = response.getResponseXml(context.getDocument());
+				SoapUtil.mergeResponses(httpResponse, cordysResponse);
+			}
 		}
 		finally {
 			if (httpResponse!=0) Node.delete(httpResponse);

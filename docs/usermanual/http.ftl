@@ -15,6 +15,7 @@ command</title>
   [prettyPrint="true|false"]
   [timeout="<replaceable>millisecs</replaceable>"]
   [body="<replaceable>xml-expression</replaceable>"]
+  [xmlResponse="<replaceable>boolean</replaceable>"]
 >
   [<header key="" value=""> ...]
 </http>
@@ -46,6 +47,10 @@ httpclient.wire logging.</para>
 <para>The timeout variable will control how long the call will wait for an answer.
 If no timeout is specified this will default to 30000 (i.e. 30 seconds). 
 A timeout of zero means waiting indefinitely.</para>
+
+<para>If the attribute xmlResponse is false, the http response will be placed in a textvariable.
+The default value is true, which means that the response will be placed in a xml variable.</para>
+
 <para>The body is the xml that is to be
 sent. If no body is specified the expression "/input/../.."
 is used. This will send the original input, including the
@@ -85,6 +90,7 @@ command</title>
   [prettyPrint="true|false"]
   [timeout="<replaceable>millisecs</replaceable>"]
   [body="<replaceable>xml-expression</replaceable>"]
+  [xmlResponse="<replaceable>boolean</replaceable>"]
   [wsa="true" replyTo="<replaceable>url-expression</replaceable>" 
     [faultTo="<replaceable>url-expression</replaceable>"]
     [wrapperName="<replaceable>element-name</replaceable>"]
@@ -113,6 +119,10 @@ the example in Chapter 6.3.</para>
 <para>One can change the qualified name of the wrapper element if one
 really wants to, but usually one can leave these at the default
 settings, which are also the defaults of the http-callback command.</para>
+<para>If the attribute xmlResponse is false, the http response will be ignored.
+This is especially useful in combination when the response is empty which might be the case
+when using wsa=true.
+The default value of xmlResponse is true.</para>
 </sect1>
 
 
@@ -124,6 +134,7 @@ command</title>
   [timeout="<replaceable>millisecs</replaceable>"]
   [wrapperName="<replaceable>element-name</replaceable>"]
   [wrapperNamespabe="<replaceable>namespace</replaceable>"]/>
+  [xmlResponse="<replaceable>boolean</replaceable>"]
 </@xmlcode>
 
 
@@ -134,6 +145,8 @@ how it should be used.</para>
 the wrapper element if one really wants to, but usually one can leave
 these at the default settings, which are also the defaults of the
 http-callback command.</para>
+<para>If the attribute xmlResponse is false, the http response will be ignored.
+The default value of xmlResponse is true.</para>
 
 </sect1>
 </chapter>

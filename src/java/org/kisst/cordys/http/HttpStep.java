@@ -12,7 +12,10 @@ public class HttpStep extends HttpBase2 implements Step {
 	public HttpStep(CompilationContext compiler, final int node) {
 		super(compiler, node);
 		resultVar = Node.getAttribute(node, "resultVar", "output");
-		compiler.declareXmlVar(resultVar);
+		if (xmlResponse)
+			compiler.declareXmlVar(resultVar);
+		else
+			compiler.declareTextVar(resultVar);
 	}
 	
 	public void executeStep(final ExecutionContext context) {
@@ -20,8 +23,10 @@ public class HttpStep extends HttpBase2 implements Step {
 		try {
 			bodyNode= createBody(context);
 		    HttpResponse response=call(context, bodyNode);
-		    int responseNode = response.getResponseXml(context.getDocument());
-		    context.setXmlVar(resultVar, responseNode );
+			if (xmlResponse)
+			    context.setXmlVar(resultVar, response.getResponseXml(context.getDocument()));
+			else
+				context.setTextVar(resultVar, response.getResponseString());
 		}
 		finally {
 			if (bodyNode!=0) Node.delete(bodyNode);
