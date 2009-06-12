@@ -1,0 +1,11 @@
+<project>
+    <org>kisst.org</org>
+    <name>EsbConnector</name>
+    <version>1.0</version>
+    <class>org.kisst.cordys.esb.EsbConnector</class>
+	<jarfiles pathid="jarfiles">
+      <pathelement location="lib/commons-httpclient-3.1.jar"/>
+      <pathelement location="lib/commons-logging-1.0.4.jar"/>
+      <pathelement location="lib/commons-codec-1.2.jar"/>
+	</jarfiles>
+</project>

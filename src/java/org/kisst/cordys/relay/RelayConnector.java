@@ -37,7 +37,7 @@ public class RelayConnector extends ApplicationConnector {
 	//public Properties properties=null;
 	private ArrayList<Module> modules=new ArrayList<Module>();
 	public final MethodCache responseCache=new MethodCache();
-	private MultiLevelProps mlprops;
+	protected MultiLevelProps mlprops;
 	
     /**
      * This method gets called when the processor is started. It reads the
