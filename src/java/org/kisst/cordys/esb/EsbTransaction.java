@@ -7,7 +7,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
@@ -91,7 +90,7 @@ public class EsbTransaction  implements ApplicationTransaction {
 		if (host.username.get(props) == null)
 			return null;
 		HttpState state=new HttpState();
-		state.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(host.username.get(props), host.password.get(props)));
+		state.setCredentials(AuthScope.ANY, host.getCredentials(props));
 		return state;
 	}
 
