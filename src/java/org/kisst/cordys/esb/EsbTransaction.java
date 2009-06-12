@@ -56,10 +56,9 @@ public class EsbTransaction  implements ApplicationTransaction {
 
     
 	private void exec(int input, int output) {
-		int bodyNode= 0;
 		int httpResponse = 0;
 		try {
-			bodyNode= Node.getParent(Node.getParent(input));
+			int bodyNode= Node.getParent(Node.getParent(input));
 		    PostMethod method = createPostMethod(host.url.get(props), bodyNode);
 			HttpState state=createState();
 		    if (state!=null)
@@ -71,7 +70,6 @@ public class EsbTransaction  implements ApplicationTransaction {
 		}
 		finally {
 			if (httpResponse!=0) Node.delete(httpResponse);
-			if (bodyNode!=0) Node.delete(bodyNode);
 		}
 	}
 	
