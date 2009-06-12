@@ -1,20 +1,17 @@
 package org.kisst.cordys.esb;
 
-import org.kisst.cordys.relay.RelayConnector;
+import org.kisst.cordys.util.BaseConnector;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.SOAPTransaction;
 
-public class EsbConnector extends RelayConnector {
-    public  static final String CONNECTOR_NAME = "EsbConnector";
-
+public class EsbConnector extends BaseConnector {
     public EsbConnector(){
     }
-    
-    protected String getManagedComponentType() { return "EsbConnector"; }
-    protected String getManagementName() { return "EsbConnector"; }
+	@Override
+	protected String getConnectorName() { return "EsbConnector"; }
     
     public ApplicationTransaction createTransaction(SOAPTransaction stTransaction) {
     	int env=stTransaction.getRequestEnvelope();
@@ -22,4 +19,5 @@ public class EsbConnector extends RelayConnector {
     	String key=NomUtil.getUniversalName(req);
 		return new EsbTransaction(mlprops.getProps(key));
 	}
+
 }
