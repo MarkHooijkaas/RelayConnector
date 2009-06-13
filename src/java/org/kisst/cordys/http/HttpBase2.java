@@ -1,7 +1,6 @@
 package org.kisst.cordys.http;
 
 import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.kisst.cordys.script.CompilationContext;
@@ -58,7 +57,7 @@ public class HttpBase2 extends HttpBase {
 		HostSettings host=getHost(context);
 		if (host.username.get(props) != null) {
 			HttpState state=new HttpState();
-			state.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(host.username.get(props), host.password.get(props)));
+			state.setCredentials(AuthScope.ANY, host.getCredentials(props));
 			return state;
 		}
 		return null;
