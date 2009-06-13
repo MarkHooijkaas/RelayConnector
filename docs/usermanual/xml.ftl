@@ -19,8 +19,7 @@ different elements:</para>
 	<listitem><para>attribute, adds a new attribute</para></listitem>
 	<listitem><para>text, adds new text</para></listitem>
 	<listitem><para>cdata, adds new cdata section</para></listitem>
-	<listitem><para>include, adds the contents of a
-	xml expression (this name might be changed in future)</para></listitem>
+	<listitem><para>include, adds the contents of a	xml expression </para></listitem>
 </itemizedlist>
 
 <para>A complete overview of all possible
@@ -39,7 +38,7 @@ share this syntax.</para>
 	[text="<replaceable>text-expression</replaceable>"]
 	[xml="<replaceable>xml-expression</replaceable>"] 
 	[childrenOf="<replaceable>xml-expression</replaceable>"]
-	[target="<replaceable>xml-expression</replaceable>"] 
+	[target="<replaceable>relative-path</replaceable>"] 
 >
   <!-- any of the following elements in any order, as many times as needed -->
   <element 
@@ -49,7 +48,7 @@ share this syntax.</para>
 	[text="<replaceable>text-expression</replaceable>"]
 	[xml="<replaceable>xml-expression</replaceable>"] 
 	[childrenOf="<replaceable>xml-expression</replaceable>"]
-	[target="<replaceable>xml-expression</replaceable>"] 
+	[target="<replaceable>relative-path</replaceable>"] 
   >
     <!-- nested elements, attributes, etc if needed -->
   </element>
@@ -67,7 +66,11 @@ share this syntax.</para>
 	[namespace="<replaceable>namespace</replaceable>" [reduceXmlns="false"]] 
 
 	[text="<replaceable>text-expression</replaceable>"]>[<replaceable>fixed-text</replaceable>]</cdata>
-  <include ..../> <!-- synonym for element -->
+  <include 
+	[xml="<replaceable>xml-expression</replaceable>"] 
+	[childrenOf="<replaceable>xml-expression</replaceable>"]
+	[target="<replaceable>relative-path</replaceable>"] 
+  />
 </output>
 </@xmlcode>
 
