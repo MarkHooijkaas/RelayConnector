@@ -28,7 +28,8 @@ public class HttpCallbackStep extends HttpBase2 implements Step {
 	    try {
 	    	int header=NomUtil.getElement(bodyNode, SoapUtil.soapNamespace, "Header");
 	    	int wrapper=NomUtil.getElement(header,  wrappperElementNamespace, wrappperElementName);
-	    	String url=Node.getData(NomUtil.getElementByLocalName(wrapper, "ReplyTo")); // TODO: check for FaultTo
+	    	int address=NomUtil.getElementByLocalName(wrapper, "Address");
+	    	String url=Node.getData(address);
 	    	PostMethod method=createPostMethod(url, bodyNode);
 		    		
 	    	HttpResponse response=httpCall(method, null);

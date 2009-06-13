@@ -31,15 +31,17 @@ url="..." <emphasis>wsa="true" replyTo="${dollar}{esbUrl}"</emphasis>/>
 </implementation>
 </@xmlcode>
 <para>If one would send a message to this service it should have a WS-A
-ReplyTo element. (It should have othe WS-A mandatory elements (like
-MessageId) as well, but these are just passed though by the
+ReplyTo element. (It should have other WS-A mandatory elements (like
+MessageId) as well, but these are just passed through by the
 http-relay command).</para>
 <@xmlcode>
-<SOAP:Envelope
-xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+<SOAP:Envelope xmlns:wsa="...." xmlns:SOAP="...">
   <SOAP:Header>
-    <emphasis><wsa:ReplyTo xmlns:wsa="http://www.w3.org/2005/08/addressing"></emphasis>
-    <emphasis>http://192.168.10.11/someService</emphasis>
+    <emphasis><wsa:ReplyTo></emphasis>
+      <emphasis><wsa:Address>http://192.168.10.11/someService</wsa:Address></emphasis>
+      <wsa:ReferenceParameters>
+        <someData xmlns="dummy">Data the caller likes to see returned</someData>
+      </wsa:ReferenceParameters>
     <emphasis></wsa:ReplyTo></emphasis>
   </SOAP:Header>
   <SOAP:Body>
@@ -51,24 +53,22 @@ xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
 <para>The http-relay command will wrap this ReplyTo element in a manner
 that it will be passed back in the response, and will add a new
 ReplyTo element as specified by the replyTo attribute.</para>
-<para>The wrapping of the original ReplyTo element is doen using the
+<para>The wrapping of the original ReplyTo element is done using the
 WS-A  element ReferenceParameters, of which the contents will be
 passed back in the response, according to the WS-A standard.</para>
 
 <@xmlcode>
-<SOAP:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing"
- xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+<SOAP:Envelope xmlns:wsa="...." xmlns:SOAP="...">
   <SOAP:Header >
     <!-- cordys specific headers removed -->
-    <<emphasis>wsa:ReferenceParameters </emphasis>xmlns:wsa="http://www.w3.org/2005/08/addressing">
-	<<emphasis>kisst:CallbackWrapper</emphasis> xmlns:kisst="http://kisst.org/cordys/http">
-	  <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
-		<emphasis>http://192.168.10.11/someService</emphasis>
-	  </ReplyTo>
-	</<emphasis>kisst:CallbackWrapper</emphasis>>
-    </<emphasis>wsa:ReferenceParameters</emphasis>>
      <wsa:ReplyTo xmlns:wsa="http://www.w3.org/2005/08/addressing">
-      <emphasis>http://esb.company.com/cordys/wcpgateway?org=...</emphasis>
+      <emphasis><wsa:Address>http://esb.company.com/cordys/wcpgateway?org=...<wsa:Address></emphasis>
+      <wsa:ReferenceParameters>
+        <someData xmlns="dummy">Data the caller likes to see returned</someData>
+        <<emphasis>kisst:CallbackWrapper</emphasis> xmlns:kisst="http://kisst.org/cordys/http">
+          <emphasis><wsa:Address>http://192.168.10.11/someService</wsa:Address></emphasis>
+        </<emphasis>kisst:CallbackWrapper</emphasis>>
+      </wsa:ReferenceParameters>
     </wsa:ReplyTo>
   </SOAP:Header>
   <SOAP:Body>
@@ -92,14 +92,12 @@ can be very simple and will look as follows:</para>
 ReferenceParameters of the original request and should  thus look
 something like this:</para>
 <@xmlcode>
-<SOAP:Envelope
-xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+<SOAP:Envelope xmlns:wsa="...." xmlns:SOAP="...">
   <SOAP:Header>
-    <CallbackWrapper xmlns="http://kisst.org/cordys/http">
-        <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
-		<emphasis>http://192.168.10.11/someService</emphasis>
-        </ReplyTo>
-    </CallbackWrapper>
+    <someData xmlns="dummy">Data the caller likes to see returned</someData>
+    <<emphasis>kisst:CallbackWrapper</emphasis> xmlns:kisst="http://kisst.org/cordys/http">
+      <emphasis><wsa:Address>http://192.168.10.11/someService</wsa:Address></emphasis>
+    </<emphasis>kisst:CallbackWrapper</emphasis>>
   </SOAP:Header>
   <SOAP:Body>
     <AsyncResponse xmlns="urn:test">....</AsyncResponse>

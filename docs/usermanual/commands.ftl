@@ -111,7 +111,7 @@ postfix "Response".</para>
 <sect1  id="call"><title>call command</title>
 <@xmlcode>
 <call method="<replaceable>method-name"|</replaceable>methodExpression="<replaceable>expr</replaceable>"
-  [namespace="<replaceable>namespace"]</replaceable>|</replaceable>namespaceExpression="<replaceable>expr</replaceable>"]
+  [namespace="<replaceable>namespace"]</replaceable>|namespaceExpression="<replaceable>expr</replaceable>"]
   [async="true|false"]*
   [showSoap="true|false"]*
   [ignoreSoapFault="true|false"]*

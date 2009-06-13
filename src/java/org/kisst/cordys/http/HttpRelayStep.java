@@ -54,16 +54,13 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 
 	private void wsaTransform(final ExecutionContext context, int top) {
 		int header=NomUtil.getElement(top, SoapUtil.soapNamespace, "Header");
-		//int to=NomUtil.getElement(header, wsaNamespace, "To");
-		//if (to==0)
-		//      throw new RuntimeException("Missing wsa:To element");
 		moveNode(header, "ReplyTo", replyToExpression.getString(context));
 		moveNode(header, "FaultTo", faultToExpression.getString(context));
 	}
 
 	private void moveNode(int header, String name, String newAddress) {
 		int node = NomUtil.getElement(header, SoapUtil.wsaNamespace, name);
-		if (node==0)
+		if (node==0) // TODO: FaultTo should maybe forced to anonymous
 			return;
 		int refpar=NomUtil.getElement(node, SoapUtil.wsaNamespace, "ReferenceParameters");
 		if (refpar==0) {
