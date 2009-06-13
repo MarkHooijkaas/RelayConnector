@@ -29,7 +29,7 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 		replyToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "replyTo"));
 		if (wsa && replyToExpression==null)
 			throw new CompilationException(compiler, "when wsa attribute is true a replyTo attribute is mandatory");
-		faultToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "faultTo"));
+		faultToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "faultTo", "http://www.w3.org/2005/08/addressing/anonymous"));
 	}
 
 	public void executeStep(final ExecutionContext context) {
@@ -58,7 +58,7 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 		//if (to==0)
 		//      throw new RuntimeException("Missing wsa:To element");
 		moveNode(header, "ReplyTo", replyToExpression.getString(context));
-		moveNode(header, "FaultTo", "http://www.w3.org/2005/08/addressing/anonymous");
+		moveNode(header, "FaultTo", faultToExpression.getString(context));
 	}
 
 	private void moveNode(int header, String name, String newAddress) {
