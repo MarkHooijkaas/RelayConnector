@@ -113,11 +113,7 @@ postfix "Response".</para>
 <call method="<replaceable>method-name"|</replaceable>methodExpression="<replaceable>expr</replaceable>"
   [namespace="<replaceable>namespace"]</replaceable>|namespaceExpression="<replaceable>expr</replaceable>"]
   [async="true|false"]*
-  [showSoap="true|false"]*
-  [ignoreSoapFault="true|false"]*
-  [appendMessagesTo="<replaceable>xml-expression</replaceable>"]*
   [resultVar="<replaceable>result-var-name</replaceable>"]
-  [timeout="<replaceable>millisec</replaceable>"]
   [name<replaceable>="element-name"</replaceable>]
   [xml="<replaceable>xml-expression</replaceable>"] 
   [text="<replaceable>text-expression</replaceable>"]
@@ -153,110 +149,15 @@ attribute is false.</para>
 
 </sect2>
 
-<sect2><title>showSoap attribute</title>
-<para>If the showSoap
-flag is true, the resultVar will be filled with the entire SOAP
-message, including Envelope, Header and Body elements. Because this
-info is usually not needed, the default behaviour is to set this
-variable to false, which will discard the SOAP elements and store the
-first child of the body in the ResultVar.</para>
-
-</sect2>
-
-<sect2><title>ignoreSoapFault
-attribute</title>
-<para>If the
-ignoreSoapFault attribute is set
-to true, a SOAP:Fault response will not result in an error, but the
-SOAP:Fault message will be stored in the resultVar. If this attribute
-is set to false (the default behavior), the processing of the script
-will finish and a SOAP:Fault will be returned as result of the
-script.</para>
-</sect2>
-
-<sect2><title>logSoapFault
-attribute</title>
-<para>If the logSoapFault
-attribute is set, a SOAP:Fault response from a call will be logged.
-The log level that it will be logged to is determined by the value of
-this attribute which should be DEBUG, INFO, WARN. ERROR or FATAL. In
-general it is advised not to set the level to ERROR. The function of
-the RelayConnector is just to relay the response to the original
-caller. The source of the error should log this error clearly, and
-one should not want to see this error being logged in intermediate
-(RelayConnector) logs.</para>
-
-<para>If this attribute
-is not specified, a setting from the configuration file will be used.
-In this way one can globally configure the RelayConnector to log any
-received SoapFaults at a certain level. 
-</para>
-</sect2>
-
-<sect2><title>timeout attribute</title>
-<para>The timeout attribute sets an timeout
-value in milliseconds. If the method call does not answer within this
-timeout period, the script will stop with a SOAP Fault. If no timeout
-attribute is specified a system wide default timeout is used. This
-value is 20 seconds by default, but a different value may be
-configured (see <xref linkend="configuration"/>). 
-</para>
-</sect2>
-
-<sect2><title>appendMessagesTo
-attribute</title>
-<para>The
-appendMessagesTo attribute is mainly meant for debugging purposes. It
-will append all request and response message to a XML element.
-Usually you would set this using the default command to "/output",
-during development, to see what is happening, and remove that default
-command, once the function works. 
-</para>
-
-<@xmlcode>
-<!-- remove the next statement after debugging is finished -->
-<default attribute="appendMessagesTo" value="/output"/>
-
-<!-- The input and output of these calls will be shown in the output -->
-<call ...>
-<call ...>
-</@xmlcode>
-
-<para>You might also set
-it to something like "/output/log", but the one should
-first append a "log" element to the output, e.g.</para>
-<@xmlcode>
-<!-- remove the next two statements after debugging is finished -->
-<output name="log">
-<default attribute="appendMessagesTo" value="/output/log"/>
-</@xmlcode>
-
-<para>Note that when
-using async calls, the order of the response messages is not defined.</para>
-
-</sect2>
 
 <sect2><title>Using the default mechanism</title>
-<para>The async, showSoap,  namespace, ignoreSoapFault and appendMessagesTo
-attributes will use a default attribute if set with the default
-command. 
+<para>The async and namespace attributes will use a default attribute 
+if set with the default command. 
 </para>
 <para>If no async
 attribute is set directly or using the default command, it will
 default to false.</para>
-<para>If no showSOAP
-attribute is set directly or using the default command, it will
-default to false.</para>
-<para>If no ignoreSoapFault
-attribute is set directly or using the default command, it will
-default to false.</para>
-<para>If no appendMessagesTo
-attribute is set directly or using the default command, it will
-default to none, which means that nothing is appended. It is
-currently not possible to unset this attribute once set using the
-default mechanism.</para>
-<para>If no namespace
-attribute is set directly or using the default command this is an
+<para>If no namespace attribute is set directly or using the default command this is an
 error.</para>
 
 </sect2>

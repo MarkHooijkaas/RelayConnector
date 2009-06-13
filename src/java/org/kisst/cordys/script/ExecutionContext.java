@@ -177,6 +177,13 @@ public class ExecutionContext extends RelayTrace {
 		MethodCache caller = getRelayConnector().responseCache;
 		handleResponse(caller.sendAndWait(method,RelaySettings.timeout.get(getProps())), resultVar);
 	}
+	
+	// TODO: fix possible memory leak if async calls never return a answer
+	// Such call will register a SOAPListener which will never be removed.
+	// In long term this could lead to a OutOfMemory error.
+	// Possible fix would be to not use sendAndCallback, but just send, and use a 
+	// default SOAPListener. This in considered not very urgent yet.
+
 	public void callMethodAsync(int method, final String resultVar) {
 		if (infoTraceEnabled())
 			traceInfo("sending request\n"+Node.writeToString(method, true));
