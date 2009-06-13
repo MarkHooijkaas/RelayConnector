@@ -5,10 +5,17 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.kisst.cfg4j.Props;
+import org.kisst.cordys.relay.MethodCache;
 import org.kisst.cordys.relay.RelayConnector;
+import org.kisst.cordys.relay.RelaySettings;
+import org.kisst.cordys.script.commands.RelaySoapFaultException;
 import org.kisst.cordys.util.Destroyable;
 import org.kisst.cordys.util.NomNode;
+import org.kisst.cordys.util.SoapUtil;
 
+import com.eibus.connector.nom.Connector;
+import com.eibus.connector.nom.SOAPMessageListener;
+import com.eibus.directory.soap.DirectoryException;
 import com.eibus.soap.BodyBlock;
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
@@ -120,16 +127,13 @@ public class ExecutionContext extends RelayTrace {
 	/**
 	 * Register object to be destroyed automatically when the call is done 
 	 * @param destroyable the object to be destroyed
-	 * @return true if the object is destroyed already, because the call is already finished 
 	 */
-	public boolean destroyWhenDone(Destroyable destroyable) { 
+	public void destroyWhenDone(Destroyable destroyable) { 
 		if (allreadyDestroyed) {
 			logger.log(Severity.WARN, "Trying to register destroyable["+destroyable+"] on allready destroyed context, destroying it now");
 			destroyable.destroy();
-			return true;
 		}
 		destroyables.add(destroyable); 
-		return false;
 	}
 	synchronized public void destroy() {
 		if (allreadyDestroyed)
@@ -150,5 +154,59 @@ public class ExecutionContext extends RelayTrace {
 		this.notifyAll();
 	}
 	
+	public NomNode createMethod(String namespace, String methodname) {
+		String dnUser=getOrganizationalUser();
+		String dnOrganization=getOrganization();
+		Connector connector = getRelayConnector().getConnector();
+		try {
+			int method = connector.createSOAPMethod(dnUser, dnOrganization, namespace, methodname);
+			if (method!=0) {
+				destroyWhenDone(new NomNode(Node.getParent(Node.getParent(method))));
+				return new NomNode(method);
+			}
+			else
+				return null;
+
+		} 
+		catch (DirectoryException e) {  throw new RuntimeException("Error when handling method "+methodname,e); }
+	}
+	
+	public void callMethod(int method, String resultVar) {
+		if (infoTraceEnabled())
+			traceInfo("sending request\n"+Node.writeToString(method, true));
+		MethodCache caller = getRelayConnector().responseCache;
+		handleResponse(caller.sendAndWait(method,RelaySettings.timeout.get(getProps())), resultVar);
+	}
+	public void callMethodAsync(int method, final String resultVar) {
+		if (infoTraceEnabled())
+			traceInfo("sending request\n"+Node.writeToString(method, true));
+		MethodCache caller = getRelayConnector().responseCache;
+		createXmlSlot(resultVar, "TODO", new Date().getTime()+RelaySettings.timeout.get(getProps()));
+		caller.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {
+			public boolean onReceive(int message)
+			{
+				try {
+					handleResponse(message, resultVar);
+				}
+				catch(Exception e) {
+					setAsynchronousError(e);
+				}
+				return false; // Node should not yet be destroyed by Callback caller!!
+			}
+		});
+	}
+	private void handleResponse(int response, String resultVar) {
+		destroyWhenDone(new NomNode(response));
+		if (infoTraceEnabled()) // TODO: this might fail if context is already done and response is deleted
+			traceInfo("received response\n"+Node.writeToString(response, true));
+		if (allreadyDestroyed)
+			return;
+		int responseBody=SoapUtil.getContent(response);
+		if (SoapUtil.isSoapFault(responseBody)) {
+			trace(Severity.WARN, "Result of methodcall for "+resultVar+" returned Fault: "+Node.writeToString(responseBody, true));
+			throw new RelaySoapFaultException(responseBody);
+		}
+		setXmlVar(resultVar, responseBody, 0);
+	}
 
 }
