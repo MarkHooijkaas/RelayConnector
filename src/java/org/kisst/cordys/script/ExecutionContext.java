@@ -1,10 +1,13 @@
 package org.kisst.cordys.script;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.RelayConnector;
+import org.kisst.cordys.util.Destroyable;
+import org.kisst.cordys.util.NomNode;
 
 import com.eibus.soap.BodyBlock;
 import com.eibus.util.logger.CordysLogger;
@@ -19,8 +22,7 @@ public class ExecutionContext extends RelayTrace {
 		String method;
 		long timeoutTime;
 		int node=0;
-		int nodeToDestroy=0;
-		private XmlVar(int node, int nodeToDestroy) { this.node=node; this.nodeToDestroy=nodeToDestroy;}
+		private XmlVar(int node) { this.node=node; }
 		private XmlVar(String method, long timeoutTime) { this.method=method; this.timeoutTime=timeoutTime;}
 	}
 	private static class TextVar {
@@ -33,8 +35,9 @@ public class ExecutionContext extends RelayTrace {
 	private final String user;
 	private final HashMap<String,TextVar> textvars = new HashMap<String,TextVar>();
 	private final HashMap<String,XmlVar>  xmlvars  = new HashMap<String,XmlVar>();
+	private final ArrayList<Destroyable> destroyables = new ArrayList<Destroyable>();
 	private final Document doc;
-	private RuntimeException asynchronousError=null;
+	private Exception asynchronousError=null;
 	private boolean allreadyDestroyed=false;
 
 	public ExecutionContext(TopScript script, RelayConnector connector, BodyBlock request, BodyBlock response) {
@@ -68,7 +71,9 @@ public class ExecutionContext extends RelayTrace {
 				Node.delete(nodeToDestroy);
 		}
 		else {
-			xmlvars.put(name, new XmlVar(node, nodeToDestroy));
+			if (nodeToDestroy!=0)
+				destroyables.add(new NomNode(nodeToDestroy));
+			xmlvars.put(name, new XmlVar(node));
 			this.notifyAll(); // notify should suffice as well instead of notifyAll
 		}
 	}
@@ -78,10 +83,17 @@ public class ExecutionContext extends RelayTrace {
 			logger.log(Severity.WARN, "Trying to set text var ["+name+"] on allready destroyed context to value ["+value+"]");
 		textvars.put(name, new TextVar(value));
 	}
+
+	private void checkForException() {
+		if (asynchronousError!=null) {
+			if (asynchronousError instanceof RuntimeException)
+				throw (RuntimeException) asynchronousError;
+			else throw new RuntimeException(asynchronousError);
+		}
+	}
 	
 	synchronized public String getTextVar(String name) {
-		if (asynchronousError!=null)
-			throw asynchronousError;
+		checkForException(); 
 		return textvars.get(name).str;
 	}
 
@@ -89,8 +101,7 @@ public class ExecutionContext extends RelayTrace {
 		while (true) {
 			if (allreadyDestroyed)
 				throw new RuntimeException("Trying to get xml var ["+name+"] from allready destroyed context");
-			if (asynchronousError!=null)
-				throw asynchronousError;
+			checkForException(); 
 			XmlVar xmlvar=xmlvars.get(name);
 			if (xmlvar==null)
 				throw new RuntimeException("Unknown xml variable "+name);
@@ -106,15 +117,26 @@ public class ExecutionContext extends RelayTrace {
 		}
 	}
 
+	/**
+	 * Register object to be destroyed automatically when the call is done 
+	 * @param destroyable the object to be destroyed
+	 * @return true if the object is destroyed already, because the call is already finished 
+	 */
+	public boolean destroyWhenDone(Destroyable destroyable) { 
+		if (allreadyDestroyed) {
+			logger.log(Severity.WARN, "Trying to register destroyable["+destroyable+"] on allready destroyed context, destroying it now");
+			destroyable.destroy();
+			return true;
+		}
+		destroyables.add(destroyable); 
+		return false;
+	}
 	synchronized public void destroy() {
 		if (allreadyDestroyed)
 			throw new RuntimeException("Trying to destroy allready destroyed context");
 		allreadyDestroyed=true;
-		// remove output (and input) nodes, so these are not destroyed
-		for(XmlVar v:xmlvars.values()) {
-			if (v.nodeToDestroy!=0)
-				Node.delete(v.nodeToDestroy);
-		}
+		for(Destroyable d:destroyables)
+			d.destroy();
 	}
 
 	public Props getProps() { return script.getProps(); }
@@ -123,8 +145,10 @@ public class ExecutionContext extends RelayTrace {
 	public String getOrganizationalUser() {	return user; }
 	public Document getDocument() { return doc; }
 
-	public synchronized void setAsynchronousError(RuntimeException asynchronousError) {
-		this.asynchronousError = asynchronousError;
+	public synchronized void setAsynchronousError(Exception e) {
+		this.asynchronousError = e;
 		this.notifyAll();
-	} 
+	}
+	
+
 }
