@@ -126,7 +126,7 @@ public class CallContext  {
 	
 	public int callMethod(int method, String resultVar) {
 		if (infoTraceEnabled())
-			traceInfo("sending request\n"+Node.writeToString(method, true));
+			traceInfo("sending request: "+Node.writeToString(method, false));
 		MethodCache caller = getRelayConnector().responseCache;
 		int response = caller.sendAndWait(method,RelaySettings.timeout.get(getProps()));
 		checkAndLogResponse(response, resultVar);
@@ -136,7 +136,7 @@ public class CallContext  {
 	public void checkAndLogResponse(int response, String resultVar) {
 		destroyWhenDone(new NomNode(response));
 		if (infoTraceEnabled()) // TODO: this might fail if context is already done and response is deleted
-			traceInfo("received response\n"+Node.writeToString(response, true));
+			traceInfo("received response: "+Node.writeToString(response, false));
 		if (allreadyDestroyed)
 			return;
 		int responseBody=SoapUtil.getContent(response);

@@ -38,7 +38,7 @@ public class RelayTrace {
 
 	public boolean debugTraceEnabled() { return (traceLevel!=null && Severity.DEBUG.isGreaterOrEqual(traceLevel)) || logger.isDebugEnabled(); }
 	public boolean infoTraceEnabled()  { return (traceLevel!=null && Severity.INFO. isGreaterOrEqual(traceLevel)) || logger.isInfoEnabled(); }
-	public String getTrace() {
+	public String getTraceAsString() {
 		StringBuffer buf=new StringBuffer();
 		for (String s:items)
 			buf.append(s).append('\n');

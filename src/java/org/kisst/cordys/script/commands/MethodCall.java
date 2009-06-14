@@ -89,7 +89,6 @@ public class MethodCall {
 		else {
 			int response = context.getCallContext().callMethod(method, resultVar);
 			context.setXmlVar(resultVar, response);
-
 		}
 	}
 }

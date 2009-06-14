@@ -102,7 +102,7 @@ public class ExecutionContext {
 
 	public void callMethodAsync(int method, final String resultVar) {
 		if (infoTraceEnabled())
-			traceInfo("sending request\n"+Node.writeToString(method, true));
+			traceInfo("sending request: "+Node.writeToString(method, false));
 		MethodCache caller = ctxt.getRelayConnector().responseCache;
 		createXmlSlot(resultVar, "TODO", new Date().getTime()+RelaySettings.timeout.get(ctxt.getProps()));
 		caller.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {

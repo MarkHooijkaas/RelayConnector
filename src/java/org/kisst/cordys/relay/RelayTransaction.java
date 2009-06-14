@@ -3,6 +3,7 @@ package org.kisst.cordys.relay;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Script;
 
@@ -35,13 +36,17 @@ public class RelayTransaction implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
+		if (ctxt.infoTraceEnabled())
+			ctxt.traceInfo("Received request: "+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), false));
 		int impl = request.getMethodDefinition().getImplementation();
 		ExecutionContext context=null;
 		String result="ERROR ";
     	try {
         	Script script=compileScript(impl);
         	context=new ExecutionContext(ctxt, request, response);
-        	runscript(script, context);
+    		script.executeStep(context);
+    		if (ctxt.infoTraceEnabled())
+    			ctxt.traceInfo("Replied with response: "+Node.writeToString(Node.getParent(Node.getParent(response.getXMLNode())), false));
         	result="SUCCESS ";
     	}
     	catch (RelayedSoapFaultException e) {
@@ -51,19 +56,13 @@ public class RelayTransaction implements ApplicationTransaction
     		e.createResponse(response);
     	}
     	catch (SoapFaultException e) {
-    		RelayTrace.logger.log(Severity.ERROR, "Error", e);
-    		int node=response.createSOAPFault(e.getFaultcode(), e.getFaultstring());
-    		int details=createErrorDetails(node, e);
-    		if (e.hasDetails()) {
-    			if (details==0)
-    				details=Node.createElement("details", node);
-    			e.fillDetails(details);
-    		}
+    		int details=response.createSOAPFault(e.getFaultcode(), e.getFaultstring());
+    		createErrorDetails(details, e);
+   			e.fillDetails(details);
     	}
     	catch (Throwable e) { //catch Throwable to also catch NoClassDefError
-    		RelayTrace.logger.log(Severity.ERROR, "Error", e);
-    		int node=response.createSOAPFault("TECHERR.ESB."+e.getClass().getName(), e.getMessage());
-    		createErrorDetails(node, e);
+    		int details=response.createSOAPFault("TECHERR.ESB."+e.getClass().getName(), e.getMessage());
+    		createErrorDetails(details, e);
     	}
     	finally {
    			ctxt.destroy();
@@ -80,21 +79,20 @@ public class RelayTransaction implements ApplicationTransaction
 		return true; // connector has to send the response
     }
 
-	private int createErrorDetails(int node, Throwable e) {
-		int details=0;
+	private int createErrorDetails(int details, Throwable e) {
+		Props props= ctxt.getProps();
+		String msg=e.getMessage();
+		boolean trace=RelaySettings.trace.get(props);
+		if (trace && RelaySettings.logTrace.get(props))
+			msg+="\n"+ctxt.getTrace().getTraceAsString();
+		RelayTrace.logger.log(Severity.ERROR, msg, e);
 		if (RelaySettings.showStacktrace.get(ctxt.getProps()))
-			details=addErrorDetail(node, details, "stacktrace", getStackTraceAsString(e));
-		if (RelaySettings.trace.get(ctxt.getProps()))
-			details=addErrorDetail(node, details, "trace", ctxt.getTrace().toString());
+			Node.createTextElement("stacktrace", getStackTraceAsString(e), details);
+		if (trace && RelaySettings.showTrace.get(props))
+			ctxt.getTrace().addToNode(Node.createElement("trace", details));
 		return details;
 	}
 
-	private int addErrorDetail(int node, int details, String tag, String msg) {
-		if (details==0)
-			details=Node.createElement("details", node);
-		Node.createTextElement(tag, msg, details);
-		return details;
-	}
 	private String getStackTraceAsString(Throwable e) {
 		StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
@@ -110,14 +108,4 @@ public class RelayTransaction implements ApplicationTransaction
 		}
 		return script;
 	}
-
-	private void runscript(Script script, ExecutionContext context) {
-		if (context.infoTraceEnabled())
-			context.traceInfo("Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(context.getRequest().getXMLNode())), true));
-		script.executeStep(context);
-		if (context.infoTraceEnabled())
-			context.traceInfo("Replied with response:\n"+Node.writeToString(Node.getParent(Node.getParent(context.getResponse().getXMLNode())), true));
-	}
-    
-
 }
