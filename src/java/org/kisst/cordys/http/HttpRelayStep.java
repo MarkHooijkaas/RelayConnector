@@ -43,7 +43,8 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 			int cordysResponse=context.getXmlVar("output");
 			if (xmlResponse) {
 				httpResponse = response.getResponseXml(context.getCallContext().getDocument());
-				SoapUtil.mergeResponses(httpResponse, cordysResponse);
+				if (httpResponse!=0 && wsa)
+					SoapUtil.mergeResponses(httpResponse, cordysResponse);
 			}
 		}
 		finally {
