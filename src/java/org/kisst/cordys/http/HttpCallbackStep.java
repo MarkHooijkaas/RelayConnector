@@ -34,7 +34,7 @@ public class HttpCallbackStep extends HttpBase2 implements Step {
 		    		
 	    	HttpResponse response=httpCall(method, null);
 			if (xmlResponse) {
-				httpResponse = response.getResponseXml(context.getDocument());
+				httpResponse = response.getResponseXml(context.getCallContext().getDocument());
 				int cordysResponse=context.getXmlVar("output");
 				SoapUtil.mergeResponses(httpResponse, cordysResponse);
 			}

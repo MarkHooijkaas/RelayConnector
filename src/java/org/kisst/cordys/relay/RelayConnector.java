@@ -5,11 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.kisst.cfg4j.MultiLevelProps;
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.script.Script;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
@@ -29,12 +27,9 @@ public class RelayConnector extends ApplicationConnector {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayConnector.class);
     public  static final String CONNECTOR_NAME = "RelayConnector";
     
-	//public final RelayConfiguration conf=new RelayConfiguration();
 	private Connector connector;
 	private String configLocation;
 	private String dnOrganization;
-	final HashMap<String, Script> scriptCache=new HashMap<String, Script>();
-	//public Properties properties=null;
 	private ArrayList<Module> modules=new ArrayList<Module>();
 	public final MethodCache responseCache=new MethodCache();
 	protected MultiLevelProps mlprops;
@@ -86,8 +81,9 @@ public class RelayConnector extends ApplicationConnector {
     public ApplicationTransaction createTransaction(SOAPTransaction stTransaction) {
     	int env=stTransaction.getRequestEnvelope();
     	int req=SoapUtil.getContent(env);
-    	String key=NomUtil.getUniversalName(req);
-		return new RelayTransaction(this, key, mlprops.getProps(key));
+    	String fullMethodName=NomUtil.getUniversalName(req);
+    	CallContext ctxt=new CallContext(this, fullMethodName, mlprops.getProps(fullMethodName), stTransaction);
+		return new RelayTransaction(ctxt);
 	}
 
     @Override
@@ -97,7 +93,6 @@ public class RelayConnector extends ApplicationConnector {
 	public void reset() {
 	    mlprops =new MultiLevelProps(getConfigStream());
         responseCache.reset(getGlobalProps());
-		scriptCache.clear();
     	for (int i=0; i<modules.size(); i++)
     		modules.get(i).reset(getGlobalProps());
 	}

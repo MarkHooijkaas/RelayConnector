@@ -1,12 +1,12 @@
 package org.kisst.cordys.relay;
 
+import java.util.HashMap;
+
 import org.kisst.cfg4j.Props;
+import org.kisst.cordys.script.Script;
 
 public class RelayModule implements Module {
-	//private static MultiLevelSettings<RelaySettings> settings=null;
-
-	//public static RelaySettings getGlobalSettings()     { return settings.getGlobalSettings(); }
-	//public static RelaySettings getSettings(String key) { return settings.get(key); }
+	static final HashMap<String, Script> scriptCache = new HashMap<String, Script>();
 
 	public String getName() { return "RelayModule";	}
 
@@ -15,7 +15,7 @@ public class RelayModule implements Module {
 	}
 
 	public void reset(Props props) {
-    	//settings=new MultiLevelSettings<RelaySettings>(mlprops, "relay", RelaySettings.class);
+		scriptCache.clear();
 	}
 
 	public void destroy() {}

@@ -24,7 +24,7 @@ public class HttpStep extends HttpBase2 implements Step {
 			bodyNode= createBody(context);
 		    HttpResponse response=call(context, bodyNode);
 			if (xmlResponse)
-			    context.setXmlVar(resultVar, response.getResponseXml(context.getDocument()));
+			    context.setXmlVar(resultVar, response.getResponseXml(context.getCallContext().getDocument()));
 			else
 				context.setTextVar(resultVar, response.getResponseString());
 		}

@@ -3,7 +3,6 @@ package org.kisst.cordys.relay;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.RelayTrace;
 import org.kisst.cordys.script.Script;
@@ -13,14 +12,15 @@ import com.eibus.soap.BodyBlock;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
-public class RelayTransaction extends CallContext implements ApplicationTransaction
+public class RelayTransaction implements ApplicationTransaction
 {
+	private final CallContext ctxt;
 	private Script script;
 	
 	public Script getScript() { return script;}
 	
-	public RelayTransaction(RelayConnector connector, String methodName, Props props) {
-		super(connector, methodName, props);
+	public RelayTransaction(CallContext ctxt) {
+		this.ctxt=ctxt;
 	}
 
     public boolean canProcess(String callType) {
@@ -43,7 +43,7 @@ public class RelayTransaction extends CallContext implements ApplicationTransact
 		ExecutionContext context=null;
     	try {
         	compileScript(impl);
-        	context=new ExecutionContext(this, request, response);
+        	context=new ExecutionContext(ctxt, request, response);
         	if (context.infoTraceEnabled())
         		context.traceInfo("Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), true));
     		script.executeStep(context);
@@ -51,12 +51,12 @@ public class RelayTransaction extends CallContext implements ApplicationTransact
         		context.traceInfo("Replied with response:\n"+Node.writeToString(Node.getParent(Node.getParent(response.getXMLNode())), true));
     	}
     	catch (SoapFaultException e) {
-    		e.createResponse(response, props);
+    		e.createResponse(response, ctxt.getProps());
     	}
     	catch (Exception e) {
     		RelayTrace.logger.log(Severity.ERROR, "Error", e);
     		int node=response.createSOAPFault("TECHERR.ESB",e.getMessage());
-    		if (RelaySettings.showStacktrace.get(props)) {
+    		if (RelaySettings.showStacktrace.get(ctxt.getProps())) {
     			StringWriter sw = new StringWriter();
     			e.printStackTrace(new PrintWriter(sw));
     			String details= sw.toString();
@@ -66,20 +66,19 @@ public class RelayTransaction extends CallContext implements ApplicationTransact
     		}
     	}
     	finally {
-    		if (context!=null)
-    			context.destroy();
+   			ctxt.destroy();
     	}
-		if (timer!=null)
-			timer.log(" finished "+fullMethodName);
+		if (ctxt.getTimer()!=null)
+			ctxt.getTimer().log(" finished "+ctxt.getFullMethodName());
 		return true; // connector has to send the response
     }
     
 	private void compileScript(int node) {
-		script=relayConnector.scriptCache.get(fullMethodName);
+		script=RelayModule.scriptCache.get(ctxt.getFullMethodName());
 		if (script==null) {
-			script=new Script(this, node);
-			if (RelaySettings.cacheScripts.get(props))
-				relayConnector.scriptCache.put(fullMethodName, script);
+			script=new Script(ctxt, node);
+			if (RelaySettings.cacheScripts.get(ctxt.getProps()))
+				RelayModule.scriptCache.put(ctxt.getFullMethodName(), script);
 		}
 	}
 

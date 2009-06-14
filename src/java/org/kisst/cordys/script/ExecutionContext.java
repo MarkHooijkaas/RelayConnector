@@ -1,27 +1,20 @@
 package org.kisst.cordys.script;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.CallContext;
 import org.kisst.cordys.relay.MethodCache;
 import org.kisst.cordys.relay.RelaySettings;
-import org.kisst.cordys.script.commands.RelaySoapFaultException;
-import org.kisst.cordys.util.Destroyable;
-import org.kisst.cordys.util.NomNode;
-import org.kisst.cordys.util.SoapUtil;
 
-import com.eibus.connector.nom.Connector;
 import com.eibus.connector.nom.SOAPMessageListener;
-import com.eibus.directory.soap.DirectoryException;
 import com.eibus.soap.BodyBlock;
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
-import com.eibus.xml.nom.Document;
 import com.eibus.xml.nom.Node;
 
-public class ExecutionContext extends CallContext {
+public class ExecutionContext {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(ExecutionContext.class);
 	
 	private static class XmlVar {
@@ -36,75 +29,56 @@ public class ExecutionContext extends CallContext {
 		private TextVar(String str) { this.str=str;}
 	}
 
-	private final BodyBlock request;
-	private final BodyBlock response;
-	private final String user;
 	private final HashMap<String,TextVar> textvars = new HashMap<String,TextVar>();
 	private final HashMap<String,XmlVar>  xmlvars  = new HashMap<String,XmlVar>();
-	private final ArrayList<Destroyable> destroyables = new ArrayList<Destroyable>();
-	private Exception asynchronousError=null;
-	private boolean allreadyDestroyed=false;
+	private final CallContext ctxt;
+	protected final BodyBlock request;
+	protected final BodyBlock response;
 
-	public ExecutionContext(CallContext trans, BodyBlock request, BodyBlock response) {
-		super(trans);
+	public ExecutionContext(CallContext ctxt, BodyBlock request, BodyBlock response) {
+		this.ctxt=ctxt;
 		this.request=request;
 		this.response=response;
 		
-		user=request.getSOAPTransaction().getUserCredentials().getOrganizationalUser();
     	int inputNode = request.getXMLNode();
 		int outputNode = response.getXMLNode();
-		setXmlVar("input", inputNode, 0);
-		setXmlVar("output", outputNode, 0);
+		setXmlVar("input", inputNode);
+		setXmlVar("output", outputNode);
 		// This fixes some strange behavior that prefix of input is not used in output
 		String inputPrefix= Node.getPrefix(inputNode);
 		if (inputPrefix!=null)
 			Node.setName(outputNode, inputPrefix+":"+Node.getLocalName(outputNode));
     }
 
+	public CallContext getCallContext() { return ctxt; }
+	public BodyBlock   getRequest() { return request; }
+	public BodyBlock   getResponse() { return response; }
+	public Props getProps() { return ctxt.getProps(); }
+
 	synchronized public void createXmlSlot(String name, String method, long timeoutTime) {
 		xmlvars.put(name, new XmlVar(method, timeoutTime));
 	}
 	synchronized public void setXmlVar(String name, int node) {
-		setXmlVar(name,node,node);
-	}
-	synchronized public void setXmlVar(String name, int node, int nodeToDestroy) {
-		if (allreadyDestroyed) {
-			logger.log(Severity.WARN, "Trying to set xml var ["+name+"] on allready destroyed context, deleting NOM node");
-			if (nodeToDestroy!=0)
-				Node.delete(nodeToDestroy);
-		}
-		else {
-			if (nodeToDestroy!=0)
-				destroyables.add(new NomNode(nodeToDestroy));
-			xmlvars.put(name, new XmlVar(node));
-			this.notifyAll(); // notify should suffice as well instead of notifyAll
-		}
+		xmlvars.put(name, new XmlVar(node));
+		this.notifyAll(); // notify should suffice as well instead of notifyAll
 	}
 
 	synchronized public void setTextVar(String name, String value) {
-		if (allreadyDestroyed)
+		if (ctxt.allreadyDestroyed())
 			logger.log(Severity.WARN, "Trying to set text var ["+name+"] on allready destroyed context to value ["+value+"]");
 		textvars.put(name, new TextVar(value));
 	}
 
-	private void checkForException() {
-		if (asynchronousError!=null) {
-			if (asynchronousError instanceof RuntimeException)
-				throw (RuntimeException) asynchronousError;
-			else throw new RuntimeException(asynchronousError);
-		}
-	}
-	
 	synchronized public String getTextVar(String name) {
-		checkForException(); 
+		ctxt.checkForException(); 
 		return textvars.get(name).str;
 	}
 
 	synchronized public int getXmlVar(String name) {
 		while (true) {
-			if (allreadyDestroyed)
+			if (ctxt.allreadyDestroyed())
 				throw new RuntimeException("Trying to get xml var ["+name+"] from allready destroyed context");
-			checkForException(); 
+			ctxt.checkForException(); 
 			XmlVar xmlvar=xmlvars.get(name);
 			if (xmlvar==null)
 				throw new RuntimeException("Unknown xml variable "+name);
@@ -120,59 +94,6 @@ public class ExecutionContext extends CallContext {
 		}
 	}
 
-	/**
-	 * Register object to be destroyed automatically when the call is done 
-	 * @param destroyable the object to be destroyed
-	 */
-	public void destroyWhenDone(Destroyable destroyable) { 
-		if (allreadyDestroyed) {
-			logger.log(Severity.WARN, "Trying to register destroyable["+destroyable+"] on allready destroyed context, destroying it now");
-			destroyable.destroy();
-		}
-		destroyables.add(destroyable); 
-	}
-	synchronized public void destroy() {
-		if (allreadyDestroyed)
-			throw new RuntimeException("Trying to destroy allready destroyed context");
-		allreadyDestroyed=true;
-		for(Destroyable d:destroyables)
-			d.destroy();
-	}
-
-	public String getOrganizationalUser() {	return user; }
-	public Document getDocument() { return Node.getDocument(request.getXMLNode()); } // TODO: is this the best document?
-	public BodyBlock getRequest() { return request; }
-	public BodyBlock getResponse() { return response; }
-
-	public synchronized void setAsynchronousError(Exception e) {
-		this.asynchronousError = e;
-		this.notifyAll();
-	}
-	
-	public NomNode createMethod(String namespace, String methodname) {
-		String dnUser=getOrganizationalUser();
-		String dnOrganization=getOrganization();
-		Connector connector = getRelayConnector().getConnector();
-		try {
-			int method = connector.createSOAPMethod(dnUser, dnOrganization, namespace, methodname);
-			if (method!=0) {
-				destroyWhenDone(new NomNode(Node.getParent(Node.getParent(method))));
-				return new NomNode(method);
-			}
-			else
-				return null;
-
-		} 
-		catch (DirectoryException e) {  throw new RuntimeException("Error when handling method "+methodname,e); }
-	}
-	
-	public void callMethod(int method, String resultVar) {
-		if (infoTraceEnabled())
-			traceInfo("sending request\n"+Node.writeToString(method, true));
-		MethodCache caller = getRelayConnector().responseCache;
-		handleResponse(caller.sendAndWait(method,RelaySettings.timeout.get(getProps())), resultVar);
-	}
-	
 	// TODO: fix possible memory leak if async calls never return a answer
 	// Such call will register a SOAPListener which will never be removed.
 	// In long term this could lead to a OutOfMemory error.
@@ -182,38 +103,26 @@ public class ExecutionContext extends CallContext {
 	public void callMethodAsync(int method, final String resultVar) {
 		if (infoTraceEnabled())
 			traceInfo("sending request\n"+Node.writeToString(method, true));
-		MethodCache caller = getRelayConnector().responseCache;
-		createXmlSlot(resultVar, "TODO", new Date().getTime()+RelaySettings.timeout.get(getProps()));
+		MethodCache caller = ctxt.getRelayConnector().responseCache;
+		createXmlSlot(resultVar, "TODO", new Date().getTime()+RelaySettings.timeout.get(ctxt.getProps()));
 		caller.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {
 			public boolean onReceive(int message)
 			{
 				try {
-					handleResponse(message, resultVar);
+					ctxt.checkAndLogResponse(message, resultVar);
+					setXmlVar(resultVar, message);
 				}
 				catch(Exception e) {
-					setAsynchronousError(e);
+					ctxt.setAsynchronousError(e);
 				}
 				return false; // Node should not yet be destroyed by Callback caller!!
 			}
 		});
 	}
-	private void handleResponse(int response, String resultVar) {
-		destroyWhenDone(new NomNode(response));
-		if (infoTraceEnabled()) // TODO: this might fail if context is already done and response is deleted
-			traceInfo("received response\n"+Node.writeToString(response, true));
-		if (allreadyDestroyed)
-			return;
-		int responseBody=SoapUtil.getContent(response);
-		if (SoapUtil.isSoapFault(responseBody)) {
-			trace.trace(Severity.WARN, "Result of methodcall for "+resultVar+" returned Fault: "+Node.writeToString(responseBody, true));
-			throw new RelaySoapFaultException(responseBody);
-		}
-		setXmlVar(resultVar, responseBody, 0);
-	}
-
-	public void traceInfo(String msg)  { if (trace!=null) trace.traceInfo(msg);	}
-	public void traceDebug(String msg) { if (trace!=null) trace.traceDebug(msg);	}
-	public boolean debugTraceEnabled() { return (trace!=null) && trace.debugTraceEnabled();	}
-	public boolean infoTraceEnabled()  { return (trace==null) && trace.infoTraceEnabled();	}
+	
+	public void traceInfo(String msg)  { ctxt.traceInfo(msg);	}
+	public void traceDebug(String msg) { ctxt.traceDebug(msg);	}
+	public boolean debugTraceEnabled() { return ctxt.debugTraceEnabled();	}
+	public boolean infoTraceEnabled()  { return ctxt.infoTraceEnabled();	}
 
 }

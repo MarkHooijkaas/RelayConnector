@@ -4,27 +4,30 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 
+import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.CallContext;
 import org.kisst.cordys.script.commands.CommandList;
 
 import com.eibus.xml.nom.Node;
 
-public class CompilationContext extends CallContext implements PrefixContext {
-	private final Script script;
+public class CompilationContext implements PrefixContext {
+	private final CallContext ctxt;
 	private final CommandList commands;
 	private final HashSet<String> txtvars=new HashSet<String>();
 	private final HashSet<String> xmlvars=new HashSet<String>();
 	private final Stack<String> parsePath = new Stack<String>();
 	private final HashMap<String,String> defaultAttributes = new HashMap<String,String>();
 
-	public CompilationContext(Script script)  {
-		super(script);
-		this.script=script;
+	public CompilationContext(CallContext ctxt, Script script)  {
+		this.ctxt=ctxt;
 		this.commands=new CommandList();
 		
 	    declareXmlVar("input");
 		declareXmlVar("output");
     }
+
+	public CallContext getCallContext() { return ctxt; } 
+	public Props getProps() { return ctxt.getProps(); }
 
 	public Step compile(int node) {
 		String stepType=Node.getLocalName(node);
@@ -87,10 +90,6 @@ public class CompilationContext extends CallContext implements PrefixContext {
 		return Integer.parseInt(str);
 	}
 
-	public Script getScript() { return script;	}
-
-
-
-	public String resolvePrefix(String prefix) { return script.resolvePrefix(prefix); }
-	public void addPrefix(String prefix, String namespace) { script.addPrefix(prefix, namespace);}
+	public String resolvePrefix(String prefix) { return ctxt.resolvePrefix(prefix); }
+	public void addPrefix(String prefix, String namespace) { ctxt.addPrefix(prefix, namespace);}
 }
