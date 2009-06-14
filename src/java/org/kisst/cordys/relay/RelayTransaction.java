@@ -60,7 +60,7 @@ public class RelayTransaction implements ApplicationTransaction
     			e.fillDetails(details);
     		}
     	}
-    	catch (Exception e) {
+    	catch (Throwable e) { //catch Throwable to also catch NoClassDefError
     		RelayTrace.logger.log(Severity.ERROR, "Error", e);
     		int node=response.createSOAPFault("TECHERR.ESB."+e.getClass().getName(), e.getMessage());
     		createErrorDetails(node, e);
@@ -80,7 +80,7 @@ public class RelayTransaction implements ApplicationTransaction
 		return true; // connector has to send the response
     }
 
-	private int createErrorDetails(int node, Exception e) {
+	private int createErrorDetails(int node, Throwable e) {
 		int details=0;
 		if (RelaySettings.showStacktrace.get(ctxt.getProps()))
 			details=addErrorDetail(node, details, "stacktrace", getStackTraceAsString(e));
@@ -95,7 +95,7 @@ public class RelayTransaction implements ApplicationTransaction
 		Node.createTextElement(tag, msg, details);
 		return details;
 	}
-	private String getStackTraceAsString(Exception e) {
+	private String getStackTraceAsString(Throwable e) {
 		StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
 		return sw.toString();
