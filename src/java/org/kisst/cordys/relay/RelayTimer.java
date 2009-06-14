@@ -9,7 +9,7 @@ public class RelayTimer {
 	private final long start=System.currentTimeMillis();
 
 	public void log(String msg) {
-		logger.log(Severity.INFO, msg+(System.currentTimeMillis()-start));
+		logger.log(Severity.INFO, (System.currentTimeMillis()-start)+msg);
 	}
 
 }

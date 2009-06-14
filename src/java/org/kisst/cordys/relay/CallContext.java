@@ -10,7 +10,8 @@ public class CallContext  {
 	protected final String fullMethodName;
 	protected final Props props;
 	protected final RelayTrace trace;
-	
+	protected final RelayTimer timer;
+
 	public RelayConnector getRelayConnector() {	return relayConnector; }
 	public String getFullMethodName() {	return fullMethodName;	}
 	public Props getProps() { return props;	}
@@ -22,6 +23,7 @@ public class CallContext  {
 		this.fullMethodName=ctxt.fullMethodName;
 		this.props=ctxt.props;
 		this.trace=ctxt.trace;
+		this.timer=ctxt.timer;
 	}
 
 	protected CallContext(RelayConnector connector, String methodName, Props props) {
@@ -32,6 +34,10 @@ public class CallContext  {
 			this.trace=new RelayTrace(Severity.DEBUG);
 		else
 			this.trace=null;
+		if (RelaySettings.timer.get(props))
+			timer=new RelayTimer();
+		else
+			timer=null;
 	}
 	
 	public void traceInfo(String msg)  { if (trace!=null) trace.traceInfo(msg);	}

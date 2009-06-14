@@ -15,17 +15,12 @@ import com.eibus.xml.nom.Node;
 
 public class RelayTransaction extends CallContext implements ApplicationTransaction
 {
-	private final RelayTimer timer;
 	private Script script;
 	
 	public Script getScript() { return script;}
 	
 	public RelayTransaction(RelayConnector connector, String methodName, Props props) {
 		super(connector, methodName, props);
-		if (RelaySettings.timer.get(props))
-			timer=new RelayTimer();
-		else
-			timer=null;
 	}
 
     public boolean canProcess(String callType) {
@@ -74,10 +69,9 @@ public class RelayTransaction extends CallContext implements ApplicationTransact
     		if (context!=null)
     			context.destroy();
     	}
-    	if (timer!=null) {
-    		timer.log("");
-    	}
-        return true; // connector has to send the response
+		if (timer!=null)
+			timer.log(" finished "+fullMethodName);
+		return true; // connector has to send the response
     }
     
 	private void compileScript(int node) {
