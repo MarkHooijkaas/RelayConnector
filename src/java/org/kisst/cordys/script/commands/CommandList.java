@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import org.kisst.cordys.script.Command;
 import org.kisst.cordys.script.GenericCommand;
-import org.kisst.cordys.script.Script;
 
 
 public class CommandList {
@@ -17,7 +16,6 @@ public class CommandList {
 		basicCommands.addCommand("import", new GenericCommand(ImportStep.class));
 		basicCommands.addCommand("delete", new GenericCommand(DeleteStep.class));
 		basicCommands.addCommand("append", new GenericCommand(XmlAppendStep.class));
-		basicCommands.addCommand("script", new GenericCommand(Script.class));
 		basicCommands.addCommand("sleep",  new GenericCommand(SleepStep.class));
 		basicCommands.addCommand("default",new GenericCommand(DefineDefaultStep.class));
 		basicCommands.addCommand("call",   new GenericCommand(CallStep.class));
