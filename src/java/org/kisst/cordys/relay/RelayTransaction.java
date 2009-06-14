@@ -14,9 +14,6 @@ import com.eibus.xml.nom.Node;
 public class RelayTransaction implements ApplicationTransaction
 {
 	private final CallContext ctxt;
-	private Script script;
-	
-	public Script getScript() { return script;}
 	
 	public RelayTransaction(CallContext ctxt) {
 		this.ctxt=ctxt;
@@ -41,13 +38,9 @@ public class RelayTransaction implements ApplicationTransaction
 		int impl = request.getMethodDefinition().getImplementation();
 		ExecutionContext context=null;
     	try {
-        	compileScript(impl);
+        	Script script=compileScript(impl);
         	context=new ExecutionContext(ctxt, request, response);
-        	if (context.infoTraceEnabled())
-        		context.traceInfo("Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), true));
-    		script.executeStep(context);
-        	if (context.infoTraceEnabled())
-        		context.traceInfo("Replied with response:\n"+Node.writeToString(Node.getParent(Node.getParent(response.getXMLNode())), true));
+        	runscript(script, context);
     	}
     	catch (SoapFaultException e) {
     		e.createResponse(response, ctxt.getProps());
@@ -71,14 +64,24 @@ public class RelayTransaction implements ApplicationTransaction
 			ctxt.getTimer().log(" finished "+ctxt.getFullMethodName());
 		return true; // connector has to send the response
     }
-    
-	private void compileScript(int node) {
-		script=RelayModule.scriptCache.get(ctxt.getFullMethodName());
+
+	private Script compileScript(int node) {
+		Script script=RelayModule.scriptCache.get(ctxt.getFullMethodName());
 		if (script==null) {
 			script=new Script(ctxt, node);
 			if (RelaySettings.cacheScripts.get(ctxt.getProps()))
 				RelayModule.scriptCache.put(ctxt.getFullMethodName(), script);
 		}
+		return script;
 	}
+
+	private void runscript(Script script, ExecutionContext context) {
+		if (context.infoTraceEnabled())
+			context.traceInfo("Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(context.getRequest().getXMLNode())), true));
+		script.executeStep(context);
+		if (context.infoTraceEnabled())
+			context.traceInfo("Replied with response:\n"+Node.writeToString(Node.getParent(Node.getParent(context.getResponse().getXMLNode())), true));
+	}
+    
 
 }
