@@ -59,7 +59,7 @@ public class CallContext  {
 	public void traceInfo(String msg)  { if (trace!=null) trace.traceInfo(msg);	}
 	public void traceDebug(String msg) { if (trace!=null) trace.traceDebug(msg);	}
 	public boolean debugTraceEnabled() { return (trace!=null) && trace.debugTraceEnabled();	}
-	public boolean infoTraceEnabled()  { return (trace==null) && trace.infoTraceEnabled();	}
+	public boolean infoTraceEnabled()  { return (trace!=null) && trace.infoTraceEnabled();	}
 	
 	public void addPrefix(String prefix, String namespace) {
 		if (prefixes.containsKey(prefix))
