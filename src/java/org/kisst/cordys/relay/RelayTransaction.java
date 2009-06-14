@@ -37,33 +37,62 @@ public class RelayTransaction implements ApplicationTransaction
     public boolean process(BodyBlock request, BodyBlock response) {
 		int impl = request.getMethodDefinition().getImplementation();
 		ExecutionContext context=null;
+		String result="ERROR ";
     	try {
         	Script script=compileScript(impl);
         	context=new ExecutionContext(ctxt, request, response);
         	runscript(script, context);
+        	result="SUCCESS ";
+    	}
+    	catch (RelayedSoapFaultException e) {
+    		Severity sev=RelaySettings.logRelayedSoapFaults.get(ctxt.getProps());
+    		if (sev!=null)
+    			RelayTrace.logger.log(sev, "Relaying Soapfault "+e.getMessage());
+    		e.createResponse(response);
     	}
     	catch (SoapFaultException e) {
-    		e.createResponse(response, ctxt.getProps());
+    		RelayTrace.logger.log(Severity.ERROR, "Error", e);
+    		int node=response.createSOAPFault(e.getFaultcode(), e.getFaultstring());
+    		int details=createErrorDetails(node, e);
+    		if (e.hasDetails()) {
+    			if (details==0)
+    				details=Node.createElement("details", node);
+    			e.fillDetails(details);
+    		}
     	}
     	catch (Exception e) {
     		RelayTrace.logger.log(Severity.ERROR, "Error", e);
-    		int node=response.createSOAPFault("TECHERR.ESB",e.getMessage());
-    		if (RelaySettings.showStacktrace.get(ctxt.getProps())) {
-    			StringWriter sw = new StringWriter();
-    			e.printStackTrace(new PrintWriter(sw));
-    			String details= sw.toString();
-    			if (details!=null) {
-    				Node.createTextElement("details", details, node);
-    			}
-    		}
+    		int node=response.createSOAPFault("TECHERR.ESB."+e.getClass().getName(), e.getMessage());
+    		createErrorDetails(node, e);
     	}
     	finally {
    			ctxt.destroy();
     	}
 		if (ctxt.getTimer()!=null)
-			ctxt.getTimer().log(" finished "+ctxt.getFullMethodName());
+			ctxt.getTimer().log(" finished "+result+ctxt.getFullMethodName());
 		return true; // connector has to send the response
     }
+
+	private int createErrorDetails(int node, Exception e) {
+		int details=0;
+		if (RelaySettings.showStacktrace.get(ctxt.getProps()))
+			details=addErrorDetail(node, details, "stacktrace", getStackTraceAsString(e));
+		if (RelaySettings.trace.get(ctxt.getProps()))
+			details=addErrorDetail(node, details, "trace", ctxt.getTrace().toString());
+		return details;
+	}
+
+	private int addErrorDetail(int node, int details, String tag, String msg) {
+		if (details==0)
+			details=Node.createElement("details", node);
+		Node.createTextElement(tag, msg, details);
+		return details;
+	}
+	private String getStackTraceAsString(Exception e) {
+		StringWriter sw = new StringWriter();
+		e.printStackTrace(new PrintWriter(sw));
+		return sw.toString();
+	}
 
 	private Script compileScript(int node) {
 		Script script=RelayModule.scriptCache.get(ctxt.getFullMethodName());

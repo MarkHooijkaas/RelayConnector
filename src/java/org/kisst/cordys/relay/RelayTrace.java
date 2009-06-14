@@ -49,16 +49,4 @@ public class RelayTrace {
 		for (String s:items)
 			Node.createTextElement("item", s, node);
 	}
-
-	public static Severity parseSeverity(String sev) {
-		if (sev==null)           return null;
-		if (sev.equals("NONE"))  return null;
-		if (sev.equals("DEBUG")) return Severity.DEBUG;
-		if (sev.equals("INFO"))  return Severity.INFO;
-		if (sev.equals("WARN"))  return Severity.WARN;
-		if (sev.equals("ERROR")) return Severity.ERROR;
-		if (sev.equals("FATAL")) return Severity.FATAL;
-		throw new RuntimeException("unknown LogLevel ["+sev+"] should be NONE, DEBUG, INFO, WARN, ERROR or FATAL");
-	}
-	
 }

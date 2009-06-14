@@ -15,7 +15,7 @@ import org.kisst.cordys.http.HostSettings;
 import org.kisst.cordys.http.HttpResponse;
 import org.kisst.cordys.http.HttpSoapFaultException;
 import org.kisst.cordys.relay.RelayTrace;
-import org.kisst.cordys.relay.SoapFaultException;
+import org.kisst.cordys.relay.RelayedSoapFaultException;
 import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.soap.ApplicationTransaction;
@@ -44,12 +44,12 @@ public class EsbTransaction  implements ApplicationTransaction {
     	try {
     		exec(request.getXMLNode(), response.getXMLNode());
     	}
-    	catch (SoapFaultException e) {
-    		e.createResponse(response, props);
+    	catch (RelayedSoapFaultException e) {
+    		e.createResponse(response);
     	}
     	catch (Exception e) {
-    		RelayTrace.logger.log(Severity.ERROR, "Error", e);
-    		response.createSOAPFault("UnknownError",e.toString());
+    		RelayTrace.logger.log(Severity.ERROR, "TECHERR.ESB", e);
+    		response.createSOAPFault("TECHERR.ESB",e.toString());
     	}
         return true; // connector has to send the response
     }

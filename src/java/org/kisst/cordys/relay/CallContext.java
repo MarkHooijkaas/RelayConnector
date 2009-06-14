@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.script.commands.RelaySoapFaultException;
 import org.kisst.cordys.util.Destroyable;
 import org.kisst.cordys.util.NomNode;
 import org.kisst.cordys.util.SoapUtil;
@@ -143,7 +142,7 @@ public class CallContext  {
 		int responseBody=SoapUtil.getContent(response);
 		if (SoapUtil.isSoapFault(responseBody)) {
 			trace.trace(Severity.WARN, "Result of methodcall for "+resultVar+" returned Fault: "+Node.writeToString(responseBody, true));
-			throw new RelaySoapFaultException(responseBody);
+			throw new RelayedSoapFaultException(response);
 		}
 	}
 
