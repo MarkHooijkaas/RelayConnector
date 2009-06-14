@@ -89,6 +89,9 @@
                       <categorygroup displayname="RelayTimer">
                          <category>org.kisst.cordys.relay.RelayTimer</category>
                       </categorygroup>
+                      <categorygroup displayname="HttpWire">
+                         <category>httpclient.wire</category>
+                      </categorygroup>
                    </loggercategory>     
                    <classpath>
                       <xsl:for-each select="project/jarfiles/pathelement">
