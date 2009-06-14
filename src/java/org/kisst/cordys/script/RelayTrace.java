@@ -15,13 +15,16 @@ import com.eibus.xml.nom.Node;
 public class RelayTrace {
 	public static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTrace.class);
 
-	private ArrayList<String> trace;
-	private Severity traceLevel=null;
+	private final ArrayList<String> items=new ArrayList<String>();
+	private final Severity traceLevel;
 
+	public RelayTrace(Severity traceLevel) {
+		this.traceLevel=traceLevel;
+	}
+	
 	public void traceDebug(String msg) { 
 		if (debugTraceEnabled())
 			trace(Severity.DEBUG,msg);
-
 	} 
 	public void traceInfo(String msg) {	trace(Severity.INFO,msg); }
 	public synchronized void trace(Severity level, String msg) { 
@@ -30,28 +33,20 @@ public class RelayTrace {
 			// trace should be at least on info level, to be added to the trace buffer
 			// otherwise an ERROR would fill the trace 
 			return;
-		if (trace==null)
-			trace=new ArrayList<String>();
-		trace.add(msg);
+		items.add(msg);
 	} 
 
-	public boolean traceAvailable() { return trace!=null; }
-	public void setTrace(Severity level) {	traceLevel=level; }
 	public boolean debugTraceEnabled() { return (traceLevel!=null && Severity.DEBUG.isGreaterOrEqual(traceLevel)) || logger.isDebugEnabled(); }
 	public boolean infoTraceEnabled()  { return (traceLevel!=null && Severity.INFO. isGreaterOrEqual(traceLevel)) || logger.isInfoEnabled(); }
 	public String getTrace() {
-		if (trace==null)
-			return null;
 		StringBuffer buf=new StringBuffer();
-		for (String s:trace)
+		for (String s:items)
 			buf.append(s).append('\n');
 		return buf.toString();
 	}
 
 	public void addToNode(int node) {
-		if (trace==null)
-			return;
-		for (String s:trace)
+		for (String s:items)
 			Node.createTextElement("item", s, node);
 	}
 

@@ -8,6 +8,7 @@ import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.MethodCache;
 import org.kisst.cordys.relay.RelayConnector;
 import org.kisst.cordys.relay.RelaySettings;
+import org.kisst.cordys.relay.RelayTransaction;
 import org.kisst.cordys.script.commands.RelaySoapFaultException;
 import org.kisst.cordys.util.Destroyable;
 import org.kisst.cordys.util.NomNode;
@@ -22,7 +23,7 @@ import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Document;
 import com.eibus.xml.nom.Node;
 
-public class ExecutionContext extends RelayTrace {
+public class ExecutionContext {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(ExecutionContext.class);
 	
 	private static class XmlVar {
@@ -36,22 +37,23 @@ public class ExecutionContext extends RelayTrace {
 		String str=null;
 		private TextVar(String str) { this.str=str;}
 	}
-	private final TopScript script;
-	private final RelayConnector  relayConnector;
-	private final String organization;
+	private final RelayTransaction trans;
+	private final BodyBlock request;
+	private final BodyBlock response;
 	private final String user;
 	private final HashMap<String,TextVar> textvars = new HashMap<String,TextVar>();
 	private final HashMap<String,XmlVar>  xmlvars  = new HashMap<String,XmlVar>();
 	private final ArrayList<Destroyable> destroyables = new ArrayList<Destroyable>();
-	private final Document doc;
+	private final RelayTrace trace;
 	private Exception asynchronousError=null;
 	private boolean allreadyDestroyed=false;
 
-	public ExecutionContext(TopScript script, RelayConnector connector, BodyBlock request, BodyBlock response) {
-		this.script=script;
-		this.relayConnector=connector; 
-		this.organization=connector.getOrganization();
-
+	public ExecutionContext(RelayTransaction trans, BodyBlock request, BodyBlock response) {
+		this.trans=trans;
+		this.request=request;
+		this.response=response;
+		this.trace=trans.getTrace();
+		
 		user=request.getSOAPTransaction().getUserCredentials().getOrganizationalUser();
     	int inputNode = request.getXMLNode();
 		int outputNode = response.getXMLNode();
@@ -61,8 +63,6 @@ public class ExecutionContext extends RelayTrace {
 		String inputPrefix= Node.getPrefix(inputNode);
 		if (inputPrefix!=null)
 			Node.setName(outputNode, inputPrefix+":"+Node.getLocalName(outputNode));
-			
-		doc=Node.getDocument(request.getXMLNode()); // TODO: is this the best document?
     }
 
 	synchronized public void createXmlSlot(String name, String method, long timeoutTime) {
@@ -143,11 +143,13 @@ public class ExecutionContext extends RelayTrace {
 			d.destroy();
 	}
 
-	public Props getProps() { return script.getProps(); }
-	public RelayConnector getRelayConnector() { return relayConnector; }
-	public String getOrganization() { return organization; }	
+	public Props getProps() { return trans.getProps(); }
+	public RelayConnector getRelayConnector() { return trans.getRelayConnector(); }
+	public String getOrganization() { return getRelayConnector().getOrganization(); }	
 	public String getOrganizationalUser() {	return user; }
-	public Document getDocument() { return doc; }
+	public Document getDocument() { return Node.getDocument(request.getXMLNode()); } // TODO: is this the best document?
+	public BodyBlock getRequest() { return request; }
+	public BodyBlock getResponse() { return response; }
 
 	public synchronized void setAsynchronousError(Exception e) {
 		this.asynchronousError = e;
@@ -210,10 +212,15 @@ public class ExecutionContext extends RelayTrace {
 			return;
 		int responseBody=SoapUtil.getContent(response);
 		if (SoapUtil.isSoapFault(responseBody)) {
-			trace(Severity.WARN, "Result of methodcall for "+resultVar+" returned Fault: "+Node.writeToString(responseBody, true));
+			trace.trace(Severity.WARN, "Result of methodcall for "+resultVar+" returned Fault: "+Node.writeToString(responseBody, true));
 			throw new RelaySoapFaultException(responseBody);
 		}
 		setXmlVar(resultVar, responseBody, 0);
 	}
+
+	public void traceInfo(String msg)  { if (trace!=null) trace.traceInfo(msg);	}
+	public void traceDebug(String msg) { if (trace!=null) trace.traceDebug(msg);	}
+	public boolean debugTraceEnabled() { return (trace!=null) && trace.debugTraceEnabled();	}
+	public boolean infoTraceEnabled()  { return (trace==null) && trace.infoTraceEnabled();	}
 
 }

@@ -11,14 +11,11 @@ import org.kisst.cordys.relay.SoapFaultException;
 public class ExecutionException extends SoapFaultException {
 	private static final long serialVersionUID = 1L;
 
-	private final ExecutionContext context;
+	//private final ExecutionContext context;
 
 	public ExecutionException(ExecutionContext context, String faultstring) {
 		super("Method.Execution.Error",faultstring);
-		this.context=context;
+		//this.context=context;
 	}
-	
-	public String getDetails() { return context.getTrace(); }
-
 }	
 

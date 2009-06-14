@@ -10,19 +10,20 @@ import org.kisst.cordys.script.commands.CommandList;
 
 import com.eibus.xml.nom.Node;
 
-public class CompilationContext extends RelayTrace implements PrefixContext {
+public class CompilationContext implements PrefixContext {
+	private final Script script;
 	private final CommandList commands;
-	private final TopScript script;
 	private final HashSet<String> txtvars=new HashSet<String>();
 	private final HashSet<String> xmlvars=new HashSet<String>();
 	private final Stack<String> parsePath = new Stack<String>();
 	private final HashMap<String,String> defaultAttributes = new HashMap<String,String>();
+	private final RelayTrace trace;
 
-	public CompilationContext(TopScript script)
-    {
+	public CompilationContext(Script script)  {
 		this.script=script;
 		this.commands=new CommandList();
-	    
+		this.trace=script.getTrace();
+		
 	    declareXmlVar("input");
 		declareXmlVar("output");
     }
@@ -88,8 +89,15 @@ public class CompilationContext extends RelayTrace implements PrefixContext {
 		return Integer.parseInt(str);
 	}
 
-	public void addPrefix(String prefix, String namespace) { script.addPrefix(prefix, namespace); }
-	public String resolvePrefix(String prefix) { return script.resolvePrefix(prefix); }
 	public RelayConnector getRelayConnector() { return script.getRelayConnector(); }
 	public Props getProps() { return script.getProps();	}
+	public Script getScript() { return script;	}
+
+	public void traceInfo(String msg)  { if (trace!=null) trace.traceInfo(msg);	}
+	public void traceDebug(String msg) { if (trace!=null) trace.traceDebug(msg);	}
+	public boolean debugTraceEnabled() { return (trace!=null) && trace.debugTraceEnabled();	}
+	public boolean infoTraceEnabled()  { return (trace==null) && trace.infoTraceEnabled();	}
+
+	public String resolvePrefix(String prefix) { return script.resolvePrefix(prefix); }
+	public void addPrefix(String prefix, String namespace) { script.addPrefix(prefix, namespace);}
 }

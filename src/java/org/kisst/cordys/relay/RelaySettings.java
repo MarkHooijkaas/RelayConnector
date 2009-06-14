@@ -13,4 +13,5 @@ public class RelaySettings {
 	public final static StringSetting logSoapFaults=new StringSetting(relay, "logSoapFaults", null);
 	public final static BooleanSetting showStacktrace=new BooleanSetting(relay, "showStacktrace",false);
 	public final static BooleanSetting timer=new BooleanSetting(relay, "timer",false);
+	public final static BooleanSetting trace=new BooleanSetting(relay, "trace",false);;
 }

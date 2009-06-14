@@ -24,7 +24,6 @@ public class CommandList {
 		basicCommands.addCommand("fault",  new GenericCommand(FaultStep.class));
 		basicCommands.addCommand("switch", new GenericCommand(SwitchStep.class));
 		basicCommands.addCommand("groovy", new GenericCommand(GroovyStep.class));
-		basicCommands.addCommand("trace",  new GenericCommand(TraceStep.class));
 		basicCommands.addCommand("createXmlVar",   new GenericCommand(CreateXmlVarStep.class));
 		basicCommands.addCommand("stripPrefixes",  new GenericCommand(StripPrefixesStep.class));
 		basicCommands.addCommand("replaceText",    new GenericCommand(ReplaceTextStep.class));

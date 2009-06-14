@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 import org.kisst.cfg4j.MultiLevelProps;
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.script.TopScript;
+import org.kisst.cordys.script.Script;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
@@ -33,7 +33,7 @@ public class RelayConnector extends ApplicationConnector {
 	private Connector connector;
 	private String configLocation;
 	private String dnOrganization;
-	final HashMap<String, TopScript> scriptCache=new HashMap<String, TopScript>();
+	final HashMap<String, Script> scriptCache=new HashMap<String, Script>();
 	//public Properties properties=null;
 	private ArrayList<Module> modules=new ArrayList<Module>();
 	public final MethodCache responseCache=new MethodCache();

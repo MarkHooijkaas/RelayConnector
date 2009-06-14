@@ -6,11 +6,10 @@ import java.io.StringWriter;
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.RelayTrace;
-import org.kisst.cordys.script.TopScript;
+import org.kisst.cordys.script.Script;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;
-import com.eibus.soap.MethodDefinition;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
@@ -20,6 +19,14 @@ public class RelayTransaction  implements ApplicationTransaction
 	private final String fullMethodName;
 	private final Props props;
 	private final RelayTimer timer;
+	private final RelayTrace trace;
+	private Script script;
+	
+	public RelayConnector getRelayConnector() {	return connector; }
+	public String getFullMethodName() {	return fullMethodName;	}
+	public Props getProps() { return props;	}
+	public RelayTrace getTrace() {return trace;}
+	public Script getScript() { return script;}
 	
 	public RelayTransaction(RelayConnector connector, String methodName, Props props) {
 		this.connector=connector;
@@ -29,6 +36,10 @@ public class RelayTransaction  implements ApplicationTransaction
 			timer=new RelayTimer();
 		else
 			timer=null;
+		if (RelaySettings.trace.get(props))
+			trace=new RelayTrace(Severity.DEBUG);
+		else
+			trace=null;
 	}
 
     public boolean canProcess(String callType) {
@@ -47,11 +58,11 @@ public class RelayTransaction  implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
-		MethodDefinition def = request.getMethodDefinition();
+		int impl = request.getMethodDefinition().getImplementation();
 		ExecutionContext context=null;
     	try {
-        	TopScript script=getScript(def.getImplementation());
-        	context=new ExecutionContext(script, connector, request, response);
+        	compileScript(impl);
+        	context=new ExecutionContext(this, request, response);
         	if (context.infoTraceEnabled())
         		context.traceInfo("Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), true));
     		script.executeStep(context);
@@ -63,7 +74,7 @@ public class RelayTransaction  implements ApplicationTransaction
     	}
     	catch (Exception e) {
     		RelayTrace.logger.log(Severity.ERROR, "Error", e);
-    		int node=response.createSOAPFault("UnknownError",e.toString());
+    		int node=response.createSOAPFault("TECHERR.ESB",e.getMessage());
     		if (RelaySettings.showStacktrace.get(props)) {
     			StringWriter sw = new StringWriter();
     			e.printStackTrace(new PrintWriter(sw));
@@ -83,14 +94,13 @@ public class RelayTransaction  implements ApplicationTransaction
         return true; // connector has to send the response
     }
     
-	private TopScript getScript(int node) {
-		TopScript script=connector.scriptCache.get(fullMethodName);
+	private void compileScript(int node) {
+		script=connector.scriptCache.get(fullMethodName);
 		if (script==null) {
-			script=new TopScript(connector, node, props);
+			script=new Script(this, node);
 			if (RelaySettings.cacheScripts.get(props))
 				connector.scriptCache.put(fullMethodName, script);
 		}
-		return script;
 	}
 
 }
