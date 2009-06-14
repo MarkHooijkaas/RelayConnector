@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.kisst.cfg4j.Props;
+import org.kisst.cordys.relay.CallContext;
 import org.kisst.cordys.relay.MethodCache;
-import org.kisst.cordys.relay.RelayConnector;
 import org.kisst.cordys.relay.RelaySettings;
-import org.kisst.cordys.relay.RelayTransaction;
 import org.kisst.cordys.script.commands.RelaySoapFaultException;
 import org.kisst.cordys.util.Destroyable;
 import org.kisst.cordys.util.NomNode;
@@ -23,7 +21,7 @@ import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Document;
 import com.eibus.xml.nom.Node;
 
-public class ExecutionContext {
+public class ExecutionContext extends CallContext {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(ExecutionContext.class);
 	
 	private static class XmlVar {
@@ -37,22 +35,20 @@ public class ExecutionContext {
 		String str=null;
 		private TextVar(String str) { this.str=str;}
 	}
-	private final RelayTransaction trans;
+
 	private final BodyBlock request;
 	private final BodyBlock response;
 	private final String user;
 	private final HashMap<String,TextVar> textvars = new HashMap<String,TextVar>();
 	private final HashMap<String,XmlVar>  xmlvars  = new HashMap<String,XmlVar>();
 	private final ArrayList<Destroyable> destroyables = new ArrayList<Destroyable>();
-	private final RelayTrace trace;
 	private Exception asynchronousError=null;
 	private boolean allreadyDestroyed=false;
 
-	public ExecutionContext(RelayTransaction trans, BodyBlock request, BodyBlock response) {
-		this.trans=trans;
+	public ExecutionContext(CallContext trans, BodyBlock request, BodyBlock response) {
+		super(trans);
 		this.request=request;
 		this.response=response;
-		this.trace=trans.getTrace();
 		
 		user=request.getSOAPTransaction().getUserCredentials().getOrganizationalUser();
     	int inputNode = request.getXMLNode();
@@ -143,9 +139,6 @@ public class ExecutionContext {
 			d.destroy();
 	}
 
-	public Props getProps() { return trans.getProps(); }
-	public RelayConnector getRelayConnector() { return trans.getRelayConnector(); }
-	public String getOrganization() { return getRelayConnector().getOrganization(); }	
 	public String getOrganizationalUser() {	return user; }
 	public Document getDocument() { return Node.getDocument(request.getXMLNode()); } // TODO: is this the best document?
 	public BodyBlock getRequest() { return request; }

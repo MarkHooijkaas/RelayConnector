@@ -13,33 +13,19 @@ import com.eibus.soap.BodyBlock;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
-public class RelayTransaction  implements ApplicationTransaction
+public class RelayTransaction extends CallContext implements ApplicationTransaction
 {
-	private final RelayConnector connector;
-	private final String fullMethodName;
-	private final Props props;
 	private final RelayTimer timer;
-	private final RelayTrace trace;
 	private Script script;
 	
-	public RelayConnector getRelayConnector() {	return connector; }
-	public String getFullMethodName() {	return fullMethodName;	}
-	public Props getProps() { return props;	}
-	public RelayTrace getTrace() {return trace;}
 	public Script getScript() { return script;}
 	
 	public RelayTransaction(RelayConnector connector, String methodName, Props props) {
-		this.connector=connector;
-		this.fullMethodName=methodName;
-		this.props=props;
+		super(connector, methodName, props);
 		if (RelaySettings.timer.get(props))
 			timer=new RelayTimer();
 		else
 			timer=null;
-		if (RelaySettings.trace.get(props))
-			trace=new RelayTrace(Severity.DEBUG);
-		else
-			trace=null;
 	}
 
     public boolean canProcess(String callType) {
@@ -95,11 +81,11 @@ public class RelayTransaction  implements ApplicationTransaction
     }
     
 	private void compileScript(int node) {
-		script=connector.scriptCache.get(fullMethodName);
+		script=relayConnector.scriptCache.get(fullMethodName);
 		if (script==null) {
 			script=new Script(this, node);
 			if (RelaySettings.cacheScripts.get(props))
-				connector.scriptCache.put(fullMethodName, script);
+				relayConnector.scriptCache.put(fullMethodName, script);
 		}
 	}
 

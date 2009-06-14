@@ -3,19 +3,17 @@ package org.kisst.cordys.script;
 import java.util.HashMap;
 
 import org.kisst.cfg4j.Props;
+import org.kisst.cordys.relay.CallContext;
 import org.kisst.cordys.relay.RelayConnector;
 import org.kisst.cordys.relay.RelayTransaction;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.xml.nom.Node;
 
-public class Script implements Step {
+public class Script extends CallContext implements Step {
 	private final CompilationContext compiler;
 	private final Step[] steps;
 	private final HashMap<String,String> prefixes;
-	private final Props props;
-	private final RelayTrace trace;
-	private final RelayConnector relayConnector;
 	
 	public Props getProps() { return props; }
 	public RelayTrace getTrace() { return trace; }
@@ -23,21 +21,17 @@ public class Script implements Step {
 
 
 	public Script(RelayTransaction trans, int scriptNode) {
+		super(trans);
 		this.compiler = new CompilationContext(this);
 		this.prefixes = new HashMap<String,String>();
-		this.props = trans.getProps();
-		this.trace = trans.getTrace();
-		this.relayConnector = trans.getRelayConnector();
 		this.steps = new Step[Node.getNumChildren(scriptNode)];
 		compile(compiler, scriptNode);
 	}
 
 	public Script(Script topscript, int scriptNode) {
+		super(topscript);
 		this.compiler = topscript.compiler;
 		this.prefixes = topscript.prefixes;
-		this.props=topscript.props;
-		this.trace=topscript.trace;
-		this.relayConnector = topscript.relayConnector;
 		this.steps = new Step[Node.getNumChildren(scriptNode)];
 		compile(compiler, scriptNode);
 	}
