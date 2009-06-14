@@ -87,7 +87,7 @@ public class RelayConnector extends ApplicationConnector {
     	int env=stTransaction.getRequestEnvelope();
     	int req=SoapUtil.getContent(env);
     	String key=NomUtil.getUniversalName(req);
-		return new RelayTransaction(this, mlprops.getProps(key));
+		return new RelayTransaction(this, key, mlprops.getProps(key));
 	}
 
     @Override

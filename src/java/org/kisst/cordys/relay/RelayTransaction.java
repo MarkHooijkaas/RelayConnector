@@ -17,11 +17,13 @@ import com.eibus.xml.nom.Node;
 public class RelayTransaction  implements ApplicationTransaction
 {
 	private final RelayConnector connector;
+	private final String fullMethodName;
 	private final Props props;
 	private final RelayTimer timer;
 	
-	public RelayTransaction(RelayConnector connector, Props props) {
+	public RelayTransaction(RelayConnector connector, String methodName, Props props) {
 		this.connector=connector;
+		this.fullMethodName=methodName;
 		this.props=props;
 		if (RelaySettings.timer.get(props))
 			timer=new RelayTimer();
@@ -46,10 +48,9 @@ public class RelayTransaction  implements ApplicationTransaction
      */
     public boolean process(BodyBlock request, BodyBlock response) {
 		MethodDefinition def = request.getMethodDefinition();
-		String methodName="{"+def.getNamespace()+"}"+def.getMethodName();
 		ExecutionContext context=null;
     	try {
-        	TopScript script=getScript(methodName, def.getImplementation());
+        	TopScript script=getScript(def.getImplementation());
         	context=new ExecutionContext(script, connector, request, response);
         	if (context.infoTraceEnabled())
         		context.traceInfo("Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), true));
@@ -82,12 +83,12 @@ public class RelayTransaction  implements ApplicationTransaction
         return true; // connector has to send the response
     }
     
-	private TopScript getScript(String methodName, int node) {
-		TopScript script=connector.scriptCache.get(methodName);
+	private TopScript getScript(int node) {
+		TopScript script=connector.scriptCache.get(fullMethodName);
 		if (script==null) {
 			script=new TopScript(connector, node, props);
 			if (RelaySettings.cacheScripts.get(props))
-				connector.scriptCache.put(methodName, script);
+				connector.scriptCache.put(fullMethodName, script);
 		}
 		return script;
 	}
