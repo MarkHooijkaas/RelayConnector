@@ -70,6 +70,13 @@ public class RelayTransaction implements ApplicationTransaction
     	}
 		if (ctxt.getTimer()!=null)
 			ctxt.getTimer().log(" finished "+result+ctxt.getFullMethodName());
+		int sleep=RelaySettings.sleepAfterCall.get(ctxt.getProps());
+		if (sleep>0) {
+			RelayTrace.logger.log(Severity.WARN, "Sleeping for "+sleep+" seconds");
+		  	try {
+				Thread.sleep(RelaySettings.sleepAfterCall.get(ctxt.getProps()));
+			} catch (InterruptedException e) { throw new RuntimeException(e); }
+		}
 		return true; // connector has to send the response
     }
 
