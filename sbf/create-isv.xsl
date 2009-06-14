@@ -86,6 +86,9 @@
                       <categorygroup displayname="RelayTrace">
                          <category>org.kisst.cordys.script.RelayTrace</category>
                       </categorygroup>
+                      <categorygroup displayname="RelayTimer">
+                         <category>org.kisst.cordys.relay.RelayTimer</category>
+                      </categorygroup>
                    </loggercategory>     
                    <classpath>
                       <xsl:for-each select="project/jarfiles/pathelement">

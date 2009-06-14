@@ -5,25 +5,19 @@ import java.util.HashMap;
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.RelayConnector;
 
-import com.eibus.soap.MethodDefinition;
-
 public class TopScript extends Script {
 	private final RelayConnector relayConnector;
-	private final MethodDefinition definition;
-	private final String name;
 	private final HashMap<String,String> prefixes = new HashMap<String,String>();
 	private final CompilationContext compiler;
 	private final Props props;
 	
-	public TopScript(RelayConnector connector, MethodDefinition def, Props props) {
-		super(def.getImplementation());
-		this.definition=def;
+	public TopScript(RelayConnector connector, int node, Props props) {
+		super(node);
 		this.props=props;
-    	this.name=getFullMethodName();
 		this.relayConnector=connector; 
 		compiler=new CompilationContext(this);
     	try {
-    		compile(compiler, def.getImplementation());
+    		compile(compiler, node);
     	}
     	catch (CompilationException e) { throw e; }
     	catch (Exception e) { throw new CompilationException(compiler, e.getMessage(), e); }
@@ -40,11 +34,6 @@ public class TopScript extends Script {
 		return prefixes.get(prefix);
 	}
 
-	public String getName() { return name; }
-	public String getMethodDn() {return definition.getMethodDN().toString(); }
-	public String getMethodName() {	return definition.getMethodName();	}
-	public String getMethodNamespace() { return definition.getNamespace();	}
-	public String getFullMethodName() {	return getMethodNamespace()+"/"+getMethodName(); }
 	public RelayConnector getRelayConnector() { return relayConnector; }
 	public Props getProps() { return props; }
 }

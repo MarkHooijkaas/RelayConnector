@@ -18,10 +18,15 @@ public class RelayTransaction  implements ApplicationTransaction
 {
 	private final RelayConnector connector;
 	private final Props props;
+	private final RelayTimer timer;
 	
 	public RelayTransaction(RelayConnector connector, Props props) {
 		this.connector=connector;
 		this.props=props;
+		if (RelaySettings.timer.get(props))
+			timer=new RelayTimer();
+		else
+			timer=null;
 	}
 
     public boolean canProcess(String callType) {
@@ -41,9 +46,10 @@ public class RelayTransaction  implements ApplicationTransaction
      */
     public boolean process(BodyBlock request, BodyBlock response) {
 		MethodDefinition def = request.getMethodDefinition();
+		String methodName="{"+def.getNamespace()+"}"+def.getMethodName();
 		ExecutionContext context=null;
     	try {
-        	TopScript script=getScript(def);
+        	TopScript script=getScript(methodName, def.getImplementation());
         	context=new ExecutionContext(script, connector, request, response);
         	if (context.infoTraceEnabled())
         		context.traceInfo("Received request:\n"+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), true));
@@ -70,14 +76,16 @@ public class RelayTransaction  implements ApplicationTransaction
     		if (context!=null)
     			context.destroy();
     	}
+    	if (timer!=null) {
+    		timer.log("");
+    	}
         return true; // connector has to send the response
     }
     
-	private TopScript getScript(MethodDefinition def) {
-		String methodName=def.getNamespace()+"/"+def.getMethodName();
+	private TopScript getScript(String methodName, int node) {
 		TopScript script=connector.scriptCache.get(methodName);
 		if (script==null) {
-			script=new TopScript(connector, def, props);
+			script=new TopScript(connector, node, props);
 			if (RelaySettings.cacheScripts.get(props))
 				connector.scriptCache.put(methodName, script);
 		}
