@@ -84,7 +84,7 @@
                     <spycategory />
                     <loggercategory>
                       <categorygroup displayname="RelayTrace">
-                         <category>org.kisst.cordys.script.RelayTrace</category>
+                         <category>org.kisst.cordys.relay.RelayTrace</category>
                       </categorygroup>
                       <categorygroup displayname="RelayTimer">
                          <category>org.kisst.cordys.relay.RelayTimer</category>

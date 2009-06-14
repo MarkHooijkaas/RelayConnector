@@ -1,4 +1,4 @@
-package org.kisst.cordys.script;
+package org.kisst.cordys.relay;
 
 import java.util.ArrayList;
 

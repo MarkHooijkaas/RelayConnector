@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.kisst.cordys.script.ExecutionContext;
-import org.kisst.cordys.script.RelayTrace;
 import org.kisst.cordys.script.Script;
 
 import com.eibus.soap.ApplicationTransaction;

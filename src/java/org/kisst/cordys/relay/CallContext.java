@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.script.RelayTrace;
 import org.kisst.cordys.script.commands.RelaySoapFaultException;
 import org.kisst.cordys.util.Destroyable;
 import org.kisst.cordys.util.NomNode;

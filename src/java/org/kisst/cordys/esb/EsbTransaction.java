@@ -14,8 +14,8 @@ import org.kisst.cfg4j.Props;
 import org.kisst.cordys.http.HostSettings;
 import org.kisst.cordys.http.HttpResponse;
 import org.kisst.cordys.http.HttpSoapFaultException;
+import org.kisst.cordys.relay.RelayTrace;
 import org.kisst.cordys.relay.SoapFaultException;
-import org.kisst.cordys.script.RelayTrace;
 import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.soap.ApplicationTransaction;
