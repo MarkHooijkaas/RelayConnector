@@ -103,6 +103,8 @@ public class ExecutionContext {
 	// Possible fix would be to not use sendAndCallback, but just send, and use a 
 	// default SOAPListener. This in considered not very urgent yet.
 
+	
+	@SuppressWarnings("deprecation")
 	public void callMethodAsync(int method, final String resultVar) {
 		ctxt.traceInfo("sending request: ",method);
 		MethodCache caller = ctxt.getRelayConnector().responseCache;
