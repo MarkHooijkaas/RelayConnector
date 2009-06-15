@@ -71,8 +71,7 @@ public class RelayTrace {
 	public void addToNode(int node, Props props) {
 		boolean showEnvelope=RelaySettings.traceShowEnvelope.get(props);
 		for (Item i:items) {
-			int itemnode = Node.createElement("item", node);
-			Node.setAttribute(itemnode, "msg", i.msg);
+			int itemnode = Node.createTextElement("item", i.msg, node);
 			if (i.node!=0) {
 				int srcnode=i.node;
 				if (showEnvelope)
