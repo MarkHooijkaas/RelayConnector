@@ -19,9 +19,9 @@ public class Script implements Step {
 		compile(compiler, scriptNode);
 	}
 
-	public Script(Script topscript, int scriptNode) {
-		this.ctxt=topscript.ctxt;
-		this.compiler = topscript.compiler;
+	public Script(CompilationContext compiler, int scriptNode) {
+		this.ctxt=compiler.getCallContext();
+		this.compiler = compiler;
 		this.steps = new Step[Node.getNumChildren(scriptNode)];
 		compile(compiler, scriptNode);
 	}

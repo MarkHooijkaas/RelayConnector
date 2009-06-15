@@ -142,7 +142,8 @@ public class CallContext  {
 		if (allreadyDestroyed)
 			return;
 		if (SoapUtil.isSoapFault(responseBody)) {
-			trace.trace(Severity.WARN, new RelayTrace.Item("Result of methodcall for "+resultVar+" returned Fault: ",responseBody));
+			if (trace!=null)
+				trace.trace(Severity.WARN, new RelayTrace.Item("Result of methodcall for "+resultVar+" returned Fault: ",responseBody));
 			throw new RelayedSoapFaultException(response);
 		}
 	}

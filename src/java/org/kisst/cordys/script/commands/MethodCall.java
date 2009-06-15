@@ -5,6 +5,7 @@ import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.Expression;
 import org.kisst.cordys.script.expression.ExpressionParser;
 import org.kisst.cordys.script.xml.ElementAppender;
+import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.xml.nom.Node;
 
@@ -88,7 +89,7 @@ public class MethodCall {
 			context.callMethodAsync(method, resultVar);
 		else {
 			int response = context.getCallContext().callMethod(method, resultVar);
-			context.setXmlVar(resultVar, response);
+			context.setXmlVar(resultVar, SoapUtil.getContent(response));
 		}
 	}
 }

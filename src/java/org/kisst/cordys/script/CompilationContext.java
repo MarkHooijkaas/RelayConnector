@@ -6,6 +6,7 @@ import java.util.Stack;
 
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.CallContext;
+import org.kisst.cordys.relay.RelayConnector;
 import org.kisst.cordys.script.commands.CommandList;
 
 import com.eibus.xml.nom.Node;
@@ -28,6 +29,7 @@ public class CompilationContext implements PrefixContext {
 
 	public CallContext getCallContext() { return ctxt; } 
 	public Props getProps() { return ctxt.getProps(); }
+	public RelayConnector getRelayConnector() { return ctxt.getRelayConnector(); }
 
 	public Step compile(int node) {
 		String stepType=Node.getLocalName(node);

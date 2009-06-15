@@ -6,7 +6,9 @@ import java.util.HashMap;
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.CallContext;
 import org.kisst.cordys.relay.MethodCache;
+import org.kisst.cordys.relay.RelayConnector;
 import org.kisst.cordys.relay.RelaySettings;
+import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.connector.nom.SOAPMessageListener;
 import com.eibus.soap.BodyBlock;
@@ -54,6 +56,7 @@ public class ExecutionContext {
 	public BodyBlock   getRequest() { return request; }
 	public BodyBlock   getResponse() { return response; }
 	public Props getProps() { return ctxt.getProps(); }
+	public RelayConnector getRelayConnector() { return ctxt.getRelayConnector(); }
 
 	synchronized public void createXmlSlot(String name, String method, long timeoutTime) {
 		xmlvars.put(name, new XmlVar(method, timeoutTime));
@@ -109,7 +112,7 @@ public class ExecutionContext {
 			{
 				try {
 					ctxt.checkAndLogResponse(message, resultVar);
-					setXmlVar(resultVar, message);
+					setXmlVar(resultVar, SoapUtil.getContent(message));
 				}
 				catch(Exception e) {
 					ctxt.setAsynchronousError(e);
