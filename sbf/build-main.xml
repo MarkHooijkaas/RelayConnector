@@ -16,6 +16,12 @@
 		<property name="isvfile"  value="${builddir}/${distname}.${buildnumber}.isvp"/>
 		<property name="copy-jar.dir" value="${cordys.dir}/${project.org}/${distname}"/>
 		<property name="scp-jar.dir"  value="${cordys.scp.dir}/${project.org}/${distname}"/>
+		<property name="cordys.version"  value="C3"/>
+		<condition property="isv.install.dir" value="isvcontent/packages" else="Web/wcp/isvcontent/packages">
+		  <equals arg1="${cordys.version}" arg2="C3"/>
+		</condition>
+		<property name="copy-isv.dir" value="${cordys.dir}/${isv.install.dir}"/>
+		<property name="scp-isv.dir"  value="${cordys.scp.dir}/${isv.install.dir}"/>
 		<mkdir dir="${builddir}" />
 		<mkdir dir="${builddir}/classes" />
 		<mkdir dir="${isvdir}" />
@@ -72,7 +78,7 @@
 	<target name="scp-isv" depends="isv">
 		<exec executable="scp">
 			<arg value="${isvfile}"/>
-			<arg value="${cordys.scp.dir}/Web/wcp/isvcontent/packages"/>
+			<arg value="${scp-isv.dir}"/>
 		</exec>
 	</target>
 
@@ -81,7 +87,7 @@
 	</target>
 
 	<target name="copy-isv" depends="isv">
-		<copy file="${isvfile}" todir="${cordys.dir}/Web/wcp/isvcontent/packages"/>
+		<copy file="${isvfile}" todir="${copy-isv.dir}"/>
 	</target>
 
 	<target name="proxy" if="proxy.host">
