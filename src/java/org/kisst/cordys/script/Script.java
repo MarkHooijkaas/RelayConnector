@@ -51,7 +51,7 @@ public class Script implements Step {
 		for (int i=0; i<steps.length; i++) {
 			if (steps[i]!=null) {// skip null steps 
 				if (context.debugTraceEnabled())
-					context.traceDebug("executing "+steps[i].toString());
+					context.traceDebug("executing "+steps[i].getClass().getSimpleName());
 				steps[i].executeStep(context);
 			}
 		}

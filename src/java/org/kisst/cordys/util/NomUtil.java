@@ -161,4 +161,13 @@ public class NomUtil {
 		return "{"+namespace+"}"+name;
 	}
 
+	public static int getRootNode(int node) {
+		do {
+			int parent=Node.getParent(node);
+			if (parent==0)
+				return node;
+			node=parent;
+		} while(true);
+	}
+
 }

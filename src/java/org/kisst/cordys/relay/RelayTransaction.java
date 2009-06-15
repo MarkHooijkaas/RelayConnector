@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Script;
+import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;
@@ -15,9 +16,11 @@ import com.eibus.xml.nom.Node;
 public class RelayTransaction implements ApplicationTransaction
 {
 	private final CallContext ctxt;
+	private final Props props;
 	
 	public RelayTransaction(CallContext ctxt) {
 		this.ctxt=ctxt;
+		this.props=ctxt.getProps();
 	}
 
     public boolean canProcess(String callType) {
@@ -36,8 +39,7 @@ public class RelayTransaction implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
-		if (ctxt.infoTraceEnabled())
-			ctxt.traceInfo("Received request: "+Node.writeToString(Node.getParent(Node.getParent(request.getXMLNode())), false));
+		ctxt.traceInfo("Received request: ",request.getXMLNode());
 		int impl = request.getMethodDefinition().getImplementation();
 		ExecutionContext context=null;
 		String result="ERROR ";
@@ -45,12 +47,11 @@ public class RelayTransaction implements ApplicationTransaction
         	Script script=compileScript(impl);
         	context=new ExecutionContext(ctxt, request, response);
     		script.executeStep(context);
-    		if (ctxt.infoTraceEnabled())
-    			ctxt.traceInfo("Replied with response: "+Node.writeToString(Node.getParent(Node.getParent(response.getXMLNode())), false));
+   			ctxt.traceInfo("Replied with response: ", response.getXMLNode());
         	result="SUCCESS ";
     	}
     	catch (RelayedSoapFaultException e) {
-    		Severity sev=RelaySettings.logRelayedSoapFaults.get(ctxt.getProps());
+    		Severity sev=RelaySettings.logRelayedSoapFaults.get(props);
     		if (sev!=null)
     			RelayTrace.logger.log(sev, "Relaying Soapfault "+e.getMessage());
     		e.createResponse(response);
@@ -61,7 +62,9 @@ public class RelayTransaction implements ApplicationTransaction
    			e.fillDetails(details);
     	}
     	catch (Throwable e) { //catch Throwable to also catch NoClassDefError
-    		int details=response.createSOAPFault("TECHERR.ESB."+e.getClass().getName(), e.getMessage());
+    		String prefix=RelaySettings.soapFaultcodePrefix.get(props);
+    		NomUtil.deleteChildren(response.getXMLNode());// TODO: is this still necessary in C3?
+    		int details=response.createSOAPFault(prefix+e.getClass().getSimpleName(), e.getMessage());
     		createErrorDetails(details, e);
     	}
     	finally {
@@ -69,27 +72,26 @@ public class RelayTransaction implements ApplicationTransaction
     	}
 		if (ctxt.getTimer()!=null)
 			ctxt.getTimer().log(" finished "+result+ctxt.getFullMethodName());
-		int sleep=RelaySettings.sleepAfterCall.get(ctxt.getProps());
+		int sleep=RelaySettings.sleepAfterCall.get(props);
 		if (sleep>0) {
 			RelayTrace.logger.log(Severity.WARN, "Sleeping for "+sleep+" seconds");
 		  	try {
-				Thread.sleep(RelaySettings.sleepAfterCall.get(ctxt.getProps()));
+				Thread.sleep(RelaySettings.sleepAfterCall.get(props));
 			} catch (InterruptedException e) { throw new RuntimeException(e); }
 		}
 		return true; // connector has to send the response
     }
 
 	private int createErrorDetails(int details, Throwable e) {
-		Props props= ctxt.getProps();
 		String msg=e.getMessage();
 		boolean trace=RelaySettings.trace.get(props);
 		if (trace && RelaySettings.logTrace.get(props))
-			msg+="\n"+ctxt.getTrace().getTraceAsString();
+			msg+="\n"+ctxt.getTrace().getTraceAsString(props);
 		RelayTrace.logger.log(Severity.ERROR, msg, e);
-		if (RelaySettings.showStacktrace.get(ctxt.getProps()))
+		if (RelaySettings.showStacktrace.get(props))
 			Node.createTextElement("stacktrace", getStackTraceAsString(e), details);
 		if (trace && RelaySettings.showTrace.get(props))
-			ctxt.getTrace().addToNode(Node.createElement("trace", details));
+			ctxt.getTrace().addToNode(Node.createElement("trace", details), props);
 		return details;
 	}
 
@@ -103,7 +105,7 @@ public class RelayTransaction implements ApplicationTransaction
 		Script script=RelayModule.scriptCache.get(ctxt.getFullMethodName());
 		if (script==null) {
 			script=new Script(ctxt, node);
-			if (RelaySettings.cacheScripts.get(ctxt.getProps()))
+			if (RelaySettings.cacheScripts.get(props))
 				RelayModule.scriptCache.put(ctxt.getFullMethodName(), script);
 		}
 		return script;

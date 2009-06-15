@@ -101,8 +101,7 @@ public class ExecutionContext {
 	// default SOAPListener. This in considered not very urgent yet.
 
 	public void callMethodAsync(int method, final String resultVar) {
-		if (infoTraceEnabled())
-			traceInfo("sending request: "+Node.writeToString(method, false));
+		ctxt.traceInfo("sending request: ",method);
 		MethodCache caller = ctxt.getRelayConnector().responseCache;
 		createXmlSlot(resultVar, "TODO", new Date().getTime()+RelaySettings.timeout.get(ctxt.getProps()));
 		caller.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {

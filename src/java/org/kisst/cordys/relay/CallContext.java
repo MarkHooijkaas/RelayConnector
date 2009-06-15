@@ -57,6 +57,7 @@ public class CallContext  {
 	}
 	
 	public void traceInfo(String msg)  { if (trace!=null) trace.traceInfo(msg);	}
+	public void traceInfo(String msg, int node)  { if (trace!=null) trace.trace(Severity.INFO, new RelayTrace.Item(msg,node));	}
 	public void traceDebug(String msg) { if (trace!=null) trace.traceDebug(msg);	}
 	public boolean debugTraceEnabled() { return (trace!=null) && trace.debugTraceEnabled();	}
 	public boolean infoTraceEnabled()  { return (trace!=null) && trace.infoTraceEnabled();	}
@@ -125,8 +126,7 @@ public class CallContext  {
 	}
 	
 	public int callMethod(int method, String resultVar) {
-		if (infoTraceEnabled())
-			traceInfo("sending request: "+Node.writeToString(method, false));
+		traceInfo("sending request: ", method);
 		MethodCache caller = getRelayConnector().responseCache;
 		int response = caller.sendAndWait(method,RelaySettings.timeout.get(getProps()));
 		checkAndLogResponse(response, resultVar);
@@ -135,13 +135,14 @@ public class CallContext  {
 	
 	public void checkAndLogResponse(int response, String resultVar) {
 		destroyWhenDone(new NomNode(response));
-		if (infoTraceEnabled()) // TODO: this might fail if context is already done and response is deleted
-			traceInfo("received response: "+Node.writeToString(response, false));
+		int responseBody=SoapUtil.getContent(response);
+		if (infoTraceEnabled()) 
+			// TODO: this might fail if context is already done and response is deleted
+			traceInfo("received response: ",responseBody);
 		if (allreadyDestroyed)
 			return;
-		int responseBody=SoapUtil.getContent(response);
 		if (SoapUtil.isSoapFault(responseBody)) {
-			trace.trace(Severity.WARN, "Result of methodcall for "+resultVar+" returned Fault: "+Node.writeToString(responseBody, true));
+			trace.trace(Severity.WARN, new RelayTrace.Item("Result of methodcall for "+resultVar+" returned Fault: ",responseBody));
 			throw new RelayedSoapFaultException(response);
 		}
 	}

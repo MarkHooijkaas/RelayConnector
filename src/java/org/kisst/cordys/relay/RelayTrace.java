@@ -2,6 +2,9 @@ package org.kisst.cordys.relay;
 
 import java.util.ArrayList;
 
+import org.kisst.cfg4j.Props;
+import org.kisst.cordys.util.NomUtil;
+
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
@@ -15,7 +18,13 @@ import com.eibus.xml.nom.Node;
 public class RelayTrace {
 	public static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTrace.class);
 
-	private final ArrayList<String> items=new ArrayList<String>();
+	public static class Item {
+		final String msg;
+		final int node;
+		Item(String msg) { this.msg=msg; this.node=0; }
+		Item(String msg, int node) { this.msg=msg; this.node=node; }
+	}
+	private final ArrayList<Item> items=new ArrayList<Item>();
 	private final Severity traceLevel;
 
 	public RelayTrace(Severity traceLevel) {
@@ -27,26 +36,49 @@ public class RelayTrace {
 			trace(Severity.DEBUG,msg);
 	} 
 	public void traceInfo(String msg) {	trace(Severity.INFO,msg); }
-	public synchronized void trace(Severity level, String msg) { 
-		logger.log(level,msg);
+	
+	public synchronized void trace(Severity level, String msg) { trace(level, new Item(msg)); }
+	public synchronized void trace(Severity level, Item item) {
+		if (item.node==0)
+			logger.log(level,item.msg);
+		else
+			logger.log(level,item.msg+Node.writeToString(item.node, false));
 		if (! infoTraceEnabled()) 
 			// trace should be at least on info level, to be added to the trace buffer
 			// otherwise an ERROR would fill the trace 
 			return;
-		items.add(msg);
+		items.add(item);
 	} 
 
 	public boolean debugTraceEnabled() { return (traceLevel!=null && Severity.DEBUG.isGreaterOrEqual(traceLevel)) || logger.isDebugEnabled(); }
 	public boolean infoTraceEnabled()  { return (traceLevel!=null && Severity.INFO. isGreaterOrEqual(traceLevel)) || logger.isInfoEnabled(); }
-	public String getTraceAsString() {
+	public String getTraceAsString(Props props) {
+		boolean showEnvelope=RelaySettings.traceShowEnvelope.get(props);
 		StringBuffer buf=new StringBuffer();
-		for (String s:items)
-			buf.append(s).append('\n');
+		for (Item i:items) {
+			buf.append(i.msg);
+			if (i.node!=0) {
+				if (showEnvelope)
+					buf.append(Node.writeToString(NomUtil.getRootNode(i.node), false));
+				else
+					buf.append(Node.writeToString(i.node, false));
+			}
+			buf.append('\n');
+		}
 		return buf.toString();
 	}
 
-	public void addToNode(int node) {
-		for (String s:items)
-			Node.createTextElement("item", s, node);
+	public void addToNode(int node, Props props) {
+		boolean showEnvelope=RelaySettings.traceShowEnvelope.get(props);
+		for (Item i:items) {
+			int itemnode = Node.createElement("item", node);
+			Node.setAttribute(itemnode, "msg", i.msg);
+			if (i.node!=0) {
+				int srcnode=i.node;
+				if (showEnvelope)
+					srcnode=NomUtil.getRootNode(i.node);
+				Node.duplicateAndAppendToChildren(srcnode, srcnode, itemnode);
+			}
+		}
 	}
 }
