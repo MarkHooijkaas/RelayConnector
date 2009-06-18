@@ -90,7 +90,6 @@ command</title>
   [prettyPrint="true|false"]
   [timeout="<replaceable>millisecs</replaceable>"]
   [body="<replaceable>xml-expression</replaceable>"]
-  [xmlResponse="<replaceable>boolean</replaceable>"]
   [wsa="true" replyTo="<replaceable>url-expression</replaceable>" 
     [faultTo="<replaceable>url-expression</replaceable>"]
     [wrapperName="<replaceable>element-name</replaceable>"]
@@ -119,10 +118,6 @@ the example in Chapter 6.3.</para>
 <para>One can change the qualified name of the wrapper element if one
 really wants to, but usually one can leave these at the default
 settings, which are also the defaults of the http-callback command.</para>
-<para>If the attribute xmlResponse is false, the http response will be ignored.
-This is especially useful in combination when the response is empty which might be the case
-when using wsa=true.
-The default value of xmlResponse is true.</para>
 </sect1>
 
 
@@ -132,9 +127,9 @@ command</title>
 <@xmlcode>
 <http-callback
   [timeout="<replaceable>millisecs</replaceable>"]
+  [prettyPrint="true|false"]
   [wrapperName="<replaceable>element-name</replaceable>"]
   [wrapperNamespabe="<replaceable>namespace</replaceable>"]/>
-  [xmlResponse="<replaceable>boolean</replaceable>"]
 </@xmlcode>
 
 

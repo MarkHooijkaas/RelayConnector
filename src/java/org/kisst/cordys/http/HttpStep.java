@@ -7,11 +7,15 @@ import org.kisst.cordys.script.Step;
 import com.eibus.xml.nom.Node;
 
 public class HttpStep extends HttpBase2 implements Step {
-    protected final String resultVar;
+    private final String resultVar;
+    private final boolean ignoreHttpErrorCode;
+    private final boolean xmlResponse;
 
 	public HttpStep(CompilationContext compiler, final int node) {
 		super(compiler, node);
 		resultVar = Node.getAttribute(node, "resultVar", "output");
+		ignoreHttpErrorCode=HttpSettings.ignoreReturnCode.get(props);
+		xmlResponse= compiler.getSmartBooleanAttribute(node, "xmlResponse", true);
 		if (xmlResponse)
 			compiler.declareXmlVar(resultVar);
 		else
@@ -23,7 +27,7 @@ public class HttpStep extends HttpBase2 implements Step {
 		try {
 			bodyNode= createBody(context);
 		    HttpResponse response=call(context, bodyNode);
-		    if (response.getCode()>=300 && ! ignoreSoapFault)
+		    if (response.getCode()>=300 && ! ignoreHttpErrorCode)
 		    	throw new HttpSoapFaultException(response);
 			if (xmlResponse)
 			    context.setXmlVar(resultVar, response.getResponseXml(context.getCallContext().getDocument()));

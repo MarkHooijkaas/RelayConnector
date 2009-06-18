@@ -29,14 +29,10 @@ public class HttpBase {
     private final boolean prettyPrint;
     private final int timeout;
     protected final Props props;
-    protected final boolean xmlResponse;
-	protected boolean ignoreSoapFault;
 	
 	public HttpBase(CompilationContext compiler, final int node) {
 		props=compiler.getProps();
-		ignoreSoapFault=HttpSettings.ignoreReturnCode.get(props);
 		prettyPrint = compiler.getSmartBooleanAttribute(node, "prettyPrint", false);
-		xmlResponse= compiler.getSmartBooleanAttribute(node, "xmlResponse", true);
 		timeout = compiler.getSmartIntAttribute(node, "timeout", HttpSettings.timeout.get(props));
 		body=new XmlExpression(compiler, Node.getAttribute(node, "body", "/input/../.."));
 	}
