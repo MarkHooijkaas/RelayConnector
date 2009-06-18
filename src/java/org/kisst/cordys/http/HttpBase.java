@@ -30,7 +30,7 @@ public class HttpBase {
     private final int timeout;
     protected final Props props;
     protected final boolean xmlResponse;
-	private boolean ignoreSoapFault;
+	protected boolean ignoreSoapFault;
 	
 	public HttpBase(CompilationContext compiler, final int node) {
 		props=compiler.getProps();
@@ -58,22 +58,11 @@ public class HttpBase {
 		return method;
 	}
 	
-	private HttpResponse retrieveResponse(PostMethod method, int statusCode) {
-		try {
-			HttpResponse result=new HttpResponse(statusCode, method.getResponseBody());
-			if (statusCode >= 300 && ! ignoreSoapFault) {
-				throw new HttpSoapFaultException(result);
-			}
-			return result;
-		}
-	    catch (IOException e) {  throw new RuntimeException(e); }
-	}
-
 	protected HttpResponse httpCall(final PostMethod method, HttpState state) {
 	    try {
 	    	//int statusCode = client.executeMethod(method.getHostConfiguration(), method, state);
 	    	int statusCode = client.executeMethod(null, method, state);
-	    	return retrieveResponse(method, statusCode);
+			return new HttpResponse(statusCode, method.getResponseBody());
 	    }
 	    catch (HttpException e) { throw new RuntimeException(e); } 
 	    catch (IOException e) {  throw new RuntimeException(e); }

@@ -41,11 +41,16 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 				wsaTransform(context, bodyNode);
 			HttpResponse response=call(context, bodyNode);
 			int cordysResponse=context.getXmlVar("output");
-			if (xmlResponse) {
-				httpResponse = response.getResponseXml(context.getCallContext().getDocument());
-				if (httpResponse!=0)
-					SoapUtil.mergeResponses(httpResponse, cordysResponse);
+			httpResponse = response.getResponseXml(context.getCallContext().getDocument());
+			if (response.getCode()>=300) {
+				if (httpResponse==0 || ! SoapUtil.isSoapFault(httpResponse))
+					throw new HttpSoapFaultException(response);
 			}
+			if (httpResponse!=0) // This should als merge SOAP:Faults
+				SoapUtil.mergeResponses(httpResponse, cordysResponse);
+			// TODO: What to do if there is no XML response???
+			// Note: if there is no XML response, ideally Cordys should give no XML response as well
+			// However this is not possible since Cordys needs a SOAP:Header for routing purposes.
 		}
 		finally {
 			if (httpResponse!=0) Node.delete(httpResponse);

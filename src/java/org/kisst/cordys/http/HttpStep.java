@@ -23,6 +23,8 @@ public class HttpStep extends HttpBase2 implements Step {
 		try {
 			bodyNode= createBody(context);
 		    HttpResponse response=call(context, bodyNode);
+		    if (response.getCode()>=300 && ! ignoreSoapFault)
+		    	throw new HttpSoapFaultException(response);
 			if (xmlResponse)
 			    context.setXmlVar(resultVar, response.getResponseXml(context.getCallContext().getDocument()));
 			else

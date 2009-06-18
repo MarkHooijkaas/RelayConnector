@@ -33,11 +33,18 @@ public class HttpCallbackStep extends HttpBase2 implements Step {
 	    	PostMethod method=createPostMethod(url, bodyNode);
 		    		
 	    	HttpResponse response=httpCall(method, null);
-			if (xmlResponse) {
-				httpResponse = response.getResponseXml(context.getCallContext().getDocument());
-				int cordysResponse=context.getXmlVar("output");
-				SoapUtil.mergeResponses(httpResponse, cordysResponse);
+			int cordysResponse=context.getXmlVar("output");
+			httpResponse = response.getResponseXml(context.getCallContext().getDocument());
+			if (response.getCode()>=300) {
+				if (httpResponse==0 || ! SoapUtil.isSoapFault(httpResponse))
+					throw new HttpSoapFaultException(response);
 			}
+			if (httpResponse!=0) // This should als merge SOAP:Faults
+				SoapUtil.mergeResponses(httpResponse, cordysResponse);
+			// TODO: What to do if there is no XML response???
+			// Note: if there is no XML response, ideally Cordys should give no XML response as well
+			// However this is not possible since Cordys needs a SOAP:Header for routing purposes.
+			
 	    }
 	    finally {
 	    	Node.delete(httpResponse);
