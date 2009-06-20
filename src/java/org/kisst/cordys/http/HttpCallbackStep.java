@@ -10,16 +10,13 @@ import org.kisst.cordys.util.SoapUtil;
 import com.eibus.xml.nom.Node;
 
 public class HttpCallbackStep extends HttpBase2 implements Step {
-	public static final String defaultWrapperElementNamespace = "http://kisst.org/cordys/http";
-	public static final String defaultWrapperElementName = "CallbackWrapper";
-	
 	private final String wrappperElementName;
 	private final String wrappperElementNamespace;
 	
 	public HttpCallbackStep(CompilationContext compiler, final int node) {
 		super(compiler, node);
-		wrappperElementName     =compiler.getSmartAttribute(node, "wrapperName", defaultWrapperElementName);
-		wrappperElementNamespace=compiler.getSmartAttribute(node, "wrapperNamespace", defaultWrapperElementNamespace);
+		wrappperElementName     =compiler.getSmartAttribute(node, "wrapperName", SoapUtil.defaultWsaWrapperElementName);
+		wrappperElementNamespace=compiler.getSmartAttribute(node, "wrapperNamespace", SoapUtil.defaultWsaWrapperElementNamespace);
 	}
 	
 	public void executeStep(final ExecutionContext context) {

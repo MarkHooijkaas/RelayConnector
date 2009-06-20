@@ -22,9 +22,9 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 	public HttpRelayStep(CompilationContext compiler, final int node) {
 		super(compiler, node);
 		wsa = compiler.getSmartBooleanAttribute(node, "wsa", false);
-		wrappperElementName     =compiler.getSmartAttribute(node, "wrapperName", HttpCallbackStep.defaultWrapperElementName);
+		wrappperElementName     =compiler.getSmartAttribute(node, "wrapperName", SoapUtil.defaultWsaWrapperElementName);
 
-		wrappperElementNamespace=compiler.getSmartAttribute(node, "wrapperNamespace", HttpCallbackStep.defaultWrapperElementNamespace);
+		wrappperElementNamespace=compiler.getSmartAttribute(node, "wrapperNamespace", SoapUtil.defaultWsaWrapperElementNamespace);
 
 		replyToExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "replyTo"));
 		if (wsa && replyToExpression==null)

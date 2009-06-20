@@ -9,7 +9,10 @@ public class SoapUtil {
 
 	public static final String wsaNamespace="http://www.w3.org/2005/08/addressing";
 	//public static final String wsaAnonymous="http://www.w3.org/2005/08/addressing/anonymous";
-	
+
+	public static final String defaultWsaWrapperElementNamespace = "http://kisst.org/cordys/http";
+	public static final String defaultWsaWrapperElementName = "CallbackWrapper";
+
 	/** Returns true is the NOM node is a SOAP:Fault element
 	 *  This is a helper routine that is generally called on the Envelope node, but can
 	 *  also be used on the Body node, or the Fault node directly 
@@ -86,6 +89,34 @@ public class SoapUtil {
 			srcchild=Node.getNextSibling(srcchild);
 		}
 	}
+
 	
+	public static void wsaTransformReplyTo(int top, String replyTo, String faultTo) {
+		int header=NomUtil.getElement(top, SoapUtil.soapNamespace, "Header");
+		moveNode(header, "ReplyTo", replyTo);
+		moveNode(header, "FaultTo", faultTo);
+	}
+
+	private static void moveNode(int header, String name, String newAddress) {
+		String wrappperElementName =defaultWsaWrapperElementName;
+		String wrappperElementNamespace = defaultWsaWrapperElementNamespace;
+
+		int node = NomUtil.getElement(header, SoapUtil.wsaNamespace, name);
+		if (node==0) // TODO: FaultTo should maybe forced to anonymous
+			return;
+		int refpar=NomUtil.getElement(node, SoapUtil.wsaNamespace, "ReferenceParameters");
+		if (refpar==0) {
+			refpar=Node.createElement("ReferenceParameters", node);
+			NomUtil.setNamespace(refpar, SoapUtil.wsaNamespace, "wsa", false);
+		}
+		int cb=Node.createElement(wrappperElementName, refpar); 
+		NomUtil.setNamespace(cb, wrappperElementNamespace, "kisst", false);
+		int origaddr = NomUtil.getElementByLocalName(node, "Address");
+		String origaddress =Node.getData(origaddr); 
+		int cbaddr=Node.createTextElement("Address", origaddress, cb);
+		NomUtil.setNamespace(cbaddr, SoapUtil.wsaNamespace, "wsa", false);
+		Node.setDataElement(origaddr, "", newAddress);
+		
+	}
 
 }
