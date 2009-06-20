@@ -37,6 +37,7 @@ public class RelayTrace {
 	} 
 	public void traceInfo(String msg) {	trace(Severity.INFO,msg); }
 	
+	public synchronized void trace(Severity level, String msg, int node) { trace(level, new Item(msg, node)); }
 	public synchronized void trace(Severity level, String msg) { trace(level, new Item(msg)); }
 	public synchronized void trace(Severity level, Item item) {
 		if (item.node==0)
