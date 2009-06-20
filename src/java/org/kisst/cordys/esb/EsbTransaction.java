@@ -10,7 +10,11 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.kisst.cfg4j.CompositeSetting;
+import org.kisst.cfg4j.LongSetting;
+import org.kisst.cfg4j.MappedSetting;
 import org.kisst.cfg4j.Props;
+import org.kisst.cfg4j.StringSetting;
 import org.kisst.cordys.http.HostSettings;
 import org.kisst.cordys.http.HttpResponse;
 import org.kisst.cordys.http.HttpSoapFaultException;
@@ -24,8 +28,14 @@ import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
 public class EsbTransaction  implements ApplicationTransaction {
-	private static final HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
-	private static final HostSettings host=new HostSettings(null,"esb");
+	private static final MultiThreadedHttpConnectionManager connmngr = new MultiThreadedHttpConnectionManager();
+	private static final HttpClient client = new HttpClient(connmngr);
+
+	private final static CompositeSetting esb=new CompositeSetting(null,"esb");
+	//private static final HostSettings host=new HostSettings(null,"esb");
+	private final static StringSetting hosts=new StringSetting(esb, "hosts", null);
+	private final static MappedSetting<HostSettings> host=new MappedSetting<HostSettings>(esb, "host", HostSettings.class);;
+	private final static LongSetting closeIdleConnections=new LongSetting(esb, "closeIdleConnections", -1);
 
 	private final Props props;
 	
@@ -56,20 +66,35 @@ public class EsbTransaction  implements ApplicationTransaction {
 
     
 	private void exec(int input, int output) {
-		int httpResponse = 0;
-		try {
-			int bodyNode= Node.getParent(Node.getParent(input));
-		    PostMethod method = createPostMethod(host.url.get(props), bodyNode);
-			HttpState state=createState();
-		    if (state!=null)
-		    	method.setDoAuthentication(true);
-		    HttpResponse response= httpCall(method, state);
-			int cordysResponse=output; //Node.getParent(Node.getParent(output));;
-			httpResponse = response.getResponseXml(Node.getDocument(input));
-			SoapUtil.mergeResponses(httpResponse, cordysResponse);
-		}
-		finally {
-			if (httpResponse!=0) Node.delete(httpResponse);
+		long l=closeIdleConnections.get(props);
+		if (l>=0) // Hack because often some idle connections were closed which resulted in 401 errors
+			connmngr.closeIdleConnections(l);
+		
+		String[] hostnames = hosts.get(props).split(",");
+		int bodyNode= Node.getParent(Node.getParent(input));
+		for (int i=0; i<hostnames.length; i++) {
+			String hostname=hostnames[i].trim();
+			PostMethod method = createPostMethod(host.get(hostname).url.get(props), bodyNode);
+			HttpState state=createState(hostname);
+			if (state!=null)
+				method.setDoAuthentication(true);
+			int httpResponse = 0;
+			try {
+				HttpResponse response= httpCall(method, state);
+				int cordysResponse=output; //Node.getParent(Node.getParent(output));;
+				httpResponse = response.getResponseXml(Node.getDocument(input));
+				SoapUtil.mergeResponses(httpResponse, cordysResponse);
+				return;
+			}
+			catch(RuntimeException e) {
+				if (i<hostnames.length-1)
+					RelayTrace.logger.log(Severity.WARN, "Error trying to call host "+hostname+" trying next host "+hostnames[i+1],e);
+				else
+					throw e;
+			}
+			finally {
+				if (httpResponse!=0) Node.delete(httpResponse);
+			}
 		}
 	}
 	
@@ -84,11 +109,11 @@ public class EsbTransaction  implements ApplicationTransaction {
 	    return method;
 	}
 
-	private HttpState createState() {
-		if (host.username.get(props) == null)
+	private HttpState createState(String hostname) {
+		if (host.get(hostname).username.get(props) == null)
 			return null;
 		HttpState state=new HttpState();
-		state.setCredentials(AuthScope.ANY, host.getCredentials(props));
+		state.setCredentials(AuthScope.ANY, host.get(hostname).getCredentials(props));
 		return state;
 	}
 
