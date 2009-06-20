@@ -424,8 +424,45 @@ This way one can easily add new languages in the configuration file.
 The default attribute can be used to specify a default value to be used if the key can not be found.
 If no default attribute is present, and the key can not be found, an error will be thrown.
 </para>
-
-
-
 </sect1>
+
+
+<sect1><title>soapMerge command</title>
+<@xmlcode>
+<soapMerge
+  src="<replaceable>xmlexpression</replaceable>" 
+  dest="<replaceable>xmlexpression</replaceable>" 
+/>
+</@xmlcode>
+<para>
+Merges two soap messages, meant to merge a response into the predefined response that the Cordys framework
+already has available (i.e. the /output/../.. variable).
+This merges the SOAP:Header fields from the src xml into the destination.
+It discards the entire body, and replaces this with the body of the src. 
+Otherwise there would be two element under the body.
+</para>
+</sect1>
+
+<sect1><title>wsaTransformReplyTo command</title>
+<@xmlcode>
+<wsaTransformReplyTo
+  xml="<replaceable>xmlexpression</replaceable>" 
+  replyTo="<replaceable>expression</replaceable>" 
+  [faultTo="<replaceable>expression</replaceable>"]
+/>
+</@xmlcode>
+<para>
+This commands changes the provided XML, in a way that it wraps the original WSA ReplyTo SOAP:Header,
+and replaces it with the provided replyTo address.
+This is done in a way that the HttpRelayCallback command can extract the original ReplyTo Address.
+Typically the replyTo attribute should contain the url of the ESB machine. 
+Of course it would be best to use a configuration variable for this, e.g. 
+<@xmlcode>
+    <wsaTransformReplyTo  xml="/input/../.."  replyTo="${EsbUrl}" />
+</@xmlcode>
+The faultTo attribute works similarily. A problem is that Cordys can not define methods with the
+qulisfied name SOAP:Fault.
+</para>
+</sect1>
+
 </chapter>

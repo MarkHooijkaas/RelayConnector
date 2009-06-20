@@ -26,6 +26,8 @@ public class CommandList {
 		basicCommands.addCommand("stripPrefixes",  new GenericCommand(StripPrefixesStep.class));
 		basicCommands.addCommand("replaceText",    new GenericCommand(ReplaceTextStep.class));
 		basicCommands.addCommand("getConfigValue", new GenericCommand(GetConfigValueStep.class));
+		basicCommands.addCommand("wsaTransformReplyTo", new GenericCommand(WsaTransformReplyToStep.class));
+		basicCommands.addCommand("soapMerge", new GenericCommand(SoapMergeStep.class));
 	}
 	public static void addBasicCommand(String name, Command type) {	basicCommands.addCommand(name, type); }
 
