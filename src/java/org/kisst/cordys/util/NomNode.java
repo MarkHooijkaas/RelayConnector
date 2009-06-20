@@ -2,7 +2,11 @@ package org.kisst.cordys.util;
 
 import java.util.ArrayList;
 
+import org.kisst.cordys.relay.RelayTrace;
+
+import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
+import com.eibus.xml.nom.XMLException;
 
 public class NomNode implements Destroyable {
 	public final int node;
@@ -17,7 +21,16 @@ public class NomNode implements Destroyable {
 	public void setText(String txt) {	Node.setDataElement(node, "", txt);	}
 	public void appendText(String txt) {	Node.setDataElement(node, "", getText()+txt);	}
 
-	public void destroy() { Node.delete(node); }
+	public void destroy() {
+		try {
+			Node.delete(node);
+			if (false)
+				throw new XMLException();
+		}
+		catch(XMLException e) {
+			RelayTrace.logger.log(Severity.ERROR, "Error when deleting node (probably double delete), ignoring this error ",e);
+		}
+	}
 
 	public NomNode[] getChildren() {
 		NomNode[] result = new NomNode[Node.getNumChildren(node)];
