@@ -73,8 +73,11 @@ public class ExecutionContext {
 	}
 
 	synchronized public String getTextVar(String name) {
-		ctxt.checkForException(); 
-		return textvars.get(name).str;
+		ctxt.checkForException();
+		TextVar v = textvars.get(name);
+		if (v==null)
+			throw new RuntimeException("Unknown TextVar "+name);
+		return v.str;
 	}
 
 	synchronized public int getXmlVar(String name) {
@@ -107,8 +110,9 @@ public class ExecutionContext {
 	@SuppressWarnings("deprecation")
 	public void callMethodAsync(int method, final String resultVar) {
 		ctxt.traceInfo("sending request: ",method);
+		String methodName=Node.getLocalName(method);
 		MethodCache caller = ctxt.getRelayConnector().responseCache;
-		createXmlSlot(resultVar, "TODO", new Date().getTime()+RelaySettings.timeout.get(ctxt.getProps()));
+		createXmlSlot(resultVar, methodName, new Date().getTime()+RelaySettings.timeout.get(ctxt.getProps()));
 		caller.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {
 			public boolean onReceive(int message)
 			{
