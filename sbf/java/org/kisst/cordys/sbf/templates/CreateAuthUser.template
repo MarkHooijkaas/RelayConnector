@@ -1,0 +1,52 @@
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP:Body>
+    <Update xmlns="http://schemas.cordys.com/1.0/ldap" xmlns:clientattr="http://schemas.cordys.com/General/ClientAttributes/" clientattr:sync_id="0">
+      <tuple clientattr:sync_id="0">
+        <new>
+          <entry dn="cn=${name},cn=authenticated users,${dn}">
+            <objectclass>
+              <string>top</string>
+              <string>busauthenticationuser</string>
+            </objectclass>
+            <cn>
+              <string>${name}</string>
+            </cn>
+            <description>
+              <string>${fullname}</string>
+            </description>
+            <osidentity>
+              <string>${login}</string>
+            </osidentity>
+            <defaultcontext>
+              <string>o=system,${dn}</string>
+            </defaultcontext>
+            <busauthenticationuserpassword>
+              <string></string>
+            </busauthenticationuserpassword>
+            <userpassword>
+              <string>{MD5}</string>
+            </userpassword>
+            <o>
+              <string></string>
+            </o>
+            <telephoneNumber>
+              <string></string>
+            </telephoneNumber>
+            <mail>
+              <string></string>
+            </mail>
+            <labeleduri>
+              <string></string>
+            </labeleduri>
+            <registeredAddress>
+              <string></string>
+            </registeredAddress>
+            <facsimileTelephoneNumber>
+              <string></string>
+            </facsimileTelephoneNumber>
+          </entry>
+        </new>
+      </tuple>
+    </Update>
+  </SOAP:Body>
+</SOAP:Envelope>

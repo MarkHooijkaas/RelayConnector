@@ -1,0 +1,28 @@
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP:Body>
+    <Update xmlns="http://schemas.cordys.com/1.0/ldap" xmlns:clientattr="http://schemas.cordys.com/General/ClientAttributes/" clientattr:sync_id="0">
+      <tuple clientattr:sync_id="0">
+        <new>
+          <entry dn="cn=${name},cn=organizational roles,o=${org},${dn}">
+            <objectclass>
+              <string>top</string>
+              <string>busorganizationalrole</string>
+              <string>busorganizationalobject</string>
+            </objectclass>
+            <cn>
+              <string>${name}</string>
+            </cn>
+            <description>
+              <string>${name}</string>
+            </description>
+            <menu />
+            <toolbar />
+            <role>
+              <string>cn=everyoneIn${org},cn=organizational roles,o=${org},${dn}</string>
+            </role>
+          </entry>
+        </new>
+      </tuple>
+    </Update>
+  </SOAP:Body>
+</SOAP:Envelope>
