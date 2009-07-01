@@ -458,7 +458,7 @@ This is done in a way that the HttpRelayCallback command can extract the origina
 Typically the replyTo attribute should contain the url of the ESB machine. 
 Of course it would be best to use a configuration variable for this, e.g. 
 <@xmlcode>
-    <wsaTransformReplyTo  xml="/input/../.."  replyTo="${EsbUrl}" />
+    <wsaTransformReplyTo  xml="/input/../.."  replyTo="${dollar}{EsbUrl}" />
 </@xmlcode>
 The faultTo attribute works similarily. A problem is that Cordys can not define methods with the
 qulisfied name SOAP:Fault.
