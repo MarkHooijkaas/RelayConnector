@@ -19,6 +19,9 @@ public class NomNode implements Destroyable {
 	public void setText(String txt) {	Node.setDataElement(node, "", txt);	}
 	public void appendText(String txt) {	Node.setDataElement(node, "", getText()+txt);	}
 	public void rename(String name) { Node.setName(node, name); }
+	public void setNamespace(String namespace, String prefix) { 
+		NomUtil.setNamespace(node, namespace, prefix, true);
+	}
 
 	public void destroy() {
 		try {
@@ -57,4 +60,5 @@ public class NomNode implements Destroyable {
 				return p.getNodeList(node);
 		}
 	}
+
 }

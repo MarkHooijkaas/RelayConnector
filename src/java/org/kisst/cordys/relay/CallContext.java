@@ -72,6 +72,11 @@ public class CallContext  {
 			throw new RuntimeException("unknown prefix "+prefix);
 		return prefixes.get(prefix);
 	}
+	public String resolvePrefix(String prefix, String defaultValue) {
+		if (! prefixes.containsKey(prefix))
+			return defaultValue;
+		return prefixes.get(prefix);
+	}
 
 	/**
 	 * Register object to be destroyed automatically when the call is done 
