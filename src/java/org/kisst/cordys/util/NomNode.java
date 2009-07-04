@@ -1,7 +1,5 @@
 package org.kisst.cordys.util;
 
-import java.util.ArrayList;
-
 import org.kisst.cordys.relay.RelayTrace;
 
 import com.eibus.util.logger.Severity;
@@ -20,11 +18,12 @@ public class NomNode implements Destroyable {
 	public NomNode appendElement(String name) {	return new NomNode(Node.createElement(name, node));	}
 	public void setText(String txt) {	Node.setDataElement(node, "", txt);	}
 	public void appendText(String txt) {	Node.setDataElement(node, "", getText()+txt);	}
+	public void rename(String name) { Node.setName(node, name); }
 
 	public void destroy() {
 		try {
 			Node.delete(node);
-			if (false)
+			if (false) // Trick because XMLException is not in throws clause of native implementation
 				throw new XMLException();
 		}
 		catch(XMLException e) {
@@ -43,13 +42,19 @@ public class NomNode implements Destroyable {
 		return result;
 	}
 
-	public Object getAt(String path) {
-		ArrayList<Object> result=new ArrayList<Object>();
+	public Object get(String path) {
 		NomPath p=new NomPath(null, path); // Note: no prefixes possible yet
-		p.fillNodeList(node, 0, result, false);
-		if (p.isAlwaysSingle())
-			return result.get(0);
-		else
-			return result;
+		if (p.singleResult()) {
+			if (p.stringResult())
+				return p.getTextList(node).get(0);
+			else
+				return p.getNodeList(node).get(0);
+		}
+		else {
+			if (p.stringResult())
+				return p.getTextList(node);
+			else
+				return p.getNodeList(node);
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package org.kisst.cordys.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.kisst.cordys.script.PrefixContext;
 
@@ -22,9 +23,15 @@ public class NomPath {
 	}
 	private final Part[] parts;
 	private final String original;
-	private boolean alwaysSingle=true;
+	private final boolean stringResult;
+	private final boolean singleResult;
+
+	public boolean singleResult() { return singleResult;}
+	public boolean stringResult() { return stringResult;}
 
 	public NomPath(PrefixContext prefixContext, String str) {
+		boolean alwaysSingle=true;
+		boolean nodeResult=true;
 		original=str;
 		while (str.endsWith("/"))
 			str=str.substring(0, str.length()-1);
@@ -69,12 +76,14 @@ public class NomPath {
 					if (! parts[i].isLast)
 						throw new RuntimeException("text() should be last element in path "+original);
 					parts[i].isText=true;
+					nodeResult=false;
 					continue;
 				}
 				if (e.startsWith("@")) {
 					if (! parts[i].isLast)
 						throw new RuntimeException("Attribute @ should be last element in path "+original);
 					parts[i].isAttribute=true;
+					nodeResult=false;
 					e=e.substring(1);
 				}
 				if (e.startsWith("*")) {
@@ -91,7 +100,8 @@ public class NomPath {
 					parts[i].name=e;
 			}
 		}
-
+		singleResult = alwaysSingle;
+		this.stringResult=! nodeResult;
 	}
 
 	public String getText(int node) {
@@ -126,16 +136,38 @@ public class NomPath {
 		return node;
 	}
 
-	public void fillNodeList(int node, int index, ArrayList<Object> result, boolean superstar) {
+	
+	public List<NomNode> getNodeList(int node) {
+		ArrayList<NomNode> result=new ArrayList<NomNode>();
+		fillNodeList(node,0,result,false);
+		return result;
+	}
+	public List<String> getTextList(int node) {
+		List<NomNode> nodes = getNodeList(node);
+		ArrayList<String> result=new ArrayList<String>();
+		String attrName=null;
+		Part last=parts[parts.length-1];
+		if (last.isAttribute)
+			attrName=last.name;
+		for(NomNode n:nodes) {
+			if (attrName==null)
+				result.add(n.getText());
+			else
+				result.add(Node.getAttribute(n.node, attrName));
+		}
+		return result;
+	}
+	
+	private void fillNodeList(int node, int index, List<NomNode> result, boolean superstar) {
 		if (parts==null || index>=parts.length)
 			return;
 		Part part=parts[index];
 		if (part.isParent)
 			fillNodeList(Node.getParent(node), index+1, result, superstar);
 		else if (part.isAttribute)
-			result.add(Node.getAttribute(node, part.name));
+			result.add(new NomNode(node));
 		else if (part.isText)
-			result.add(Node.getData(node));
+			result.add(new NomNode(node));
 		else if (part.superstar) {
 			throw new RuntimeException("** not yet implemented in path "+original);
 		}
@@ -161,7 +193,7 @@ public class NomPath {
 				if (match) {
 					atLeastOneMatch=true;
 					if (part.isLast)
-						result.add(child);
+						result.add(new NomNode(child));
 					else
 						fillNodeList(child, index+1, result, superstar);
 				}
@@ -175,6 +207,4 @@ public class NomPath {
 				throw new RuntimeException("Could not find any non-optional element with name "+part.name);
 		}
 	}
-
-	public boolean isAlwaysSingle() { return alwaysSingle;}
 }

@@ -1,7 +1,11 @@
 package org.kisst.cordys.script.expression;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
+import org.kisst.cordys.util.NomNode;
 import org.kisst.cordys.util.NomPath;
 
 import com.eibus.xml.nom.Node;
@@ -44,6 +48,17 @@ public class XmlExpression  implements Expression {
 			return node;
 		else
 			return path.findNode(node);
+	}
+
+	public List<NomNode> getNodeList(ExecutionContext context) {
+		int node=context.getXmlVar(name);
+		if (path==null) {
+			ArrayList<NomNode> result = new ArrayList<NomNode>();
+			result.add(new NomNode(node));
+			return result;
+		}
+		else
+			return path.getNodeList(node);
 	}
 
 }
