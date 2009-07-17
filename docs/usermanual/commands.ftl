@@ -48,6 +48,33 @@ namespace="<replaceable>http://kisst.org/test</replaceable>"/>
 </sect1>
 
 
+<sect1 id="rename"><title>rename command</title>
+<@xmlcode>
+<rename nodes="<replaceable>nodelist</replaceable>" 
+	[name="<replaceable>name</replaceable>"]
+	[prefix="<replaceable>prefix</replaceable>"]
+	[namespace="<replaceable>namespace</replaceable>"]
+/>
+</@xmlcode>
+<para>
+This command renames and or changes namespace details of all specified nodes.
+If the name attribute is specified all nodes with get the new local name.
+Any prefix is preserved unless the prefix attribute is specified.
+If a prefix attribute is specified, te prefixes of the nodes are set to this prefix.
+Here the following rules apply:
+<itemizedlist>
+	<listitem><para>if namespace attribute is present the prefix is "forced" to refer to this namespace</para></listitem>
+	<listitem><para>if no namespace attribute is present, but an earlier xmlns command for this prefix is present, the prefix is "forced" to refer to the namespace set by the xmlns command</para></listitem>
+	<listitem><para>if no namespace attribute is present, and no earlier xmlns command for this prefix is present, if will be checked if the prefix is known in the XML document</para></listitem>
+	<listitem><para>if none of the above situation apply, an error is thrown</para></listitem>
+</itemizedlist>
+The namespace attribute may be left empty, even if a prefix attribute is specified (see above).
+On the other hand if a namespace is specified without a prefix, this namespace will be used without prefix (i.e. the defautl namespace will be forced to the specified namespace).
+When "forcing" a namespace (either by prefix or as default namespace), it will first be checked if this is already the case in the XML document.
+If not, an xmlns or xmlns:prefix attribute will be added to the element.
+</para>
+</sect1>
+
 
 <sect1><title>append command</title>
 <@xmlcode>
