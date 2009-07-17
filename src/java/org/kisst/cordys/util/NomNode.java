@@ -18,7 +18,16 @@ public class NomNode implements Destroyable {
 	public NomNode appendElement(String name) {	return new NomNode(Node.createElement(name, node));	}
 	public void setText(String txt) {	Node.setDataElement(node, "", txt);	}
 	public void appendText(String txt) {	Node.setDataElement(node, "", getText()+txt);	}
-	public void rename(String name) { Node.setName(node, name); }
+
+	public void rename(String name) {
+		String oldname=Node.getName(node);
+		int pos=oldname.indexOf(':');
+		if (pos>=0)
+			// preserve prefix
+			Node.setName(node, oldname.substring(0,pos+1)+name); 
+		else
+			Node.setName(node, name); 
+	}
 	public void setNamespace(String namespace, String prefix) { 
 		NomUtil.setNamespace(node, namespace, prefix, true);
 	}
