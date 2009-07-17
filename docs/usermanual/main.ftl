@@ -12,9 +12,9 @@ ${txt?replace("&lt;emphasis&gt;","<emphasis role=\"bold\">")?replace("&lt;/empha
 
 <!-- <book xmlns="http://docbook.org/ns/docbook">-->
 <book>
-<title>UserManual for ${projectname}</title>
+<title>UserManual for RelayConnector and HttpConnector</title>
 
-<subtitle>buildnumber ${buildnumber}</subtitle>
+<subtitle>buildnumber 1.0.${buildnumber}</subtitle>
 
 
 <#include "intro.ftl">
