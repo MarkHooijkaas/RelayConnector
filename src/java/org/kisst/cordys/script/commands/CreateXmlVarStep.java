@@ -16,6 +16,8 @@ public class CreateXmlVarStep implements Step {
     
 	public CreateXmlVarStep(CompilationContext compiler, final int node) {
 		name =Node.getAttribute(node, "var");
+		if (name==null)
+			throw new RuntimeException("no var attribute defined in createXmlVarStep ");
 		compiler.declareXmlVar(name);
 		String expr=Node.getAttribute(node,	"value");
 		if (expr==null) {
