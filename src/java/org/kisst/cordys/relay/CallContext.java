@@ -82,7 +82,7 @@ public class CallContext  {
 	 * Register object to be destroyed automatically when the call is done 
 	 * @param destroyable the object to be destroyed
 	 */
-	public void destroyWhenDone(Destroyable destroyable) { 
+	public synchronized void destroyWhenDone(Destroyable destroyable) { 
 		if (allreadyDestroyed) {
 			//logger.log(Severity.WARN, "Trying to register destroyable["+destroyable+"] on allready destroyed context, destroying it now");
 			destroyable.destroy();
