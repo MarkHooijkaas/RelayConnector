@@ -14,7 +14,6 @@ public class NomPath {
 		boolean isAttribute=false;
 		boolean isText=false;
 		boolean isParent=false;
-		boolean superstar=false;
 		boolean singlestar=false;
 		boolean isLast=false;
 		String name;
@@ -56,19 +55,9 @@ public class NomPath {
 					parts[i].isParent=true;
 					continue;
 				}
-				if ("**".equals(e)) {
-					parts[i].superstar=true;
-					alwaysSingle=false;
-					continue;
-				}
 				if ("*".equals(e)) {
 					parts[i].singlestar=true;
 					parts[i].optional=true;
-					alwaysSingle=false;
-					continue;
-				}
-				if ("+".equals(e)) {
-					parts[i].singlestar=true;
 					alwaysSingle=false;
 					continue;
 				}
@@ -88,6 +77,7 @@ public class NomPath {
 				}
 				if (e.startsWith("*")) {
 					parts[i].singlestar=true;
+					parts[i].optional=true;
 					alwaysSingle=false;
 					e=e.substring(1);
 				}
@@ -136,7 +126,7 @@ public class NomPath {
 		return node;
 	}
 
-	
+
 	public List<NomNode> getNodeList(int node) {
 		ArrayList<NomNode> result=new ArrayList<NomNode>();
 		fillNodeList(node,0,result,false);
@@ -157,7 +147,7 @@ public class NomPath {
 		}
 		return result;
 	}
-	
+
 	private void fillNodeList(int node, int index, List<NomNode> result, boolean superstar) {
 		if (parts==null || index>=parts.length)
 			return;
@@ -168,9 +158,6 @@ public class NomPath {
 			result.add(new NomNode(node));
 		else if (part.isText)
 			result.add(new NomNode(node));
-		else if (part.superstar) {
-			throw new RuntimeException("** not yet implemented in path "+original);
-		}
 		else {
 			int child=Node.getFirstElement(node);
 			boolean atLeastOneMatch=false;
