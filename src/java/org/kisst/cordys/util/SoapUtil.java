@@ -41,6 +41,21 @@ public class SoapUtil {
 		else 
 			return 0;
 	}
+
+	/** Returns the faultstring of the SOAP:Fault element, or null if XML is not a SOAP:Fault
+	 *  This is a helper routine that is generally called on the Envelope node, but can
+	 *  also be used on the Body node, or the Fault node directly.
+	 *  
+	 * @param node the NOM node of a SOAP Envelope, Body or Fault
+	 * @return the faultstring, or null if it is not 
+	 */
+	public static String getSoapFaultMessage(int node) {
+		int fault=SoapUtil.getSoapFault(node);
+		if (fault==0)
+			return null;
+		return Node.getData(NomUtil.getElementByLocalName(fault,"faultstring"));
+	}
+
 	
 	/** Returns the NOM node of the SOAP:Body element
 	 *  This is a helper routine that is called on the Envelope node

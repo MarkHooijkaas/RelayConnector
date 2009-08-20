@@ -14,11 +14,12 @@ public class RelayedSoapFaultException extends RuntimeException {
 
 	private final String envelope;
 
-	public RelayedSoapFaultException(String envelope) {
+	public RelayedSoapFaultException(String message, String envelope) {
+		super(message);
 		this.envelope=envelope;
 	}
 	public RelayedSoapFaultException(int envelope) {
-		this(Node.writeToString(envelope, false));
+		this(SoapUtil.getSoapFaultMessage(envelope), Node.writeToString(envelope, false));
 	}
 	public void createResponse(BodyBlock responseBlock) {
 		int cordysResponse=responseBlock.getXMLNode();
@@ -35,4 +36,3 @@ public class RelayedSoapFaultException extends RuntimeException {
 		}
 	}	
 }	
-
