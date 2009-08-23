@@ -75,6 +75,21 @@ If not, an xmlns or xmlns:prefix attribute will be added to the element.
 </para>
 </sect1>
 
+<sect1 id="convert"><title>convert command</title>
+<@xmlcode>
+<convert node="<replaceable>nodelist</replaceable>" 
+	convertor="<replaceable>classname</replaceable>"
+/>
+</@xmlcode>
+<para>
+This command converts the text in one node or in a node set using a certain converter. 
+At this moment the following convertors are available:
+TextToXsdBoolean
+XsdBooleanToText
+XsddateToYyyymmdd
+YyyymmddToXsdDate
+</para>
+</sect1>
 
 <sect1><title>append command</title>
 <@xmlcode>
