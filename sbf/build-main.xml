@@ -40,6 +40,9 @@
 				<pathelement path="${libdir}/log4j-1.2.13.jar" />
 				<pathelement path="${libdir}/ehcache-1.5.0.jar" />
 				<pathelement path="${libdir}/groovy-all-1.6.2.jar" />
+				<pathelement path="${libdir}/jt400.jar" />
+				<pathelement path="${libdir}/quartz-1.5.2.jar" />
+				<pathelement path="${libdir}/commons-pool-1.5.jar" />
 			</classpath>
 		</javac>
 	</target>
