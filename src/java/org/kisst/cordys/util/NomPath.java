@@ -16,6 +16,9 @@ public class NomPath {
 		boolean isParent=false;
 		boolean singlestar=false;
 		boolean isLast=false;
+		boolean isDot=false;
+		boolean searchLast=false;
+		boolean searchFirst=false;
 		String name;
 		String namespace=null;
 
@@ -25,10 +28,16 @@ public class NomPath {
 	private final boolean stringResult;
 	private final boolean singleResult;
 
+	public String toString() { return original;}
+
 	public boolean singleResult() { return singleResult;}
 	public boolean stringResult() { return stringResult;}
 
 	public NomPath(PrefixContext prefixContext, String str) {
+		this(prefixContext, str, false);
+	}
+	
+	public NomPath(PrefixContext prefixContext, String str, boolean optional) {
 		boolean alwaysSingle=true;
 		boolean nodeResult=true;
 		original=str;
@@ -45,11 +54,24 @@ public class NomPath {
 			for(int i=0; i<elements.length; i++) {
 				String e=elements[i];
 				parts[i]=new Part();
+				parts[i].optional=optional;
 				if (i==parts.length-1)
 					parts[i].isLast=true;
 				if (e.startsWith("?")) {
 					parts[i].optional=true;
 					e=e.substring(1);
+				}
+				if (e.endsWith("$")) {
+					parts[i].searchLast=true;
+					e=e.substring(0,e.length()-1);
+				}
+				if (e.startsWith("^")) {
+					parts[i].searchFirst=true;
+					e=e.substring(1);
+				}
+				if (".".equals(e)) {
+					parts[i].isDot=true;
+					continue;
 				}
 				if ("..".equals(e)) {
 					parts[i].isParent=true;
@@ -103,13 +125,28 @@ public class NomPath {
 		return Node.getData(node);
 	}
 
+	public int setText(int node, String text) {
+		node=findNodeWithCreate(node);
+		Part last=parts[parts.length-1];
+		if (last.isAttribute) {
+			Node.setAttribute(node, last.name, text);
+			return 0;
+		}
+		else
+			Node.setDataElement(node, "", text);
+		return node;
+	}
+
 	public int findNode(int node) {
 		if (parts==null)
 			return node;
 		for(int i=0; i<parts.length; i++) {
 			Part part=parts[i];
 			String name = part.name;
-			if (part.isParent)
+			if (part.isDot) {
+				// do nothing
+			}
+			else if (part.isParent)
 				node=Node.getParent(node);
 			else if (part.isAttribute || part.isText) {
 				// skip for an attribute or text node: should only happen for final node
@@ -193,5 +230,34 @@ public class NomPath {
 				// Add namespace and star info in error
 				throw new RuntimeException("Could not find any non-optional element with name "+part.name);
 		}
+	}
+	public int findNodeWithCreate(int node) {
+		if (parts==null)
+			return 0;
+		for(int i=0; i<parts.length; i++) {
+			Part part=parts[i];
+			String name = part.name;
+			if (part.isDot) {
+				// do nothing
+			}
+			else if (part.isParent)
+				node=Node.getParent(node);
+			else if (part.isAttribute) {
+				// skip for an attribute: should only happen for final node
+			}
+			else if (part.searchLast)
+				node=NomUtil.getLastElementByLocalName(node, name);
+			else if (part.searchFirst)
+				node=NomUtil.getElementByLocalName(node, name);
+/*			else if (part.optional) {
+				node=NomUtil.getLastElementByLocalName(node, name);
+				if (node==0)
+					return 0;
+			}
+		*/
+			else
+				node=Node.createElement(name, node);
+		}
+		return node;
 	}
 }

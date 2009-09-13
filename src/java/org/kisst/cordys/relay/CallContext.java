@@ -30,6 +30,8 @@ public class CallContext  {
 	protected final RelayTimer timer;
 	private final SOAPTransaction soapTransaction;
 
+	private final HashMap<String,Object> objects=new HashMap<String,Object>();
+
 	public RelayConnector getRelayConnector() {	return relayConnector; }
 	public String getFullMethodName() {	return fullMethodName;	}
 	public Props getProps() { return props;	}
@@ -152,6 +154,8 @@ public class CallContext  {
 			throw new RelayedSoapFaultException(response);
 		}
 	}
+	public Object getObject(String name)  { return objects.get(name); }
+	public void setObject(String name, Object o) { objects.put(name, o); }
 
 	
 }

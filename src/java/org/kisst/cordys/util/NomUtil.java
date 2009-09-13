@@ -3,6 +3,29 @@ package org.kisst.cordys.util;
 import com.eibus.xml.nom.Node;
 
 public class NomUtil {
+	static public int getIntAttribute(int node, String name, int defaultValue) {
+		String tmp=Node.getAttribute(node, name);
+		if (tmp!=null)
+			return Integer.parseInt(tmp);
+		else 
+			return defaultValue;
+	}
+
+	static public long getLongAttribute(int node, String name, long defaultValue) {
+		String tmp=Node.getAttribute(node, name);
+		if (tmp!=null)
+			return Long.parseLong(tmp);
+		else 
+			return defaultValue;
+	}
+
+	static public String getStringAttribute(int node, String name, String defaultValue) {
+		String tmp=Node.getAttribute(node, name);
+		if (tmp==null)
+			return defaultValue;
+		else
+			return tmp;
+	}
 	public static boolean getBooleanAttribute(int node, String attrName , boolean defaultValue) {
     	String str = Node.getAttribute(node, attrName);
 		if (str==null)
@@ -74,7 +97,15 @@ public class NomUtil {
 	public static int getElementByLocalName(int node, String tag) {
 		return getElementByLocalName(node, tag, 0);
 	}
-		
+
+	/**
+	 * Finds the last element with a certain tagname, no matter what namespace or prefix it has  
+	 * @return returns 0 if not found 
+	 */
+	public static int getLastElementByLocalName(int node, String tag) {
+		return getElementByLocalNameReverse(node, tag, 0);
+	}		
+	
 	/**
 	 * Finds a element with a certain tagname, no matter what namespace or prefix it has  
 	 * @param index if multiple elements with same name exist, this is an index (starting at 0)
@@ -93,6 +124,24 @@ public class NomUtil {
 		return 0;
 	}
 
+	/**
+	 * Finds a element with a certain tagname, no matter what namespace or prefix it has.
+	 * The search starts at the end  
+	 * @param index if multiple elements with same name exist, this is an index (starting at 0)
+	 * @return returns 0 if not found 
+	 */
+	public static int getElementByLocalNameReverse(int node, String tag, int index) {
+		node=Node.getLastChild(node);
+		while (node!=0) {
+			if (tag.equals(Node.getLocalName(node))) {
+				if (index==0)
+					return node;
+				index--;
+			}
+			node=Node.getPreviousSibling(node);
+		}
+		return 0;
+	}
 	
 	/**
 	 * returns the attribute of an element, or if not found, it looks upward to parent

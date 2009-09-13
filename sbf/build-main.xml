@@ -30,9 +30,8 @@
 		
 
 	<target name="compile" description="Compiles Java files" depends="init">
-		<javac srcdir="${srcdir}/java" destdir="${builddir}/classes" debug="on" optimize="on" target="1.5">
+		<javac srcdir="${srcdir}/java" includes="${project.javafiles}" destdir="${builddir}/classes" debug="on" optimize="on" target="1.5">
 		    <compilerarg value="-Xlint"/>
-			<include name="**/*.java"/>
 			<classpath>
 				<pathelement path="${libdir}/cordys/wcp.jar" />
 				<pathelement path="${libdir}/cordys/ldap.jar" />
@@ -109,6 +108,14 @@
 
 	<target name="setup-log4j" depends="init,proxy">
 		<get src="http://repo2.maven.org/maven2/log4j/log4j/1.2.13/log4j-1.2.13.jar" dest="lib/log4j-1.2.13.jar"/>
+	</target>
+
+	<target name="get-commons-pool" depends="init,proxy">
+		<get src="http://repo2.maven.org/maven2/commons-pool/commons-pool/1.5/commons-pool-1.5.jar" dest="lib/commons-pool-1.5.jar"/>
+	</target>
+
+	<target name="get-quartz" depends="init,proxy">
+		<get src="http://repo2.maven.org/maven2/quartz/quartz/1.5.2/quartz-1.5.2.jar" dest="lib/quartz-1.5.2.jar"/>
 	</target>
 
 	<target name="setup-freemarker" depends="init,proxy">

@@ -8,4 +8,5 @@
       <pathelement location="lib/commons-logging-1.0.4.jar"/>
       <pathelement location="lib/commons-codec-1.2.jar"/>
 	</jarfiles>
+	<javafiles>org/kisst/cordys/util/**,org/kisst/cordys/relay/**,org/kisst/cordys/esb/**</javafiles>
 </project>

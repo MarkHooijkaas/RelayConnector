@@ -28,7 +28,7 @@ public class ConvertStep implements Step {
 			convertor=null;
 		else {
 			if (classname.indexOf('.')<0)
-				classname="nl.ibgroep.esb.connectors.as400.pcml.convert."+classname;
+				classname="org.kisst.cordys.util.convert."+classname;
 			try {
 				Class cls = Class.forName(classname);
 				Constructor cons = ReflectionUtil.getConstructor(cls, new Class[] {int.class});
