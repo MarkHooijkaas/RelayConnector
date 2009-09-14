@@ -65,9 +65,10 @@ public class PcmlXml extends PcmlElement {
 			int node=createOutputSubNode(outputNode, null);
 			if (node==0)
 				return true; // no output node created, so an empty element
-
-			xml=Node.getDocument(node).parseString(str);
-			Node.duplicateAndAppendToChildren(xml, xml, node);
+			if (str.trim().length()>0) {
+				xml=Node.getDocument(node).parseString(str);
+				Node.duplicateAndAppendToChildren(xml, xml, node);
+			}
 		} 
 		catch (UnsupportedEncodingException e) { throw new RuntimeException(e); }
 		catch (XMLException e) { throw new RuntimeException(e); }
