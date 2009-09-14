@@ -84,7 +84,11 @@ public class HttpBase2 extends HttpBase {
 
 	protected HostSettings getHost(final ExecutionContext context) {
 		//connector.settings.set(connector.conf.properties);
-		return HttpSettings.host.get(applicationExpression.getString(context));
+		String key=applicationExpression.getString(context);
+		HostSettings result = HttpSettings.host.get(key);
+		if (result==null || result.url==null)
+			throw new RuntimeException("Could not find http configuration "+key);
+		return result;
 	}	
 
 	protected HttpResponse call(final ExecutionContext context, int bodyNode) {
