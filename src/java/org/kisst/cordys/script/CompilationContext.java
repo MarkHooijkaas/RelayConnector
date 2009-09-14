@@ -24,31 +24,29 @@ import java.util.HashSet;
 import java.util.Stack;
 
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.relay.CallContext;
-import org.kisst.cordys.relay.RelayConnector;
+import org.kisst.cordys.relay.RelayTrace;
 import org.kisst.cordys.script.commands.CommandList;
 
 import com.eibus.xml.nom.Node;
 
-public class CompilationContext implements PrefixContext {
-	private final CallContext ctxt;
+public class CompilationContext extends RelayTrace implements PrefixContext {
+	private final HashMap<String,String> prefixes=new HashMap<String,String>();
 	private final CommandList commands;
 	private final HashSet<String> txtvars=new HashSet<String>();
 	private final HashSet<String> xmlvars=new HashSet<String>();
 	private final Stack<String> parsePath = new Stack<String>();
 	private final HashMap<String,String> defaultAttributes = new HashMap<String,String>();
+	private final Props props;
 
-	public CompilationContext(CallContext ctxt, Script script)  {
-		this.ctxt=ctxt;
+	public CompilationContext(Script script, Props props)  {
+		this.props=props;
 		this.commands=new CommandList();
 		
 	    declareXmlVar("input");
 		declareXmlVar("output");
     }
 
-	public CallContext getCallContext() { return ctxt; } 
-	public Props getProps() { return ctxt.getProps(); }
-	public RelayConnector getRelayConnector() { return ctxt.getRelayConnector(); }
+	public Props getProps() { return props; }
 
 	public Step compile(int node) {
 		String stepType=Node.getLocalName(node);
@@ -111,6 +109,19 @@ public class CompilationContext implements PrefixContext {
 		return Integer.parseInt(str);
 	}
 
-	public String resolvePrefix(String prefix) { return ctxt.resolvePrefix(prefix); }
-	public void addPrefix(String prefix, String namespace) { ctxt.addPrefix(prefix, namespace);}
+	public void addPrefix(String prefix, String namespace) {
+		if (prefixes.containsKey(prefix))
+			throw new RuntimeException("prefix "+prefix+" allready defined when trying to set new namespace "+namespace);
+		prefixes.put(prefix,namespace);
+	}
+	public String resolvePrefix(String prefix) {
+		if (! prefixes.containsKey(prefix))
+			throw new RuntimeException("unknown prefix "+prefix);
+		return prefixes.get(prefix);
+	}
+	public String resolvePrefix(String prefix, String defaultValue) {
+		if (! prefixes.containsKey(prefix))
+			return defaultValue;
+		return prefixes.get(prefix);
+	}
 }

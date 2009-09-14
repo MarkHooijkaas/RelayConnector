@@ -47,8 +47,8 @@ public class CreateXmlVarStep implements Step {
 			expression = new XmlExpression(compiler, expr);
 			appender= null;
 		}
-		if (compiler.getCallContext().debugTraceEnabled())
-			compiler.getCallContext().traceDebug("Declaring xml var "+name);
+		if (compiler.debugTraceEnabled())
+			compiler.traceDebug("Declaring xml var "+name);
 	}
 
 	public void executeStep(final ExecutionContext context) {

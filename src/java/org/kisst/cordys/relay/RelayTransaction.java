@@ -105,12 +105,12 @@ public class RelayTransaction implements ApplicationTransaction
 		String msg=e.getMessage();
 		boolean trace=RelaySettings.trace.get(props);
 		if (trace && RelaySettings.logTrace.get(props))
-			msg+="\n"+ctxt.getTrace().getTraceAsString(props);
+			msg+="\n"+ctxt.getTraceAsString(props);
 		RelayTrace.logger.log(Severity.ERROR, msg, e);
 		if (RelaySettings.showStacktrace.get(props))
 			Node.createTextElement("stacktrace", getStackTraceAsString(e), details);
 		if (trace && RelaySettings.showTrace.get(props))
-			ctxt.getTrace().addToNode(Node.createElement("trace", details), props);
+			ctxt.addToNode(Node.createElement("trace", details), props);
 		return details;
 	}
 
@@ -123,7 +123,7 @@ public class RelayTransaction implements ApplicationTransaction
 	private Script compileScript(int node) {
 		Script script=RelayModule.scriptCache.get(ctxt.getFullMethodName());
 		if (script==null) {
-			script=new Script(ctxt, node);
+			script=new Script(node, props);
 			if (RelaySettings.cacheScripts.get(props))
 				RelayModule.scriptCache.put(ctxt.getFullMethodName(), script);
 		}

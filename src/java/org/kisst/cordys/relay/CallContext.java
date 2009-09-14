@@ -34,9 +34,7 @@ import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Document;
 import com.eibus.xml.nom.Node;
 
-public class CallContext  {
-	private final HashMap<String,String> prefixes=new HashMap<String,String>();
-
+public class CallContext extends RelayTrace {
 	protected final ArrayList<Destroyable> destroyables = new ArrayList<Destroyable>();
 	private Exception asynchronousError=null;
 	protected boolean allreadyDestroyed=false;
@@ -45,7 +43,6 @@ public class CallContext  {
 	protected final RelayConnector relayConnector;
 	protected final String fullMethodName;
 	protected final Props props;
-	protected final RelayTrace trace;
 	protected final RelayTimer timer;
 	private final SOAPTransaction soapTransaction;
 
@@ -54,7 +51,7 @@ public class CallContext  {
 	public RelayConnector getRelayConnector() {	return relayConnector; }
 	public String getFullMethodName() {	return fullMethodName;	}
 	public Props getProps() { return props;	}
-	public RelayTrace getTrace() {return trace;}
+	public RelayTrace getTrace() {return this;} // TODO: remove
 	public RelayTimer getTimer() { return timer;}
 	public String getOrganization() { return relayConnector.getOrganization(); }	
 	public String getOrganizationalUser() {	return soapTransaction.getUserCredentials().getOrganizationalUser();}
@@ -67,38 +64,12 @@ public class CallContext  {
 		this.props=props;
 		this.soapTransaction=stTransaction;
 
-		if (RelaySettings.trace.get(props))
-			this.trace=new RelayTrace(Severity.DEBUG);
-		else
-			this.trace=null;
 		if (RelaySettings.timer.get(props))
 			timer=new RelayTimer();
 		else
 			timer=null;
 	}
 	
-	public void traceInfo(String msg)  { if (trace!=null) trace.traceInfo(msg);	}
-	public void traceInfo(String msg, int node)  { if (trace!=null) trace.trace(Severity.INFO, new RelayTrace.Item(msg,node));	}
-	public void traceDebug(String msg) { if (trace!=null) trace.traceDebug(msg);	}
-	public boolean debugTraceEnabled() { return (trace!=null) && trace.debugTraceEnabled();	}
-	public boolean infoTraceEnabled()  { return (trace!=null) && trace.infoTraceEnabled();	}
-	
-	public void addPrefix(String prefix, String namespace) {
-		if (prefixes.containsKey(prefix))
-			throw new RuntimeException("prefix "+prefix+" allready defined when trying to set new namespace "+namespace);
-		prefixes.put(prefix,namespace);
-	}
-	public String resolvePrefix(String prefix) {
-		if (! prefixes.containsKey(prefix))
-			throw new RuntimeException("unknown prefix "+prefix);
-		return prefixes.get(prefix);
-	}
-	public String resolvePrefix(String prefix, String defaultValue) {
-		if (! prefixes.containsKey(prefix))
-			return defaultValue;
-		return prefixes.get(prefix);
-	}
-
 	/**
 	 * Register object to be destroyed automatically when the call is done 
 	 * @param destroyable the object to be destroyed
@@ -168,8 +139,7 @@ public class CallContext  {
 		if (allreadyDestroyed)
 			return;
 		if (SoapUtil.isSoapFault(responseBody)) {
-			if (trace!=null)
-				trace.trace(Severity.WARN, new RelayTrace.Item("Result of methodcall for "+resultVar+" returned Fault: ",responseBody));
+				trace(Severity.WARN, new RelayTrace.Item("Result of methodcall for "+resultVar+" returned Fault: ",responseBody));
 			throw new RelayedSoapFaultException(response);
 		}
 	}

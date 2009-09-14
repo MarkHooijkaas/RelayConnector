@@ -46,6 +46,9 @@ public class RelayTrace {
 	private final ArrayList<Item> items=new ArrayList<Item>();
 	private final Severity traceLevel;
 
+	public RelayTrace() {
+		this(Severity.DEBUG);
+	}
 	public RelayTrace(Severity traceLevel) {
 		this.traceLevel=traceLevel;
 	}
@@ -55,7 +58,8 @@ public class RelayTrace {
 			trace(Severity.DEBUG,msg);
 	} 
 	public void traceInfo(String msg) {	trace(Severity.INFO,msg); }
-	
+	public void traceInfo(String msg, int node)  { trace(Severity.INFO, new RelayTrace.Item(msg,node));	}
+
 	public synchronized void trace(Severity level, String msg, int node) { trace(level, new Item(msg, node)); }
 	public synchronized void trace(Severity level, String msg) { trace(level, new Item(msg)); }
 	public synchronized void trace(Severity level, Item item) {

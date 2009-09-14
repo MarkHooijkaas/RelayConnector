@@ -40,7 +40,7 @@ public class RenameStep implements Step {
 		compiler.declareTextVar("it"); // TODO: remove after compilation
 		name=Node.getAttribute(node, "name");
 		prefix=Node.getAttribute(node, "prefix");
-		namespace= compiler.getCallContext().resolvePrefix(prefix, Node.getAttribute(node, "namespace"));
+		namespace= compiler.resolvePrefix(prefix, Node.getAttribute(node, "namespace"));
 	}
 
 	public void executeStep(ExecutionContext context) {

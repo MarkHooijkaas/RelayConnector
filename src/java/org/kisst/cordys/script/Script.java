@@ -19,39 +19,28 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.script;
 
-import org.kisst.cordys.relay.CallContext;
+import org.kisst.cfg4j.Props;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.xml.nom.Node;
 
 public class Script implements Step {
-	private final CallContext ctxt;
-	private final CompilationContext compiler;
 	private final Step[] steps;
 	
-	public CallContext getCallContext() { return ctxt; } 
 
-	public Script(CallContext ctxt, int scriptNode) {
-		this.ctxt=ctxt;
-		this.compiler = new CompilationContext(ctxt,this);
+	public Script(int scriptNode, Props props) {
 		this.steps = new Step[Node.getNumChildren(scriptNode)];
-		compile(compiler, scriptNode);
-	}
-
-	public Script(CompilationContext compiler, int scriptNode) {
-		this.ctxt=compiler.getCallContext();
-		this.compiler = compiler;
-		this.steps = new Step[Node.getNumChildren(scriptNode)];
-		compile(compiler, scriptNode);
+		compile(scriptNode, props);
 	}
 	
-	protected void compile(CompilationContext compiler, int scriptNode) {
+	protected void compile(int scriptNode, Props props) {
+		CompilationContext compiler= new CompilationContext(this, props);
 		int i=0;
     	int node = Node.getFirstChild(scriptNode);
     	while (node != 0) {
     		try {
-    			if (ctxt.debugTraceEnabled())
-    				ctxt.traceDebug("compiling "+NomUtil.nodeToString(node));
+    			if (compiler.debugTraceEnabled())
+    				compiler.traceDebug("compiling "+NomUtil.nodeToString(node));
     			steps[i]=compiler.compile(node);
     		}
     		catch (Exception e) {
