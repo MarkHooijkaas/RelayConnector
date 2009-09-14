@@ -85,7 +85,7 @@ public class MethodCall {
 	protected int createMethod(final ExecutionContext context) {
 		String ns = getNamespace(context);
 		String mname=getMethodName(context);
-		int method = context.getCallContext().createMethod(ns, mname).node;
+		int method = context.createMethod(ns, mname).node;
 		appender.append(context, method);
 		return method;
 	}
@@ -107,7 +107,7 @@ public class MethodCall {
 		if (async)
 			context.callMethodAsync(method, resultVar);
 		else {
-			int response = context.getCallContext().callMethod(method, resultVar);
+			int response = context.callMethod(method, resultVar);
 			context.setXmlVar(resultVar, SoapUtil.getContent(response));
 		}
 	}

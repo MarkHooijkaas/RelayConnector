@@ -43,8 +43,8 @@ public class SoapMergeStep implements Step {
 		int dest = destExpression.getNode(context);
 		SoapUtil.mergeResponses(src,dest);
 		if (context.debugTraceEnabled()) {
-			if (context.getCallContext().getTrace()!=null)
-				context.getCallContext().getTrace().trace(Severity.DEBUG, "result after soap merge ", dest);
+			if (context.getTrace()!=null)
+				context.getTrace().trace(Severity.DEBUG, "result after soap merge ", dest);
 		}
 	}
 }

@@ -54,7 +54,7 @@ public class CreateXmlVarStep implements Step {
 	public void executeStep(final ExecutionContext context) {
 		int node;
 		if (appender!=null) {
-			node=context.getCallContext().getDocument().createElement(name); // TODO: what element name should be used???
+			node=context.getDocument().createElement(name); // TODO: what element name should be used???
 			appender.append(context, node);
 		}
 		else
@@ -62,7 +62,7 @@ public class CreateXmlVarStep implements Step {
 			node = Node.clone(expression.getNode(context), true);
 		if (context.debugTraceEnabled())
 			context.traceDebug("setting xml var "+name+" to "+Node.writeToString(node, false));
-		context.getCallContext().destroyWhenDone(node);
+		context.destroyWhenDone(node);
 		context.setXmlVar(name,node);
 
 	}

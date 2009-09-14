@@ -49,7 +49,7 @@ public class HttpStep extends HttpBase2 implements Step {
 		    if (response.getCode()>=300 && ! ignoreHttpErrorCode)
 		    	throw new HttpSoapFaultException(response);
 			if (xmlResponse)
-			    context.setXmlVar(resultVar, response.getResponseXml(context.getCallContext().getDocument()));
+			    context.setXmlVar(resultVar, response.getResponseXml(context.getDocument()));
 			else
 				context.setTextVar(resultVar, response.getResponseString());
 		}

@@ -29,20 +29,21 @@ import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;
+import com.eibus.soap.SOAPTransaction;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
 public class RelayTransaction implements ApplicationTransaction
 {
-	private final CallContext ctxt;
 	private final Props props;
-	
-	public RelayTransaction(CallContext ctxt) {
-		this.ctxt=ctxt;
-		this.props=ctxt.getProps();
+	private final ExecutionContext context;
+
+	public RelayTransaction(RelayConnector connector, String fullMethodName, Props props, SOAPTransaction transaction) {
+    	context=new ExecutionContext(connector, fullMethodName, props, transaction);
+		this.props=props;
 	}
 
-    public boolean canProcess(String callType) {
+	public boolean canProcess(String callType) {
     	if ("RelayCall".equals(callType))
     		return true;
     	else
@@ -58,15 +59,14 @@ public class RelayTransaction implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
-		ctxt.traceInfo("Received request: ",request.getXMLNode());
+    	context.setCallDetails(request, response);
 		int impl = request.getMethodDefinition().getImplementation();
-		ExecutionContext context=null;
 		String result="ERROR ";
     	try {
         	Script script=compileScript(impl);
-        	context=new ExecutionContext(ctxt, request, response);
+    		context.traceInfo("Received request: ",request.getXMLNode());
     		script.executeStep(context);
-   			ctxt.traceInfo("Replied with response: ", response.getXMLNode());
+   			context.traceInfo("Replied with response: ", response.getXMLNode());
         	result="SUCCESS ";
     	}
     	catch (RelayedSoapFaultException e) {
@@ -87,10 +87,10 @@ public class RelayTransaction implements ApplicationTransaction
     		createErrorDetails(details, e);
     	}
     	finally {
-   			ctxt.destroy();
+   			context.destroy();
     	}
-		if (ctxt.getTimer()!=null)
-			ctxt.getTimer().log(" finished "+result+ctxt.getFullMethodName());
+		if (context.getTimer()!=null)
+			context.getTimer().log(" finished "+result+context.getFullMethodName());
 		int sleep=RelaySettings.sleepAfterCall.get(props);
 		if (sleep>0) {
 			RelayTrace.logger.log(Severity.WARN, "Sleeping for "+sleep+" seconds");
@@ -105,12 +105,12 @@ public class RelayTransaction implements ApplicationTransaction
 		String msg=e.getMessage();
 		boolean trace=RelaySettings.trace.get(props);
 		if (trace && RelaySettings.logTrace.get(props))
-			msg+="\n"+ctxt.getTraceAsString(props);
+			msg+="\n"+context.getTraceAsString(props);
 		RelayTrace.logger.log(Severity.ERROR, msg, e);
 		if (RelaySettings.showStacktrace.get(props))
 			Node.createTextElement("stacktrace", getStackTraceAsString(e), details);
 		if (trace && RelaySettings.showTrace.get(props))
-			ctxt.addToNode(Node.createElement("trace", details), props);
+			context.addToNode(Node.createElement("trace", details), props);
 		return details;
 	}
 
@@ -121,11 +121,11 @@ public class RelayTransaction implements ApplicationTransaction
 	}
 
 	private Script compileScript(int node) {
-		Script script=RelayModule.scriptCache.get(ctxt.getFullMethodName());
+		Script script=RelayModule.scriptCache.get(context.getFullMethodName());
 		if (script==null) {
 			script=new Script(node, props);
 			if (RelaySettings.cacheScripts.get(props))
-				RelayModule.scriptCache.put(ctxt.getFullMethodName(), script);
+				RelayModule.scriptCache.put(context.getFullMethodName(), script);
 		}
 		return script;
 	}

@@ -57,7 +57,7 @@ public class HttpCallbackStep extends HttpBase2 implements Step {
 				method=createPostMethod(url, bodyNode);
 			HttpResponse response=httpCall(method, null);
 			int cordysResponse=context.getXmlVar("output");
-			httpResponse = response.getResponseXml(context.getCallContext().getDocument());
+			httpResponse = response.getResponseXml(context.getDocument());
 			if (response.getCode()>=300) {
 				if (httpResponse==0 || ! SoapUtil.isSoapFault(httpResponse))
 					throw new HttpSoapFaultException(response);

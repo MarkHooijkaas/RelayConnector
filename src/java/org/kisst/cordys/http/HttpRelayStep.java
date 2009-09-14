@@ -60,7 +60,7 @@ public class HttpRelayStep extends HttpBase2 implements Step {
 				wsaTransform(context, bodyNode);
 			HttpResponse response=call(context, bodyNode);
 			int cordysResponse=context.getXmlVar("output");
-			httpResponse = response.getResponseXml(context.getCallContext().getDocument());
+			httpResponse = response.getResponseXml(context.getDocument());
 			if (response.getCode()>=300) {
 				if (httpResponse==0 || ! SoapUtil.isSoapFault(httpResponse))
 					throw new HttpSoapFaultException(response);

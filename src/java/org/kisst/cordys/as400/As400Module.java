@@ -115,13 +115,13 @@ public class As400Module implements Module {
 		// because one Execution context, will only be used in one thread
 		// (except fo asynchronous callbacks)
 		final String key="_as400connection";
-		As400Connection conn= (As400Connection) context.getCallContext().getObject(key);
+		As400Connection conn= (As400Connection) context.getObject(key);
 		if (conn!=null)
 			return conn;
 		As400ConnectionPool pool = pools.get("TODO");
 		conn=pool.borrowConnection(30000);
-		context.getCallContext().destroyWhenDone(new BorrowedAs400Connection(pool, conn));
-		context.getCallContext().setObject(key, conn);
+		context.destroyWhenDone(new BorrowedAs400Connection(pool, conn));
+		context.setObject(key, conn);
 		return conn;
 	}
 }

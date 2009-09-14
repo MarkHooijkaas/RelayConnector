@@ -101,8 +101,7 @@ public class RelayConnector extends ApplicationConnector {
     	int env=stTransaction.getRequestEnvelope();
     	int req=SoapUtil.getContent(env);
     	String fullMethodName=NomUtil.getUniversalName(req);
-    	CallContext ctxt=new CallContext(this, fullMethodName, mlprops.getProps(fullMethodName), stTransaction);
-		return new RelayTransaction(ctxt);
+		return new RelayTransaction(this, fullMethodName, mlprops.getProps(fullMethodName), stTransaction);
 	}
 
     @Override

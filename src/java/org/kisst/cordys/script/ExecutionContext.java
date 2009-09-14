@@ -31,11 +31,12 @@ import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.connector.nom.SOAPMessageListener;
 import com.eibus.soap.BodyBlock;
+import com.eibus.soap.SOAPTransaction;
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
-public class ExecutionContext {
+public class ExecutionContext extends CallContext {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(ExecutionContext.class);
 	
 	private static class XmlVar {
@@ -52,15 +53,11 @@ public class ExecutionContext {
 
 	private final HashMap<String,TextVar> textvars = new HashMap<String,TextVar>();
 	private final HashMap<String,XmlVar>  xmlvars  = new HashMap<String,XmlVar>();
-	private final CallContext ctxt;
-	protected final BodyBlock request;
-	protected final BodyBlock response;
 
-	public ExecutionContext(CallContext ctxt, BodyBlock request, BodyBlock response) {
-		this.ctxt=ctxt;
-		this.request=request;
-		this.response=response;
-		
+	public ExecutionContext(RelayConnector connector, String fullMethodName, Props props, SOAPTransaction transaction) {
+    	super(connector, fullMethodName, props, transaction);
+    }
+	public void setCallDetails(BodyBlock request, BodyBlock response) {
     	int inputNode = request.getXMLNode();
 		int outputNode = response.getXMLNode();
 		setXmlVar("input", inputNode);
@@ -69,13 +66,7 @@ public class ExecutionContext {
 		String inputPrefix= Node.getPrefix(inputNode);
 		if (inputPrefix!=null)
 			Node.setName(outputNode, inputPrefix+":"+Node.getLocalName(outputNode));
-    }
-
-	public CallContext getCallContext() { return ctxt; }
-	public BodyBlock   getRequest() { return request; }
-	public BodyBlock   getResponse() { return response; }
-	public Props getProps() { return ctxt.getProps(); }
-	public RelayConnector getRelayConnector() { return ctxt.getRelayConnector(); }
+	}
 
 	synchronized public void createXmlSlot(String name, String method, long timeoutTime) {
 		xmlvars.put(name, new XmlVar(method, timeoutTime));
@@ -86,13 +77,13 @@ public class ExecutionContext {
 	}
 
 	synchronized public void setTextVar(String name, String value) {
-		if (ctxt.allreadyDestroyed())
+		if (allreadyDestroyed())
 			logger.log(Severity.WARN, "Trying to set text var ["+name+"] on allready destroyed context to value ["+value+"]");
 		textvars.put(name, new TextVar(value));
 	}
 
 	synchronized public String getTextVar(String name) {
-		ctxt.checkForException();
+		checkForException();
 		TextVar v = textvars.get(name);
 		if (v==null)
 			throw new RuntimeException("Unknown TextVar "+name);
@@ -101,9 +92,9 @@ public class ExecutionContext {
 
 	synchronized public int getXmlVar(String name) {
 		while (true) {
-			if (ctxt.allreadyDestroyed())
+			if (allreadyDestroyed())
 				throw new RuntimeException("Trying to get xml var ["+name+"] from allready destroyed context");
-			ctxt.checkForException(); 
+			checkForException(); 
 			XmlVar xmlvar=xmlvars.get(name);
 			if (xmlvar==null)
 				throw new RuntimeException("Unknown xml variable "+name);
@@ -128,28 +119,22 @@ public class ExecutionContext {
 	
 	@SuppressWarnings("deprecation")
 	public void callMethodAsync(int method, final String resultVar) {
-		ctxt.traceInfo("sending request: ",method);
+		traceInfo("sending request: ",method);
 		String methodName=Node.getLocalName(method);
-		MethodCache caller = ctxt.getRelayConnector().responseCache;
-		createXmlSlot(resultVar, methodName, new Date().getTime()+RelaySettings.timeout.get(ctxt.getProps()));
+		MethodCache caller = getRelayConnector().responseCache;
+		createXmlSlot(resultVar, methodName, new Date().getTime()+RelaySettings.timeout.get(getProps()));
 		caller.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {
 			public boolean onReceive(int message)
 			{
 				try {
-					ctxt.checkAndLogResponse(message, resultVar);
+					checkAndLogResponse(message, resultVar);
 					setXmlVar(resultVar, SoapUtil.getContent(message));
 				}
 				catch(Exception e) {
-					ctxt.setAsynchronousError(e);
+					setAsynchronousError(e);
 				}
 				return false; // Node should not yet be destroyed by Callback caller!!
 			}
 		});
 	}
-	
-	public void traceInfo(String msg)  { ctxt.traceInfo(msg);	}
-	public void traceDebug(String msg) { ctxt.traceDebug(msg);	}
-	public boolean debugTraceEnabled() { return ctxt.debugTraceEnabled();	}
-	public boolean infoTraceEnabled()  { return ctxt.infoTraceEnabled();	}
-
 }
