@@ -31,7 +31,7 @@ public class TextToXsdBoolean  implements Convertor {
 	}
 	
 	public String convert(String str) {
-		str=str.toLowerCase().trim();
+		str=str.trim();
 		if (str.equals(trueText))
 			return "true";
 		if (str.equals(falseText))
