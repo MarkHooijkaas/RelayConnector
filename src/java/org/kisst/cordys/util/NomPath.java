@@ -36,6 +36,9 @@ public class NomPath {
 		boolean singlestar=false;
 		boolean isLast=false;
 		boolean isDot=false;
+		boolean isLocalname=false;
+		boolean isName=false;
+		boolean isNamespace=false;
 		boolean searchLast=false;
 		boolean searchFirst=false;
 		String name;
@@ -109,6 +112,27 @@ public class NomPath {
 					nodeResult=false;
 					continue;
 				}
+				if ("name()".equals(e)) {
+					if (! parts[i].isLast)
+						throw new RuntimeException("name() should be last element in path "+original);
+					parts[i].isName=true;
+					nodeResult=false;
+					continue;
+				}
+				if ("localname()".equals(e)) {
+					if (! parts[i].isLast)
+						throw new RuntimeException("localname() should be last element in path "+original);
+					parts[i].isLocalname=true;
+					nodeResult=false;
+					continue;
+				}
+				if ("namespace()".equals(e)) {
+					if (! parts[i].isLast)
+						throw new RuntimeException("namespace() should be last element in path "+original);
+					parts[i].isNamespace=true;
+					nodeResult=false;
+					continue;
+				}
 				if (e.startsWith("@")) {
 					if (! parts[i].isLast)
 						throw new RuntimeException("Attribute @ should be last element in path "+original);
@@ -141,6 +165,12 @@ public class NomPath {
 		Part last=parts[parts.length-1];
 		if (last.isAttribute)
 			return Node.getAttribute(node, last.name);
+		if (last.isName)
+			return Node.getName(node);
+		if (last.isNamespace)
+			return Node.getNamespaceURI(node);
+		if (last.isLocalname)
+			return Node.getLocalName(node);
 		return Node.getData(node);
 	}
 
@@ -167,7 +197,7 @@ public class NomPath {
 			}
 			else if (part.isParent)
 				node=Node.getParent(node);
-			else if (part.isAttribute || part.isText) {
+			else if (part.isAttribute || part.isText || part.isName || part.isNamespace || part.isLocalname) {
 				// skip for an attribute or text node: should only happen for final node
 			}
 			else {
