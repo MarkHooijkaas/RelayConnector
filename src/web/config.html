@@ -1,103 +1,54 @@
 <html xmlns:eibus onapplicationready="initialize()">
-    <head>
-        <link href="/cordys/wcp/style/behaviors.css" rel="stylesheet"></link>
-        <title>@PROJECT@ Configuration</title>
-    </head>
-    <script	src="/cordys/wcp/admin/behavior/applicationconnector.js"></script>
-    <script language="JScript">
-        /**
-         * This method creates the needed configuration for the connector
-         *
-         * @param xmlConfig The configuration-XML.
-		 *
-		 * @return true if the checks were successfull and the configuration is finished.
-		 *         false if the user still has to fill the mandatory fields.
-         */
-        function createConnectorConfiguration(xmlConfig)
-        {
-            var bReturn = true;
-            var xmlDoc = xmlConfig.ownerDocument;
-            var nConfig = xmlDoc.createElement("Configuration");
-            xmlConfig.appendChild(nConfig);
-            
-			if (bReturn == true)
-			{
-				bReturn = createXML(txtConfigLocation
-									, "Specify the config file location."
-									, nConfig
-									, "ConfigLocation");
-			}	
+<head>
+	<script src="/cordys/wcp/application.js"></script>
+	<style>
+		input{font-size:11; font-family:verdana; width=100% }
+		label{font-size:11; font-family:verdana;}
+	</style>
+</head>
+<script src="/cordys/wcp/admin/behavior/applicationconnector.js"></script>	
+<script>
+function createConnectorConfiguration(cfg) {
+	cfg.appendChild(cfg.ownerDocument.createElement("ConfigLocation")).text = ConfigLocationField.value;
+	return true;
+}
 
-            return bReturn;
-        }//createConnectorConfiguration
-        
-        /**
-         * This method fills the inputfields based on the XML.
-         *
-         * @param xmlConfig The configuration-XML.
-         */
-        function fillInPropertyScreen(xmlConfig)
-        {
-			fillFromXML(xmlConfig, "ConfigLocation", txtConfigLocation, "");
-        }
-        
-        /**
-		 * This method fills htmlInput's value with the data of sTagName. If sTagName could
-		 * not be found htmlInput's value is set to sDefaultValue.
-		 *
-		 * @param xmlConfig The configuration XML.
-		 * @param sTagName The name of the child tag.
-		 * @param htmlInput The HTML object.
-		 * @param sDefaultValue The value to set if sTagName was not found.
-		 */
-		function fillFromXML(xmlConfig, sTagName, htmlInput, sDefaultValue)
-		{
-			var nNode = xmlConfig.selectSingleNode(".//" + sTagName);
-	        if (nNode != null)
-	        {
-	            htmlInput.value = nNode.text;
-	        }
-	        else
-	        {
-	            htmlInput.value = sDefaultValue;
-	        }
-		}
-		
-		/**
-		 * This method creates the XML for a certain field.
-		 *
-		 * @param htmlInput The HTML object to validate.
-		 * @param sAlertMissing The message to display if the field is not filled.
-		 * @param nConfig The node to append the child to.
-		 * @param sTagname The name of the child tag to create.
-		 *
-		 * @return true if everything went ok. Otherwise false.
-		 */
-		function createXML(htmlInput, sAlertMissing, nConfig, sTagname)
-		{
-			var bReturn = true;
-			var xmlDoc = nConfig.ownerDocument;
-            nNode = xmlDoc.createElement(sTagname);
-            nNode.text = htmlInput.value;
-            nConfig.appendChild(nNode);
-			return bReturn;
-		}
-    </script>
-    <body>
-        <table width="100%" style="border: 1px solid black;" cellspacing="0" cellpadding="5">
-            <tr class="medium">
-                <td colspan="2" align="center">
-                    <STRONG>@PROJECT@ Details</STRONG>
-                </td>
-            </tr>
-            <tr>
-                <td width="50%" align="right">
-                    Config file location:
-                </td>
-                <td  align="left">
-                    <input type="text" style="width:300px" id="txtConfigLocation" class="input"  value="D:/config/@PROJECT@.properties"/>
-                </td>
-            </tr>
-		</table>
-    </body>
+function fillInPropertyScreen(cfg) {
+	ConfigLocationField.value = cfg.selectSingleNode(".//ConfigLocation").text;
+}
+</script>
+
+<body leftmargin="20">
+	<br/>
+	<table width="100%" style="border: 1px solid black;" cellspacing="0" cellpadding="5">
+		<tr class="medium">
+			<td colspan="2" align="center"><STRONG>@PROJECT@ Details</STRONG></td>
+		</tr>
+		<tr>
+			<td width="150px" align="right">Config file location:</td>
+			<td align="left"><input type="text" style="width:100%" title="The configuration file" id="ConfigLocationField" class="input"  value="D:/config/@PROJECT@.properties"/></td>
+		</tr>
+	</table>
+	<br>
+	<p>
+	Examples for windows systems:
+	<ul>
+	  <li>D:/config/@PROJECT@.properties
+	  <li>xmlstore:administrator@/config/@PROJECT@.properties
+	  <li>xmlstore:cn=administrator,cn=organizational users,o=system,cn=cordys,o=kisst.org@/config/@PROJECT@.properties
+	</ul>
+	Examples for Linux systems:
+	<ul>
+	  <li>/opt/config/@PROJECT@.properties
+	  <li>xmlstore:root@/config/@PROJECT@.properties
+	  <li>xmlstore:cn=root,cn=organizational users,o=system,cn=cordys,o=kisst.org@/config/@PROJECT@.properties
+	</ul>
+	When referring to the XMLStore, a special xmlstore url is used.
+	In this syntax the user before the @ sign will be used to retrieve the data from the XMLStore.
+	This must be a user that has the authorization to retrieve objects from the XMLStore.
+	The examples with the administrator or root user, are often a good choice, if this user exists.
+	<p>
+	In the short format the user with that name from the organization of the SOAP processor will be used.
+	Instead one may also user the LDAP dn of a user from a different organization (the third example).
+</body>
 </html>
