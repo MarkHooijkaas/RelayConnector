@@ -42,6 +42,8 @@ public class HttpBase {
     	// TODO: better way to clear all. This will not affect active connections
     	client.getHttpConnectionManager().closeIdleConnections(0);
     	client.getParams().setAuthenticationPreemptive(true);
+    	client.getHttpConnectionManager().getParams().setDefaultMaxConnectionsPerHost(100); // TODO: make configurable
+    	client.getHttpConnectionManager().getParams().setMaxTotalConnections(100); // TODO: make configurable
     }
 	
     private final XmlExpression body;

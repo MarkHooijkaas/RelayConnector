@@ -40,6 +40,7 @@ public class HttpModule implements Module {
 	}
 
 	public void reset(Props  props) {
+		HttpBase.reset();
     	//settings=new MultiLevelSettings<HttpSettings>(mlprops,"http", HttpSettings.class);
 	}
 
