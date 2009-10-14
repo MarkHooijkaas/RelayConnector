@@ -40,6 +40,7 @@ public class RelaySettings {
 	public final static BooleanSetting showTrace=new BooleanSetting(relay, "showTrace",false);
 	public final static BooleanSetting showStacktrace=new BooleanSetting(relay, "showStacktrace",false);
 	public final static BooleanSetting traceShowEnvelope=new BooleanSetting(relay, "traceShowEnvelope",false);
+	public final static BooleanSetting logRequestOnError=new BooleanSetting(relay, "logRequestOnError",true);
 
 	public final static BooleanSetting timer=new BooleanSetting(relay, "timer",false);
 

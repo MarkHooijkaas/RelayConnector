@@ -64,9 +64,19 @@ public class RelayTransaction implements ApplicationTransaction
 		String result="ERROR ";
     	try {
         	Script script=compileScript(impl);
-    		context.traceInfo("Received request: ",request.getXMLNode());
+        	if (context.infoTraceEnabled()) {
+        		int reqnode=request.getXMLNode();
+        		if (RelaySettings.traceShowEnvelope.get(props))
+        			reqnode=NomUtil.getRootNode(reqnode);
+        		context.traceInfo("Received request: ",reqnode);
+        	}
     		script.executeStep(context);
-   			context.traceInfo("Replied with response: ", response.getXMLNode());
+        	if (context.infoTraceEnabled()) {
+        		int respnode=response.getXMLNode();
+        		if (RelaySettings.traceShowEnvelope.get(props))
+        			respnode=NomUtil.getRootNode(respnode);
+        		context.traceInfo("Replied with response: ", respnode);
+        	}
         	result="SUCCESS ";
     	}
     	catch (RelayedSoapFaultException e) {
@@ -76,15 +86,15 @@ public class RelayTransaction implements ApplicationTransaction
     		e.createResponse(response);
     	}
     	catch (SoapFaultException e) {
-    		int details=response.createSOAPFault(e.getFaultcode(), e.getFaultstring());
-    		createErrorDetails(details, e);
-   			e.fillDetails(details);
+    		int soapfault=response.createSOAPFault(e.getFaultcode(), e.getFaultstring());
+    		createErrorDetails(soapfault, context, e);
+   			e.fillDetails(soapfault);
     	}
     	catch (Throwable e) { //catch Throwable to also catch NoClassDefError
     		String prefix=RelaySettings.soapFaultcodePrefix.get(props);
     		NomUtil.deleteChildren(response.getXMLNode());// TODO: is this still necessary in C3?
-    		int details=response.createSOAPFault(prefix+e.getClass().getSimpleName(), e.getMessage());
-    		createErrorDetails(details, e);
+    		int soapfault=response.createSOAPFault(prefix+e.getClass().getSimpleName(), e.getMessage());
+    		createErrorDetails(soapfault, context, e);
     	}
     	finally {
    			context.destroy();
@@ -101,8 +111,13 @@ public class RelayTransaction implements ApplicationTransaction
 		return true; // connector has to send the response
     }
 
-	private int createErrorDetails(int details, Throwable e) {
-		String msg=e.getMessage();
+	private int createErrorDetails(int details, ExecutionContext context, Throwable e) {
+		String msg=e.getMessage()+" while handling "+context.getFullMethodName();
+		if (RelaySettings.logRequestOnError.get(context.props)) {
+			int input=context.getXmlVar("input");
+			input=NomUtil.getRootNode(input);
+			msg+="\n"+Node.writeToString(input,false);
+		}
 		boolean trace=RelaySettings.trace.get(props);
 		if (trace && RelaySettings.logTrace.get(props))
 			msg+="\n"+context.getTraceAsString(props);
