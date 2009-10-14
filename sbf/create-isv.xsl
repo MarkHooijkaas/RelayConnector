@@ -81,6 +81,9 @@
                     <image>/cordys/wcp/images/admin/configurationconnector.png</image>
                     <implementation><xsl:value-of select="$CLASSFILE"/></implementation>
                     <sharejvm>true</sharejvm>
+					<startupDependency>
+				 		<namespace>http://schemas.cordys.com/1.0/xmlstore</namespace>
+					</startupDependency>
                     <spycategory />
                     <loggercategory>
                       <categorygroup displayname="RelayTrace">
