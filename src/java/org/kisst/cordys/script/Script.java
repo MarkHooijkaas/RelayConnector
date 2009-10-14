@@ -28,13 +28,17 @@ public class Script implements Step {
 	private final Step[] steps;
 	
 
+	public Script(int scriptNode, CompilationContext compiler) {
+		this.steps = new Step[Node.getNumChildren(scriptNode)];
+		compile(scriptNode, compiler);
+	}
+
 	public Script(int scriptNode, Props props) {
 		this.steps = new Step[Node.getNumChildren(scriptNode)];
-		compile(scriptNode, props);
+		compile(scriptNode, new CompilationContext(this, props));
 	}
-	
-	protected void compile(int scriptNode, Props props) {
-		CompilationContext compiler= new CompilationContext(this, props);
+
+	private void compile(int scriptNode, CompilationContext compiler) {
 		int i=0;
     	int node = Node.getFirstChild(scriptNode);
     	while (node != 0) {
@@ -65,4 +69,3 @@ public class Script implements Step {
 		}
 	}
 }
-

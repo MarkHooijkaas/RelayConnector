@@ -37,7 +37,7 @@ public class SwitchStep implements Step {
     			value=null;
     		else
     			value=Node.getAttribute(node, "value");
-    		script=new Script(node, compiler.getProps());
+    		script=new Script(node, compiler);
     	}
     	private boolean evaluate(final ExecutionContext context, String casevalue) {
     		if (value!=null && ! value.equals(casevalue)) {
