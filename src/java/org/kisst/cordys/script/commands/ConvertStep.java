@@ -20,7 +20,6 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cordys.script.commands;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.kisst.cordys.script.CompilationContext;
@@ -48,20 +47,14 @@ public class ConvertStep implements Step {
 		else {
 			if (classname.indexOf('.')<0)
 				classname="org.kisst.cordys.util.convert."+classname;
-			try {
-				Class cls = Class.forName(classname);
-				Constructor cons = ReflectionUtil.getConstructor(cls, new Class[] {int.class});
-				if (cons != null )
-					convertor = (Convertor) cons.newInstance(new Object[] {node});
-				else if (ReflectionUtil.getConstructor(cls, new Class[] {})!=null) // has default constructor
-					convertor = (Convertor) cls.newInstance();
-				else
-					throw new RuntimeException("No default or (int) constructor for class "+classname);
-			}
-			catch (InstantiationException e) { throw new RuntimeException(e); }
-			catch (IllegalAccessException e) { throw new RuntimeException(e); }
-			catch (ClassNotFoundException e) { throw new RuntimeException(e); }
-			catch (InvocationTargetException e) { throw new RuntimeException(e); }
+			Class cls = ReflectionUtil.findClass(classname);
+			Constructor cons = ReflectionUtil.getConstructor(cls, new Class[] {int.class});
+			if (cons != null )
+				convertor = (Convertor) ReflectionUtil.createObject(cons,new Object[] {node});
+			else if (ReflectionUtil.getConstructor(cls, new Class[] {})!=null) // has default constructor
+				convertor = (Convertor) ReflectionUtil.createObject(cls);
+			else
+				throw new RuntimeException("No default or (int) constructor for class "+classname);
 		}
 	}
 
