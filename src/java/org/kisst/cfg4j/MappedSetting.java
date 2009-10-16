@@ -52,4 +52,6 @@ public class MappedSetting<T extends Setting> extends CompositeSetting {
 		}
 		return  result;
 	}
+	
+	public void reset() { items.clear(); }
 }
