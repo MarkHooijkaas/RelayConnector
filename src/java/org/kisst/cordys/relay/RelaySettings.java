@@ -22,7 +22,9 @@ package org.kisst.cordys.relay;
 import org.kisst.cfg4j.BooleanSetting;
 import org.kisst.cfg4j.CompositeSetting;
 import org.kisst.cfg4j.IntSetting;
+import org.kisst.cfg4j.MappedSetting;
 import org.kisst.cfg4j.StringSetting;
+import org.kisst.cordys.relay.resourcepool.ResourcePoolSettings;
 import org.kisst.cordys.util.SeveritySetting;
 
 import com.eibus.util.logger.Severity;
@@ -45,4 +47,8 @@ public class RelaySettings {
 	public final static BooleanSetting timer=new BooleanSetting(relay, "timer",false);
 
 	public final static IntSetting sleepAfterCall=new IntSetting(relay, "sleepAfterCall",0);
+	
+	public final static MappedSetting<ResourcePoolSettings> resourcepool=
+		new MappedSetting<ResourcePoolSettings>(relay, "resourcepool", ResourcePoolSettings.class);;
+
 }

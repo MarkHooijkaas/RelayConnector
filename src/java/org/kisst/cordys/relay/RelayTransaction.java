@@ -63,6 +63,9 @@ public class RelayTransaction implements ApplicationTransaction
 		int impl = request.getMethodDefinition().getImplementation();
 		String result="ERROR ";
     	try {
+    		String pool= RelaySettings.resourcepool.get(props);
+    		if (pool!=null)
+    			context.changeResourcePool(pool);
         	Script script=compileScript(impl);
         	if (context.infoTraceEnabled()) {
         		int reqnode=request.getXMLNode();

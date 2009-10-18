@@ -24,9 +24,12 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.kisst.cfg4j.MultiLevelProps;
 import org.kisst.cfg4j.Props;
+import org.kisst.cordys.relay.resourcepool.ResourcePool;
+import org.kisst.cordys.relay.resourcepool.ResourcePoolSettings;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
@@ -52,6 +55,7 @@ public class RelayConnector extends ApplicationConnector {
 	private ArrayList<Module> modules=new ArrayList<Module>();
 	public final MethodCache responseCache=new MethodCache();
 	protected MultiLevelProps mlprops;
+	private HashMap<String,ResourcePool> resourcePoolMap=new HashMap<String,ResourcePool>();
 	
     /**
      * This method gets called when the processor is started. It reads the
@@ -210,4 +214,18 @@ public class RelayConnector extends ApplicationConnector {
 	}
 
 	public Props getGlobalProps() {	return mlprops.getGlobalProps();	}
+
+	public ResourcePool getResourcePool(String poolName) {
+		if (poolName==null)
+			return null;
+		synchronized(resourcePoolMap) {
+			ResourcePool result=resourcePoolMap.get(poolName);
+			if (result!=null)
+				return result;
+			ResourcePoolSettings settings=RelaySettings.resourcepool.get(poolName);
+			ResourcePool pool=settings.create(getGlobalProps());
+			resourcePoolMap.put(poolName,pool);
+			return pool;
+		}		
+	}
 }

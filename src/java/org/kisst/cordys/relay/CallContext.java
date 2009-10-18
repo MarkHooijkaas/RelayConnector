@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.kisst.cfg4j.Props;
+import org.kisst.cordys.relay.resourcepool.ResourcePool;
 import org.kisst.cordys.util.Destroyable;
 import org.kisst.cordys.util.NomNode;
 import org.kisst.cordys.util.SoapUtil;
@@ -45,7 +46,8 @@ public class CallContext extends RelayTrace {
 	protected final Props props;
 	protected final RelayTimer timer;
 	private final SOAPTransaction soapTransaction;
-
+	private ResourcePool resourcepool=null;
+	
 	private final HashMap<String,Object> objects=new HashMap<String,Object>();
 
 	public RelayConnector getRelayConnector() {	return relayConnector; }
@@ -84,11 +86,24 @@ public class CallContext extends RelayTrace {
 	public void destroyWhenDone(int node) { destroyWhenDone(new NomNode(node));	}
 
 	synchronized public void destroy() {
+		changeResourcePool((ResourcePool) null);
 		if (allreadyDestroyed)
 			throw new RuntimeException("Trying to destroy allready destroyed context");
 		allreadyDestroyed=true;
 		for(Destroyable d:destroyables)
 			d.destroy();
+	}
+
+	public synchronized void changeResourcePool(String poolName) {
+		ResourcePool pool =	relayConnector.getResourcePool(poolName);
+		changeResourcePool(pool);
+	}
+	public synchronized void changeResourcePool(ResourcePool pool) {
+		if (resourcepool!=null)
+			resourcepool.remove(this);
+		resourcepool=pool;
+		if (resourcepool!=null)
+			resourcepool.add(this);
 	}
 
 
