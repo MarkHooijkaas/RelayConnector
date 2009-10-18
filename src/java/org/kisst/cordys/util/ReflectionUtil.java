@@ -45,11 +45,19 @@ public class ReflectionUtil {
 			return m.invoke(o, args);
 		}
 		catch (NoSuchMethodException e) { throw new RuntimeException(e); }
-		catch (IllegalArgumentException e) { throw new RuntimeException(e); }
 		catch (IllegalAccessException e) { throw new RuntimeException(e); }
 		catch (InvocationTargetException e) {throw new RuntimeException(e); }
 	}
 
+	public static Object invoke(Object o, Method meth, Object[] args) {
+		try {
+			meth.setAccessible(true);
+			return meth.invoke(o, args);
+		}
+		catch (IllegalAccessException e) { throw new RuntimeException(e); }
+		catch (InvocationTargetException e) {throw new RuntimeException(e); }
+	}
+	
 	private static Class[] getSignature(Object[] args) {
 		Class[] signature=new Class[args.length];
 		for (int i=0; i<args.length; i++)
@@ -61,7 +69,6 @@ public class ReflectionUtil {
 		try {	
 			return Class.forName(name);
 		}
-		catch (IllegalArgumentException e) { throw new RuntimeException(e); }
 		catch (ClassNotFoundException e) { throw new RuntimeException(e); }
 	}
 
@@ -73,14 +80,12 @@ public class ReflectionUtil {
 			Constructor cons= c.getConstructor(getSignature(args));
 			return createObject(cons,args);
 		}
-		catch (IllegalArgumentException e) { throw new RuntimeException(e); }
 		catch (NoSuchMethodException e) { throw new RuntimeException(e); } 
 	}
 	public static Object createObject(Constructor cons, Object[] args) {
 		try {
 			return cons.newInstance(args);
 		}
-		catch (IllegalArgumentException e) { throw new RuntimeException(e); }
 		catch (IllegalAccessException e) { throw new RuntimeException(e); } 
 		catch (InstantiationException e) { throw new RuntimeException(e); }
 		catch (InvocationTargetException e) { throw new RuntimeException(e); }
@@ -93,7 +98,6 @@ public class ReflectionUtil {
 		try {
 			return c.newInstance();
 		}
-		catch (IllegalArgumentException e) { throw new RuntimeException(e); }
 		catch (IllegalAccessException e) { throw new RuntimeException(e); } 
 		catch (InstantiationException e) { throw new RuntimeException(e); }
 	}

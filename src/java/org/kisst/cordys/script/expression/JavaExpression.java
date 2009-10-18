@@ -19,12 +19,12 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.script.expression;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
+import org.kisst.cordys.util.ReflectionUtil;
 
 public class JavaExpression implements Expression {
 	private final Method method;
@@ -74,15 +74,7 @@ public class JavaExpression implements Expression {
 		Object args[]=new Object[paramExpressions.length];
 		for (int i=0; i<args.length; i++)
 			args[i]=paramExpressions[i].getString(context);
-		Object result;
-		try {
-			result = method.invoke(null, args);
-		}
-		catch (IllegalArgumentException e) { throw new RuntimeException("invocation error ",e); }
-		catch (IllegalAccessException e) { throw new RuntimeException("invocation error ",e); }
-		catch (InvocationTargetException e) { throw new RuntimeException("invocation error ",e); }
-		
-		return (String) result;
+		return (String) ReflectionUtil.invoke(null, method, args);
 	}
 
 }
