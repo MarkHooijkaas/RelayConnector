@@ -47,7 +47,7 @@ public class Setting {
   public CompositeSetting getParent() { return parent; }
   
   public boolean exists(Props props) {
-	  return props.get(fullName)!=null;
+	  return props.get(fullName,null)!=null;
   }
   //public boolean ok() { return ! this.required; }
 
