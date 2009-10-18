@@ -29,14 +29,20 @@ public class MappedSetting<T extends Setting> extends CompositeSetting {
 	// TODO: This is a cache, but it is reset-proof
 	private final HashMap<String,T> items=new HashMap<String,T>();
 	private final Constructor constructor;
+	private final String defaultValue;
 	
-	public MappedSetting(CompositeSetting parent, String name, Class<?> clazz) { 
+	public MappedSetting(CompositeSetting parent, String name, Class<?> clazz) {
+		this(parent, name, clazz, null);
+	}
+	public MappedSetting(CompositeSetting parent, String name, Class<?> clazz, String defaultValue) { 
 		super(parent, name);
 		try {
 			constructor=clazz.getConstructor(new Class[] {CompositeSetting.class, String.class});
 		} catch (NoSuchMethodException e) { throw new RuntimeException(e); }
+		this.defaultValue=defaultValue;
 	}
 
+	public String get(Props props) { return props.getString(fullName, defaultValue);  }
 
 	@SuppressWarnings("unchecked")
 	public T get(String name) {
