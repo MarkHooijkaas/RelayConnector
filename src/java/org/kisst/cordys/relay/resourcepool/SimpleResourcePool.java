@@ -32,9 +32,9 @@ public class SimpleResourcePool implements ResourcePool {
 		this.max=max;
 	}
 	public synchronized void add(CallContext ctxt) {
-		if (count>=max)
-			throw new RuntimeException("ResourcePool "+name+" already contains "+count+" calls, aborting new call");
-		count++;
+		count++; // count isincreased here, because the remove method will be called even if exception is thrown
+		if (count>max)
+			throw new RuntimeException("ResourcePool "+name+" already contains "+max+" calls, aborting new call");
 	}
 	public synchronized void remove(CallContext ctxt) {
 		count--;

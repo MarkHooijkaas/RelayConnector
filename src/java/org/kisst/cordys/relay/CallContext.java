@@ -99,9 +99,9 @@ public class CallContext extends RelayTrace {
 		changeResourcePool(pool);
 	}
 	public synchronized void changeResourcePool(ResourcePool pool) {
-		if (resourcepool!=null)
-			resourcepool.remove(this);
-		resourcepool=pool;
+		if (this.resourcepool!=null)
+			this.resourcepool.remove(this);
+		this.resourcepool=pool;
 		if (resourcepool!=null)
 			resourcepool.add(this);
 	}
