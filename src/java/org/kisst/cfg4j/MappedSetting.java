@@ -20,8 +20,9 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cfg4j;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+
+import org.kisst.cordys.util.ReflectionUtil;
 
 
 public class MappedSetting<T extends Setting> extends CompositeSetting {
@@ -41,13 +42,7 @@ public class MappedSetting<T extends Setting> extends CompositeSetting {
 	public T get(String name) {
 		T result=items.get(name);
 		if (result==null) {
-			try {
-				result= (T) constructor.newInstance(new Object[] {this, name});
-			}
-			catch (IllegalArgumentException e) { throw new RuntimeException(e); }
-			catch (InstantiationException e) { throw new RuntimeException(e); }
-			catch (IllegalAccessException e) { throw new RuntimeException(e); }
-			catch (InvocationTargetException e) { throw new RuntimeException(e); }
+			result= (T) ReflectionUtil.createObject(constructor, new Object[] {this, name});
 			items.put(name, result);
 		}
 		return  result;
