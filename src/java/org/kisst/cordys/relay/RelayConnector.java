@@ -145,7 +145,9 @@ public class RelayConnector extends ApplicationConnector {
 
 		if (!Node.getLocalName(configNode).equals("configuration"))
 			throw new RuntimeException("Root-tag of the configuration should be <configuration>");
-		configNode=NomUtil.getElementByLocalName(configNode, "Configuration");
+		int tmp=NomUtil.getElementByLocalName(configNode, "Configuration");
+		if (tmp!=0)
+			configNode=tmp;
 		configLocation = Node.getData(NomUtil.getElementByLocalName(configNode,"ConfigLocation")); 
 	}
 
