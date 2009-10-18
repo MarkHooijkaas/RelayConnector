@@ -145,6 +145,10 @@ public class RelayConnector extends ApplicationConnector {
 
 		if (!Node.getLocalName(configNode).equals("configuration"))
 			throw new RuntimeException("Root-tag of the configuration should be <configuration>");
+		// The old config.html stored the items under a Configuration node
+		// The new config.html file does nog longer do this
+		// Check if the old location is still there, for SOAP processors created with the old
+		// config.html
 		int tmp=NomUtil.getElementByLocalName(configNode, "Configuration");
 		if (tmp!=0)
 			configNode=tmp;
