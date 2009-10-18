@@ -72,6 +72,8 @@
 
 	<target name="scp-jar" depends="jar">
 		<exec executable="scp">
+			<arg value="-P"/>
+			<arg value="${cordys.scp.port}"/>
 			<arg value="${isvdir}/${distname}.jar"/>
 			<arg value="${scp-jar.dir}"/>
 		</exec>
@@ -79,6 +81,8 @@
 
 	<target name="scp-isv" depends="isv">
 		<exec executable="scp">
+			<arg value="-P"/>
+			<arg value="${cordys.scp.port}"/>
 			<arg value="${isvfile}"/>
 			<arg value="${scp-isv.dir}"/>
 		</exec>
