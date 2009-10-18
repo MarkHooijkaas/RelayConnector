@@ -20,6 +20,7 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cfg4j;
 
 
+
 public class Setting {
   protected final CompositeSetting parent;
   protected final String fullName;
@@ -41,6 +42,13 @@ public class Setting {
 	}
   }
   
+  public String getName() { return name; }
+  public String getFullName() { return fullName; }
+  public CompositeSetting getParent() { return parent; }
+  
+  public boolean exists(Props props) {
+	  return props.get(fullName)!=null;
+  }
   //public boolean ok() { return ! this.required; }
 
 
