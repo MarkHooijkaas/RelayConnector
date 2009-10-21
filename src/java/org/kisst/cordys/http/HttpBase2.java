@@ -63,7 +63,10 @@ public class HttpBase2 extends HttpBase {
 	protected PostMethod createPostMethod(ExecutionContext context, HttpState state, int bodyNode) {
 		HostSettings host=getHost(context);
 		String url=urlExpression.getString(context);
-	    PostMethod method = createPostMethod(host.url.get(props)+url, bodyNode); // TODO: handle slashes /
+		String urlstart=host.url.get(props);
+		if (urlstart==null || urlstart.trim().length()==0)
+			throw new RuntimeException("Could not find http configuration "+applicationExpression.getString(context));
+	    PostMethod method = createPostMethod(urlstart+url, bodyNode); // TODO: handle slashes /
 		for (HttpHeader h:headers) {
 	    	method.addRequestHeader(h.key, h.value.getString(context));
 		}
@@ -86,8 +89,6 @@ public class HttpBase2 extends HttpBase {
 		//connector.settings.set(connector.conf.properties);
 		String key=applicationExpression.getString(context);
 		HostSettings result = HttpSettings.host.get(key);
-		if (result==null || result.url==null)
-			throw new RuntimeException("Could not find http configuration "+key);
 		return result;
 	}	
 
