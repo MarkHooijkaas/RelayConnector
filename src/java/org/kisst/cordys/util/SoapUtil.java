@@ -86,6 +86,15 @@ public class SoapUtil {
 		return NomUtil.getElement(envelope, soapNamespace, "Body");
 	}
 
+	/** Returns the NOM node of the SOAP:Header element
+	 *  This is a helper routine that is called on the Envelope node
+	 *  
+	 * @param node the NOM node of a SOAP Envelope
+	 * @return the NOM node of the SOAP Header element, or 0 if it is not 
+	 */
+	public static int getHeader(int envelope) {
+		return NomUtil.getElement(envelope, soapNamespace, "Header");
+	}
 	/** Returns the NOM node of the first child of the SOAP:Body element
 	 *  This is a helper routine that is called on the Envelope node
 	 *  
@@ -102,28 +111,54 @@ public class SoapUtil {
 	 * The merging is a bit tricky, because of possible namespace prefix differences.
 	 */
 	public static void mergeResponses(int originalResponse, int cordysResponse) {
-		cordysResponse=Node.getParent(cordysResponse); // get Soap:Body
-		cordysResponse=Node.getParent(cordysResponse); // get Soap:Envelope
-		
-		// copy Envelope attributes
-		NomUtil.copyAttributes(originalResponse, cordysResponse);
-		// copy children (Header and Body)
-		int srcchild=Node.getFirstChild(originalResponse);
-		while (srcchild!=0) {
-			// Find the equivalent node in the cordysResponse 
-			int destchild=NomUtil.getElement(cordysResponse, Node.getNamespaceURI(srcchild), Node.getLocalName(srcchild));
-			if (destchild==0) { 
-				// Node did not exist (should not happen)
-				destchild=Node.createElement(Node.getLocalName(originalResponse), cordysResponse);
-			}
-			if (Node.getLocalName(srcchild).equals("Body"))
-				NomUtil.deleteChildren(destchild); // Body needs boilerplate response child removed
-			NomUtil.copyAttributes(srcchild, destchild);
-			Node.duplicateAndAppendToChildren(Node.getFirstChild(srcchild), Node.getLastChild(srcchild), destchild );
-			srcchild=Node.getNextSibling(srcchild);
-		}
+		originalResponse = Node.getRoot(originalResponse); // get Soap:Envelope
+		cordysResponse   = Node.getRoot(cordysResponse);   // get Soap:Envelope
+		copyHeaders(originalResponse, cordysResponse);
+		int srcbody=getBody(originalResponse);
+		int destbody=getBody(cordysResponse);
+		NomUtil.copyXmlnsAttributes(srcbody, destbody);
+		NomUtil.deleteChildren(destbody); // remove boilerplate response 
+		Node.duplicateAndAppendToChildren(Node.getFirstChild(srcbody), Node.getLastChild(srcbody), destbody );
 	}
 
+	/** 
+	 * This function copies the SOAP:Header fields from one Envelope to another.
+	 * The parameters do not need to point to the Envelope, but may point elsewhere
+	 * because this function first does a getRoot on both parameters.  
+	 */
+	public static void copyHeaders(int src, int dest) {
+		src=getHeader(Node.getRoot(src)); // get Soap:Header
+		if (src==0)
+			return; // no Header to copy
+		int destheader=getHeader(Node.getRoot(dest)); // get Soap:Header
+		if (destheader==0) {
+			dest=Node.getRoot(dest);
+			destheader=Node.createElement("Header", dest);
+			NomUtil.setNamespace(destheader, soapNamespace, "SOAP", true);
+		}
+			
+		// copy Envelope and Header attributes for xmlns definitions 
+		// C2 will not do this for you 
+		// In C3 the dupplicateAndAppend will do this for each child
+		NomUtil.copyXmlnsAttributes(Node.getRoot(src), Node.getRoot(dest));
+		NomUtil.copyXmlnsAttributes(src, dest);
+		// copy children of Header
+		int child=Node.getFirstChild(src);
+		while (child!=0) {
+			if (! isCordysHeader(child))
+				Node.duplicateAndAppendToChildren(child, child, destheader );
+			child=Node.getNextSibling(child);
+		}
+	}
+	
+	public static boolean isCordysHeader(int node) {
+		if (! "header".equals(Node.getName(node)))
+			return false;
+		String ns=Node.getNamespaceURI(node);
+		if (ns==null || ns.length()==0) // Cordys C2 did not use a namespace
+			return true;
+		return "http://schemas.cordys.com/General/1.0/".equals(ns);
+	}
 	
 	public static void wsaTransformReplyTo(int top, String replyTo, String faultTo) {
 		int header=NomUtil.getElement(top, SoapUtil.soapNamespace, "Header");

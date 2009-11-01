@@ -23,6 +23,7 @@ import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.Expression;
 import org.kisst.cordys.script.expression.ExpressionParser;
+import org.kisst.cordys.script.expression.XmlExpression;
 import org.kisst.cordys.script.xml.ElementAppender;
 import org.kisst.cordys.util.SoapUtil;
 
@@ -38,6 +39,7 @@ public class MethodCall {
 	private final boolean async;
 	private final ElementAppender appender;
 	private final String resultVar;
+	private final XmlExpression headerExpression;
 
 	
 	public MethodCall(CompilationContext compiler, final int node) {
@@ -80,6 +82,12 @@ public class MethodCall {
 		if (resultVar==null)
 			throw new RuntimeException("resultVar should be defined when using methodExpression");
 		compiler.declareXmlVar(resultVar);
+		
+		String tmp=Node.getAttribute(node, "headersFrom");
+		if (tmp==null)
+			headerExpression=null;
+		else
+			headerExpression=new XmlExpression(compiler, tmp);
 	}
 	
 	protected int createMethod(final ExecutionContext context) {
@@ -87,6 +95,10 @@ public class MethodCall {
 		String mname=getMethodName(context);
 		int method = context.createMethod(ns, mname).node;
 		appender.append(context, method);
+		if (headerExpression!=null) {
+			int headerSrc=headerExpression.getNode(context);
+			SoapUtil.copyHeaders(headerSrc, method);
+		}
 		return method;
 	}
 

@@ -218,7 +218,16 @@ public class NomUtil {
 			Node.setAttribute(dest, name, Node.getAttribute(src, name));
 		}
 	}
-	
+
+	public static void copyXmlnsAttributes(int src, int dest) {
+		int count=Node.getNumAttributes(src);
+		for (int i=0; i<count; i++) {
+			String name=Node.getAttributeName(src, i);
+			if (name.equals("xmlns") || name.startsWith("xmlns:"))
+				Node.setAttribute(dest, name, Node.getAttribute(src, name));
+		}
+	}
+
 	/**
 	 * returns the universal name, looking like {<namespace>}<name>
 	 * See http://www.jclark.com/xml/xmlns.htm
