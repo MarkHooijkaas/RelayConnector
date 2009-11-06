@@ -296,14 +296,14 @@ public class NomPath {
 			}
 			else if (part.searchLast) {
 				int nodefound=NomUtil.getLastElementByLocalName(node, name);
-				if (nodefound==0 && part.optional)
+				if (nodefound==0)
 					node=Node.createElement(name, node);
 				else
 					node=nodefound;
 			}
 			else if (part.searchFirst) {
 				int nodefound=NomUtil.getElementByLocalName(node, name);
-				if (nodefound==0 && part.optional)
+				if (nodefound==0)
 					node=Node.createElement(name, node);
 				else
 					node=nodefound;
