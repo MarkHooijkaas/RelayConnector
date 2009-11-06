@@ -294,10 +294,21 @@ public class NomPath {
 			else if (part.isAttribute) {
 				// skip for an attribute: should only happen for final node
 			}
-			else if (part.searchLast)
-				node=NomUtil.getLastElementByLocalName(node, name);
-			else if (part.searchFirst)
-				node=NomUtil.getElementByLocalName(node, name);
+			else if (part.searchLast) {
+				int nodefound=NomUtil.getLastElementByLocalName(node, name);
+				if (nodefound==0 && part.optional)
+					node=Node.createElement(name, node);
+				else
+					node=nodefound;
+			}
+			else if (part.searchFirst) {
+				int nodefound=NomUtil.getElementByLocalName(node, name);
+				if (nodefound==0 && part.optional)
+					node=Node.createElement(name, node);
+				else
+					node=nodefound;
+			}
+
 /*			else if (part.optional) {
 				node=NomUtil.getLastElementByLocalName(node, name);
 				if (node==0)
