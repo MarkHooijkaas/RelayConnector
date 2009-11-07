@@ -163,7 +163,6 @@ public class MethodCache {
 		}
 		try {
 			connector.sendAndCallback(method,new SOAPMessageListener() {
-				@SuppressWarnings("deprecation")
 				public boolean onReceive(int message) {
 					putResponse(method, message);
 					return callback.onReceive(message); // Node should not yet be destroyed by Callback caller!!

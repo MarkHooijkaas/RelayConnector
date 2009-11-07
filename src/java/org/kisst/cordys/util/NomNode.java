@@ -52,9 +52,10 @@ public class NomNode implements Destroyable {
 	}
 
 	public void destroy() {
+		boolean never=false;
 		try {
 			Node.delete(node);
-			if (false) // Trick because XMLException is not in throws clause of native implementation
+			if (never) // Trick because XMLException is not in throws clause of native implementation
 				throw new XMLException();
 		}
 		catch(XMLException e) {

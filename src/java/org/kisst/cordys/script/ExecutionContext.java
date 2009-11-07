@@ -117,7 +117,6 @@ public class ExecutionContext extends CallContext {
 	// default SOAPListener. This in considered not very urgent yet.
 
 	
-	@SuppressWarnings("deprecation")
 	public void callMethodAsync(int method, final String resultVar) {
 		traceInfo("sending request: ",method);
 		String methodName=Node.getLocalName(method);

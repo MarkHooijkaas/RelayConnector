@@ -33,7 +33,7 @@ import com.eibus.xml.nom.Node;
 
 public class GroovyStep implements Step {
 	private final static GroovyClassLoader loader = new GroovyClassLoader();
-	private final Class scriptClass;
+	private final Class<?> scriptClass;
 	
 	
 	public GroovyStep(CompilationContext compiler, final int node) {

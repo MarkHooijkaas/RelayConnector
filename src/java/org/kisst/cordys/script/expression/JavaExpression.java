@@ -38,7 +38,7 @@ public class JavaExpression implements Expression {
 		String className=str.substring(0,pos).trim();
 		String methodName=str.substring(pos+2,pos2).trim();
 		String params[]=str.substring(pos2+1,pos3).split(",");
-		Class paramTypes[]=new Class[params.length];
+		Class<?> paramTypes[]=new Class[params.length];
 		for (int i=0; i<params.length; i++)
 			paramTypes[i]=String.class;
 		try {

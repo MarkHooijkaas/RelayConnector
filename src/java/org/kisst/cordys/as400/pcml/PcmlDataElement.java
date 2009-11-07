@@ -60,8 +60,8 @@ public abstract class PcmlDataElement extends PcmlElement {
 		else {
 			if (classname.indexOf('.')<0)
 				classname="org.kisst.cordys.util.convert."+classname;
-			Class cls = ReflectionUtil.findClass(classname);
-			Constructor cons = ReflectionUtil.getConstructor(cls, new Class[] {int.class});
+			Class<?> cls = ReflectionUtil.findClass(classname);
+			Constructor<?> cons = ReflectionUtil.getConstructor(cls, new Class[] {int.class});
 			if (cons != null )
 				convertor = (Convertor) ReflectionUtil.createObject(cons,new Object[] {dataNode});
 			else if (ReflectionUtil.getConstructor(cls, new Class[] {})!=null) // has default constructor

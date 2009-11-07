@@ -28,7 +28,7 @@ import org.kisst.cordys.util.ReflectionUtil;
 public class MappedSetting<T extends Setting> extends CompositeSetting {
 	// TODO: This is a cache, but it is reset-proof
 	private final HashMap<String,T> items=new HashMap<String,T>();
-	private final Constructor constructor;
+	private final Constructor<?> constructor;
 	private final String defaultValue;
 	
 	public MappedSetting(CompositeSetting parent, String name, Class<?> clazz) {
