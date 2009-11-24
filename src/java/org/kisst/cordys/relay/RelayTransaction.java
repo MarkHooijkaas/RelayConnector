@@ -62,7 +62,7 @@ public class RelayTransaction implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
-    	if (RelaySettings.forbidden.get(props)) {
+    	if (RelaySettings.emergencyBreak.get(props)) {
     		String msg="Forbidden to call method "+context.fullMethodName+", see relay.forbidden property";
     		logger.log(Severity.WARN, msg);
     		response.createSOAPFault("ESB.TECHERR.FORBIDDEN",msg);
