@@ -79,6 +79,9 @@ public class MultiLevelProps {
 					if (!str.endsWith("{"))
 						throw new RuntimeException("layer should have { symbol on same line in config line: @"+str);
 					String key=str.substring(0,str.length()-1).trim();
+					// TODO: remove the following backward compatibility hack when all old config files are changed
+					if (key.startsWith("override")) 
+						key="method:"+key.substring(8).trim();
 					SimpleProps layer=new SimpleProps();
 					this.layers.put(key, layer);
 					load(layer, input);
