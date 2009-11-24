@@ -46,6 +46,7 @@ public class RelaySettings {
 
 	public final static BooleanSetting timer=new BooleanSetting(relay, "timer",false);
 
+	public final static BooleanSetting forbidden=new BooleanSetting(relay, "forbidden",false);
 	public final static IntSetting sleepAfterCall=new IntSetting(relay, "sleepAfterCall",0);
 	
 	public final static MappedSetting<ResourcePoolSettings> resourcepool=

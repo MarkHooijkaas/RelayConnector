@@ -30,11 +30,14 @@ import org.kisst.cordys.util.NomUtil;
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;
 import com.eibus.soap.SOAPTransaction;
+import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
 public class RelayTransaction implements ApplicationTransaction
 {
+	private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTransaction.class);
+
 	private final Props props;
 	private final ExecutionContext context;
 
@@ -59,6 +62,13 @@ public class RelayTransaction implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
+    	if (RelaySettings.forbidden.get(props)) {
+    		String msg="Forbidden to call method "+context.fullMethodName+", see relay.forbidden property";
+    		logger.log(Severity.WARN, msg);
+    		response.createSOAPFault("ESB.TECHERR.FORBIDDEN",msg);
+    		return true;
+    	}
+    		
     	context.setCallDetails(request, response);
 		int impl = request.getMethodDefinition().getImplementation();
 		String result="ERROR ";
