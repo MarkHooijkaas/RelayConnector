@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.kisst.cfg4j.LayeredProps;
 import org.kisst.cfg4j.MultiLevelProps;
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.resourcepool.ResourcePool;
@@ -105,7 +106,10 @@ public class RelayConnector extends ApplicationConnector {
     	int env=stTransaction.getRequestEnvelope();
     	int req=SoapUtil.getContent(env);
     	String fullMethodName=NomUtil.getUniversalName(req);
-		return new RelayTransaction(this, fullMethodName, mlprops.getProps(fullMethodName), stTransaction);
+    	LayeredProps props=new LayeredProps(mlprops.getGlobalProps());
+    	props.addTopLayer(mlprops.getProps("namespace:"+Node.getNamespaceURI(req)));
+    	props.addTopLayer(mlprops.getProps("method:"+fullMethodName));
+		return new RelayTransaction(this, fullMethodName, props, stTransaction);
 	}
 
     @Override

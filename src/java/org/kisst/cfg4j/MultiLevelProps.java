@@ -26,15 +26,15 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 
 public class MultiLevelProps {
-	private final HashMap<String,Props> props=new HashMap<String,Props>();
-	private final LayeredProps globalProps=new LayeredProps(null);
+	private final HashMap<String,SimpleProps> layers=new HashMap<String,SimpleProps>();
+	private final SimpleProps globalProps=new SimpleProps();
 
 	public MultiLevelProps(InputStream configStream) {
 		load(configStream);
 	}
 	public Props getGlobalProps() { return globalProps; }
 	public Props getProps(String key) {
-		Props result = props.get(key);
+		Props result = layers.get(key);
 		if (result==null)
 			return globalProps;
 		else
@@ -64,7 +64,7 @@ public class MultiLevelProps {
 		load(globalProps, new BufferedReader(new InputStreamReader(inp)));
 	}
 
-	private void load(LayeredProps props, BufferedReader input)  {
+	private void load(SimpleProps props, BufferedReader input)  {
 		try {
 			String str;
 			while ((str = input.readLine()) != null) {
@@ -74,13 +74,14 @@ public class MultiLevelProps {
 				}
 				else if (str.equals("}")) 
 					return;
-				else if (str.startsWith("@override")) {
+				else if (str.startsWith("@")) {
+					str=str.substring(1).trim();
 					if (!str.endsWith("{"))
-						throw new RuntimeException("override should have { symbol on same line in config line: "+str);
-					String key=str.substring(9,str.length()-1).trim();
-					LayeredProps subprops=new LayeredProps(props);
-					this.props.put(key, subprops);
-					load(subprops, input);
+						throw new RuntimeException("layer should have { symbol on same line in config line: @"+str);
+					String key=str.substring(0,str.length()-1).trim();
+					SimpleProps layer=new SimpleProps();
+					this.layers.put(key, layer);
+					load(layer, input);
 				}
 				else {
 					int pos=str.indexOf('=');

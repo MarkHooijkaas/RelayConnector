@@ -19,33 +19,22 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cfg4j;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 
-public class LayeredProps extends PropsBase {
-	private final Props global; 
-	private final LinkedList<Props> layers = new LinkedList<Props>();
 
-	public LayeredProps(Props global) {
-		this.global=global;
+public class SimpleProps extends PropsBase {
+	private static final long serialVersionUID = 1L;
+
+	private final HashMap<String, Object> map=new HashMap<String, Object>();
+	public void put(String key, String value) {
+		map.put(key,value);
 	}
-	public void addTopLayer(Props props)    { layers.add(0,props); }
-	public void addBottomLayer(Props props) { layers.add(props); }
-	
+
 	public Object get(String key, Object defaultValue) {
-		for (Props p:layers) {
-			Object result=p.get(key, null);
-			if (result!=null)
-				return result;
-		}
-		return global.get(key,defaultValue);
-	}
-
-	public Object get(String key) {
-		Object result=get(key, null);
+		Object result=map.get(key);
 		if (result!=null)
 			return result;
 		else
-			return global.get(key);
+			return defaultValue;
 	}
-
 }

@@ -19,12 +19,14 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.esb;
 
+import org.kisst.cfg4j.LayeredProps;
 import org.kisst.cordys.util.BaseConnector;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.SOAPTransaction;
+import com.eibus.xml.nom.Node;
 
 public class EsbConnector extends BaseConnector {
     public EsbConnector(){
@@ -35,8 +37,11 @@ public class EsbConnector extends BaseConnector {
     public ApplicationTransaction createTransaction(SOAPTransaction stTransaction) {
     	int env=stTransaction.getRequestEnvelope();
     	int req=SoapUtil.getContent(env);
-    	String key=NomUtil.getUniversalName(req);
-		return new EsbTransaction(mlprops.getProps(key));
+    	String fullMethodName=NomUtil.getUniversalName(req);
+    	LayeredProps props=new LayeredProps(mlprops.getGlobalProps());
+    	props.addTopLayer(mlprops.getProps("namespace:"+Node.getNamespaceURI(req)));
+    	props.addTopLayer(mlprops.getProps("method:"+fullMethodName));
+		return new EsbTransaction(props);
 	}
 
 }
