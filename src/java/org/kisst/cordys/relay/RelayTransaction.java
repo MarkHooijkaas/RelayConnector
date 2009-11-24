@@ -121,13 +121,12 @@ public class RelayTransaction implements ApplicationTransaction
 			input=NomUtil.getRootNode(input);
 			msg+="\n"+Node.writeToString(input,false);
 		}
-		boolean trace=RelaySettings.trace.get(props);
-		if (trace && RelaySettings.logTrace.get(props))
+		if (RelaySettings.logTrace.get(props))
 			msg+="\n"+context.getTraceAsString(props);
 		RelayTrace.logger.log(Severity.ERROR, msg, e);
 		if (RelaySettings.showStacktrace.get(props))
 			Node.createTextElement("stacktrace", getStackTraceAsString(e), details);
-		if (trace && RelaySettings.showTrace.get(props))
+		if (RelaySettings.showTrace.get(props))
 			context.addToNode(Node.createElement("trace", details), props);
 		return details;
 	}

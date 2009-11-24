@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Stack;
 
 import org.kisst.cfg4j.Props;
+import org.kisst.cordys.relay.RelaySettings;
 import org.kisst.cordys.relay.RelayTrace;
 import org.kisst.cordys.script.commands.CommandList;
 
@@ -39,6 +40,7 @@ public class CompilationContext extends RelayTrace implements PrefixContext {
 	private final Props props;
 
 	public CompilationContext(Script script, Props props)  {
+		super(RelaySettings.trace.get(props));
 		this.props=props;
 		this.commands=new CommandList();
 		

@@ -46,9 +46,6 @@ public class RelayTrace {
 	private final ArrayList<Item> items=new ArrayList<Item>();
 	private final Severity traceLevel;
 
-	public RelayTrace() {
-		this(Severity.DEBUG);
-	}
 	public RelayTrace(Severity traceLevel) {
 		this.traceLevel=traceLevel;
 	}

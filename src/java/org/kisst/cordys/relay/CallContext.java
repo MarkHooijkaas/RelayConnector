@@ -61,6 +61,7 @@ public class CallContext extends RelayTrace {
 	public boolean allreadyDestroyed() { return allreadyDestroyed; }
 
 	public CallContext(RelayConnector connector, String fullMethodName, Props props, SOAPTransaction stTransaction) {
+		super(RelaySettings.trace.get(props));
 		this.relayConnector=connector;
 		this.fullMethodName=fullMethodName;
 		this.props=props;

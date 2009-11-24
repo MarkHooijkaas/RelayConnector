@@ -37,7 +37,7 @@ public class RelaySettings {
 
 	public final static StringSetting soapFaultcodePrefix=new StringSetting(relay, "soapFaultcodePrefix", "TECHERR.ESB.");
 	public final static SeveritySetting logRelayedSoapFaults=new SeveritySetting(relay, "logRelayedSoapFaults",Severity.WARN);
-	public final static BooleanSetting trace=new BooleanSetting(relay, "trace",false);
+	public final static SeveritySetting trace=new SeveritySetting(relay, "trace",Severity.WARN);
 	public final static BooleanSetting logTrace=new BooleanSetting(relay, "logTrace",true);
 	public final static BooleanSetting showTrace=new BooleanSetting(relay, "showTrace",false);
 	public final static BooleanSetting showStacktrace=new BooleanSetting(relay, "showStacktrace",false);
