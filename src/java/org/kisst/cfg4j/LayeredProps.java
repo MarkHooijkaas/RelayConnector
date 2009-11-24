@@ -28,8 +28,8 @@ public class LayeredProps extends PropsBase {
 	public LayeredProps(Props global) {
 		this.global=global;
 	}
-	public void addTopLayer(Props props)    { layers.add(0,props); }
-	public void addBottomLayer(Props props) { layers.add(props); }
+	public void addTopLayer(Props props) { layers.add(0,props); }
+	public void addLayer(Props props)    { layers.add(props); }
 	
 	public Object get(String key, Object defaultValue) {
 		for (Props p:layers) {

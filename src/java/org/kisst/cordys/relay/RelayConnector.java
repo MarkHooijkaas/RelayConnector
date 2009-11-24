@@ -107,8 +107,8 @@ public class RelayConnector extends ApplicationConnector {
     	int req=SoapUtil.getContent(env);
     	String fullMethodName=NomUtil.getUniversalName(req);
     	LayeredProps props=new LayeredProps(mlprops.getGlobalProps());
-    	props.addTopLayer(mlprops.getProps("namespace:"+Node.getNamespaceURI(req)));
-    	props.addTopLayer(mlprops.getProps("method:"+fullMethodName));
+    	props.addLayer(mlprops.getProps("method:"+fullMethodName));
+    	props.addLayer(mlprops.getProps("namespace:"+Node.getNamespaceURI(req)));
 		return new RelayTransaction(this, fullMethodName, props, stTransaction);
 	}
 
