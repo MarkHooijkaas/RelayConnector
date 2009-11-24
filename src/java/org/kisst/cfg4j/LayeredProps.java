@@ -19,11 +19,11 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cfg4j;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class LayeredProps extends PropsBase {
 	private final Props global; 
-	private final LinkedList<Props> layers = new LinkedList<Props>();
+	private final ArrayList<Props> layers = new ArrayList<Props>();
 
 	public LayeredProps(Props global) {
 		this.global=global;
