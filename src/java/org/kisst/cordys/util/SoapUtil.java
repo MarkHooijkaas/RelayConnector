@@ -103,7 +103,7 @@ public class SoapUtil {
 	 */
 	public static int getContent(int envelope) {
 		int body=NomUtil.getElement(envelope, soapNamespace, "Body");
-		return Node.getFirstChild(body);  
+		return Node.getFirstElement(body);  
 	}
 
 	/** This function merges the response from some kind of call with the boilerplate response that Cordys made. 
