@@ -22,6 +22,7 @@ package org.kisst.cordys.http;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.kisst.cordys.relay.RelaySettings;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.Expression;
@@ -93,8 +94,25 @@ public class HttpBase2 extends HttpBase {
 	}	
 
 	protected HttpResponse call(final ExecutionContext context, int bodyNode) {
+    	if (context.infoTraceEnabled()) {
+    		int reqnode=bodyNode;
+    		if (RelaySettings.traceShowEnvelope.get(props))
+    			reqnode=NomUtil.getRootNode(bodyNode);
+    		context.traceInfo("Sending HTTP request: ",reqnode);
+    	}
 		HttpState state=createState(context);
 	    PostMethod method = createPostMethod(context, state, bodyNode);
-	    return httpCall(method, state);
+	    HttpResponse result=httpCall(method, state);
+    	if (context.infoTraceEnabled()) {
+    		try {
+    			context.traceInfo("Received HTTP response: "+result.getCode()+" "+result.getResponseString());
+    		}
+    		catch(Exception e) {
+    			// the getResponseString could throw a wrapped UnsupportedEncoding exception
+    			// to be safe I catch all errors, because tracing should not break the function 
+    			context.traceInfo("Could not log HTTP response, due to following error: "+e.getMessage());
+    		}
+    	}
+	    return result;
 	}
 }
