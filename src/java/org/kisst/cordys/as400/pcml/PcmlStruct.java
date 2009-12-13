@@ -37,7 +37,7 @@ public class PcmlStruct extends PcmlElement {
     	AS400DataType[] types = new AS400DataType[paramCount];
     	
     	int i=0;
-    	int node = Node.getFirstChild(structNode);
+    	int node = Node.getFirstElement(structNode);
     	while (node != 0) {
     		String maintype=Node.getLocalName(node);
     		try {

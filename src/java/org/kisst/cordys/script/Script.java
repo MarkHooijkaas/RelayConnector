@@ -40,7 +40,7 @@ public class Script implements Step {
 
 	private void compile(int scriptNode, CompilationContext compiler) {
 		int i=0;
-    	int node = Node.getFirstChild(scriptNode);
+    	int node = Node.getFirstElement(scriptNode);
     	while (node != 0) {
     		try {
     			if (compiler.debugTraceEnabled())

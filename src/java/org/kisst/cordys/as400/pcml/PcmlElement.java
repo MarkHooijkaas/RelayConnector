@@ -141,7 +141,7 @@ public abstract class PcmlElement implements PcmlParameter {
 		}
 		Object[] objs=new Object[count];
 		int i=0;
-		int node=Node.getFirstChild(inputNode);
+		int node=Node.getFirstElement(inputNode);
 		while (node!=0 && i<count) {
 			// ugly, test each sibling for the correct name
 			// no other way to get all children with a specific name

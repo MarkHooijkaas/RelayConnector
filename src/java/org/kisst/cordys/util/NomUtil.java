@@ -61,9 +61,10 @@ public class NomUtil {
 	 */
 	public static int countElements(int node, String name) {
 		int count=0;
-		int child=Node.getFirstChild(node);
+		int child=Node.getFirstElement(node);
 		while (child!=0) {
-			if (Node.getLocalName(child).equals(name))
+			String nodename=Node.getLocalName(child);
+			if (nodename!=null && nodename.equals(name))
 				count++;
 			child=Node.getNextSibling(child);
 		}
@@ -95,7 +96,7 @@ public class NomUtil {
 	 * @return returns 0 if not found 
 	 */
 	public static int getElement(int node, String namespace, String tag, int index) {
-		node=Node.getFirstChild(node);
+		node=Node.getFirstElement(node);
 		while (node!=0) {
 			if (tag.equals(Node.getLocalName(node)) && namespace.equals(Node.getNamespaceURI(node))) {
 				if (index==0)
@@ -131,7 +132,7 @@ public class NomUtil {
 	 * @return returns 0 if not found 
 	 */
 	public static int getElementByLocalName(int node, String tag, int index) {
-		node=Node.getFirstChild(node);
+		node=Node.getFirstElement(node);
 		while (node!=0) {
 			if (tag.equals(Node.getLocalName(node))) {
 				if (index==0)

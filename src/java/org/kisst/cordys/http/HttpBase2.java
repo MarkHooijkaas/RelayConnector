@@ -49,7 +49,7 @@ public class HttpBase2 extends HttpBase {
 	public HttpBase2(CompilationContext compiler, final int node) {
 		super(compiler, node);
 		headers = new HttpHeader[NomUtil.countElements(node, "header")];
-		int child=Node.getFirstChild(node);
+		int child=Node.getFirstElement(node);
 		int idx=0;
 		while (child!=0) {
 			if (Node.getLocalName(child).equals("header"))

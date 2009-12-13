@@ -62,7 +62,7 @@ public class SwitchStep implements Step {
 	public SwitchStep(CompilationContext compiler, final int node) {
 		expr=ExpressionParser.parse(compiler, Node.getAttribute(node, "expression"));
 		cases=new Case[Node.getNumChildren(node)];
-		int child=Node.getFirstChild(node);
+		int child=Node.getFirstElement(node);
 		int i=0;
 		while (child!=0) {
 			cases[i++]=new Case(compiler, child);

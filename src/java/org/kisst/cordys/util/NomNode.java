@@ -66,7 +66,7 @@ public class NomNode implements Destroyable {
 	public NomNode[] getChildren() {
 		NomNode[] result = new NomNode[Node.getNumChildren(node)];
 		int idx=0;
-		int n=Node.getFirstChild(node);
+		int n=Node.getFirstElement(node);
 		while (n!=0) {
 			result[idx++]=new NomNode(n);
 			n=Node.getNextSibling(n);

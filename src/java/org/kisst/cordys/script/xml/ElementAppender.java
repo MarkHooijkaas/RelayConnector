@@ -71,7 +71,7 @@ public class ElementAppender implements XmlAppender {
 			parts[index++]=new IncludeAppender(compiler, node);
 		
 
-		int child=Node.getFirstChild(node);
+		int child=Node.getFirstElement(node);
 		while (child!=0) {
 			String nodeName=Node.getLocalName(child);
 			if ("element".equals(nodeName))
