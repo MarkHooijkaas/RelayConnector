@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.resourcepool.ResourcePool;
+import org.kisst.cordys.util.BaseConnector;
 import org.kisst.cordys.util.Destroyable;
 import org.kisst.cordys.util.NomNode;
 import org.kisst.cordys.util.SoapUtil;
@@ -41,7 +42,7 @@ public class CallContext extends RelayTrace {
 	protected boolean allreadyDestroyed=false;
 
 	
-	protected final RelayConnector relayConnector;
+	protected final BaseConnector baseConnector;
 	protected final String fullMethodName;
 	protected final Props props;
 	protected final RelayTimer timer;
@@ -50,19 +51,19 @@ public class CallContext extends RelayTrace {
 	
 	private final HashMap<String,Object> objects=new HashMap<String,Object>();
 
-	public RelayConnector getRelayConnector() {	return relayConnector; }
+	public RelayConnector getRelayConnector() {	return (RelayConnector) baseConnector; }
 	public String getFullMethodName() {	return fullMethodName;	}
 	public Props getProps() { return props;	}
 	public RelayTrace getTrace() {return this;} // TODO: remove
 	public RelayTimer getTimer() { return timer;}
-	public String getOrganization() { return relayConnector.getOrganization(); }	
+	public String getOrganization() { return baseConnector.getOrganization(); }	
 	public String getOrganizationalUser() {	return soapTransaction.getUserCredentials().getOrganizationalUser();}
 	public Document getDocument() { return Node.getDocument(soapTransaction.getRequestEnvelope()); } // TODO: is this the best document?
 	public boolean allreadyDestroyed() { return allreadyDestroyed; }
 
-	public CallContext(RelayConnector connector, String fullMethodName, Props props, SOAPTransaction stTransaction) {
+	public CallContext(BaseConnector connector, String fullMethodName, Props props, SOAPTransaction stTransaction) {
 		super(RelaySettings.trace.get(props));
-		this.relayConnector=connector;
+		this.baseConnector=connector;
 		this.fullMethodName=fullMethodName;
 		this.props=props;
 		this.soapTransaction=stTransaction;
@@ -96,7 +97,7 @@ public class CallContext extends RelayTrace {
 	}
 
 	public synchronized void changeResourcePool(String poolName) {
-		ResourcePool pool =	relayConnector.getResourcePool(poolName);
+		ResourcePool pool =	baseConnector.getResourcePool(poolName);
 		changeResourcePool(pool);
 	}
 	public synchronized void changeResourcePool(ResourcePool pool) {
