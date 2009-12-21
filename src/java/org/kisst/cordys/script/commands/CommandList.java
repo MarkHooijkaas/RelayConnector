@@ -47,6 +47,7 @@ public class CommandList {
 		basicCommands.addCommand("getConfigValue", new GenericCommand(GetConfigValueStep.class));
 		basicCommands.addCommand("wsaTransformReplyTo", new GenericCommand(WsaTransformReplyToStep.class));
 		basicCommands.addCommand("soapMerge", new GenericCommand(SoapMergeStep.class));
+		basicCommands.addCommand("convert", new GenericCommand(ConvertStep.class));
 	}
 	public static void addBasicCommand(String name, Command type) {	basicCommands.addCommand(name, type); }
 
