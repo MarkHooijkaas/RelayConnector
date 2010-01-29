@@ -201,8 +201,21 @@ public class NomPath {
 				// skip for an attribute or text node: should only happen for final node
 			}
 			else {
-				if (part.namespace==null)
-					node=NomUtil.getElementByLocalName(node, name);
+				if (name==null) { 
+					if (part.searchLast) {
+						node=Node.getLastChild(node); 
+						while (node!=0 && Node.getType(node)!=NodeType.ELEMENT)
+							node=Node.getPreviousSibling(node);
+					}
+					else
+						node=Node.getFirstElement(node);
+				}
+				else if (part.namespace==null) {
+					if (part.searchLast)
+						node=NomUtil.getLastElementByLocalName(node, name);
+					else
+						node=NomUtil.getElementByLocalName(node, name);
+				}
 				else
 					node=NomUtil.getElement(node, part.namespace, name);
 				if (node==0 && ! part.optional)
