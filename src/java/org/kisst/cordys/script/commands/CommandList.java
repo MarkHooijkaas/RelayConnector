@@ -34,6 +34,7 @@ public class CommandList {
 		basicCommands.addCommand("output", new GenericCommand(OutputStep.class));
 		basicCommands.addCommand("import", new GenericCommand(ImportStep.class));
 		basicCommands.addCommand("delete", new GenericCommand(DeleteStep.class));
+		basicCommands.addCommand("rename", new GenericCommand(RenameStep.class));
 		basicCommands.addCommand("append", new GenericCommand(XmlAppendStep.class));
 		basicCommands.addCommand("sleep",  new GenericCommand(SleepStep.class));
 		basicCommands.addCommand("default",new GenericCommand(DefineDefaultStep.class));
