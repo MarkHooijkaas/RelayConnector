@@ -39,6 +39,7 @@ public class CommandList {
 		basicCommands.addCommand("sleep",  new GenericCommand(SleepStep.class));
 		basicCommands.addCommand("default",new GenericCommand(DefineDefaultStep.class));
 		basicCommands.addCommand("call",   new GenericCommand(CallStep.class));
+		basicCommands.addCommand("relay-call", new GenericCommand(RelayCallStep.class));
 		basicCommands.addCommand("fault",  new GenericCommand(FaultStep.class));
 		basicCommands.addCommand("switch", new GenericCommand(SwitchStep.class));
 		basicCommands.addCommand("groovy", new GenericCommand(GroovyStep.class));
