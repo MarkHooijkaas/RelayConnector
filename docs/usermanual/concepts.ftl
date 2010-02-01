@@ -72,16 +72,52 @@ The code above will work on input xml in the form of:
 <@xmlcode>
   <address street="..." city="..."/>
 </@xmlcode>
+One can also select the element name, prefixed name or namespace of an element using 
+the localname(), name() and namespace() functions at the end of the path.
+For example
+<@xmlcode>
+  <output name="name" text="/input/localname()"/>
+  <output name="namespace" text="/input/namespace()"/>
+</@xmlcode>
+If some element is optional, one may prefix it with a question mark, e.g.
+<@xmlcode>
+  <output name="country" text="/input/address/?country"/>
+</@xmlcode>
+Will not result in an error if there is no country element available. 
+Note that the command that uses this XML path will get no XML to perform it's action upon.
 </para>
 
-<para>These expressions are still very
-limited. There is no support for recurring elements with the same
-name or for selecting all children without the surrounding element.</para>
+<para>
+When there are multiple elements with the same name, usually the first element with that name is chosen.
+One may make this explicit by using the regular-expression syntax ^ to denote the top/first element.
+This is not strictly necessary because the first element is chosen anyway.
+On the other hand, one may also select the last element with that name, by using the 
+regular-expression anchor symbol $.
+<@xmlcode>
+  <output name="first-country" text="/input/address/^country"/>
+  <output name="last-country"  text="/input/address/country$"/>
+</@xmlcode>
+One interesting use of the ^ and $ constructs is to use it with no name. 
+In this case it will select either the first or last child element, regardless of name.
+This can be usefull if one does not know the name of an element.
+<@xmlcode>
+  <output name="method" text="/input/jms-message/Envelope/Body/^/name()"/>
+</@xmlcode>
+It is not possible to select any other specific element, except for the first, or the last.
+However it is possible to select all elements (with a certain name), by prefixing them with a star.
+Such a path expression might result in a list of nodes, instead of just one node, so it should
+only be used in commands that can handle a list of nodes, e.g. the delete, convert or rename commands.
+<@xmlcode>
+  <delete node="/input/*country/*city/description"/>
+</@xmlcode>
+The above example will delete the description node in all city nodes in all country nodes.
+</para>
 
-<para>There is support for namespaces. First
-one must map a prefix to the correct namespace using the xmlns
-command (see <xref linkend="xmlns"/>). Next one can use this prefix within the
-xml expression.</para>
+
+<para>There is also support for namespaces. 
+First one must map a prefix to the correct namespace using the xmlns
+command (see <xref linkend="xmlns"/>). 
+Next one can use this prefix within the xml expression.</para>
 
 <para>If the syntax .. is used in a path, the
 parent element will be returned. This can be used to access the SOAP
