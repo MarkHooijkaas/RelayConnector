@@ -201,7 +201,7 @@ public class NomPath {
 				// skip for an attribute or text node: should only happen for final node
 			}
 			else {
-				if (name==null) { 
+				if (name==null || name.length()==0) { 
 					if (part.searchLast) {
 						node=Node.getLastChild(node); 
 						while (node!=0 && Node.getType(node)!=NodeType.ELEMENT)
