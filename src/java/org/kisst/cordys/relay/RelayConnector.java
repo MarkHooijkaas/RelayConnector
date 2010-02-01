@@ -33,7 +33,7 @@ public class RelayConnector extends BaseConnector {
 
 	public RelayConnector() {
 		addModule(new RelayModule());
-		//TODO: responseCache.init(connector, getGlobalProps());
+		responseCache.init(getConnector(), getGlobalProps());
 	}
 	
 	@Override protected String getConnectorName() { return "RelayConnector"; }
@@ -49,8 +49,8 @@ public class RelayConnector extends BaseConnector {
 		return new RelayTransaction(this, fullMethodName, props, stTransaction);
 	}
 
-
-    //responseCache.reset(getGlobalProps());
-
-
+	@Override public void reset() {
+		super.reset();
+		responseCache.reset(getGlobalProps());
+	}
 }
