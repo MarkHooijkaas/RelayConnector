@@ -37,7 +37,10 @@ public class RelayCallStep implements Step {
 
 	
 	public RelayCallStep(CompilationContext compiler, final int node) {
-		message=new XmlExpression(compiler, Node.getAttribute(node,	"message", "/input/../.."));
+		String str=Node.getAttribute(node,	"message");
+		if (str==null)
+			throw new RuntimeException("relay-call step needs a message attribute");
+		message=new XmlExpression(compiler, str);
 		async=compiler.getSmartBooleanAttribute(node, "async", false);
 		appender=new ElementAppender(compiler, node);
 		
