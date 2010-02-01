@@ -50,7 +50,7 @@ namespace="<replaceable>http://kisst.org/test</replaceable>"/>
 
 <sect1 id="rename"><title>rename command</title>
 <@xmlcode>
-<rename nodes="<replaceable>nodelist</replaceable>" 
+<rename nodes="<replaceable>nodeset-expression</replaceable>" 
 	[name="<replaceable>name</replaceable>"]
 	[prefix="<replaceable>prefix</replaceable>"]
 	[namespace="<replaceable>namespace</replaceable>"]
@@ -77,12 +77,16 @@ If not, an xmlns or xmlns:prefix attribute will be added to the element.
 
 <sect1 id="convert"><title>convert command</title>
 <@xmlcode>
-<convert node="<replaceable>nodelist</replaceable>" 
+<convert node="<replaceable>nodeset-expression</replaceable>" 
 	convertor="<replaceable>classname</replaceable>"
 />
 </@xmlcode>
 <para>
-This command converts the text in one node or in a node set using a certain converter. 
+This command converts the text in one node or in a node set using a certain converter.
+As convertor one should provide the classname of a class that implements the Convertor interface.
+One may provide a fully qualified classname inlcuding package.
+If one does not provide a package (i.e. the classname does not contain a dot), the class is 
+assumed to be in the org.kisst.relay.util.convert package.
 At this moment the following convertors are available:
 TextToXsdBoolean
 XsdBooleanToText
@@ -205,14 +209,28 @@ error.</para>
 </sect2>
 </sect1>
 
+<sect1  id="relay-call"><title>relay-call command</title>
+<@xmlcode>
+<relay-call message="<replaceable>xml-expression</replaceable>"
+  [async="true|false"]*
+  [resultVar="<replaceable>result-var-name</replaceable>"]
+/>
+</@xmlcode>
+
+<para>This command will execute a method call just like the <code>call</code> command. 
+Instead of specifying a method-name, the method to be called is determined from the <replaceable>message</replaceable>,
+which should contain a valid SOAP Envelope including a body.
+This entire message is relayed to the corresponding method.  
+The response of this call will be stored in a variable <replaceable>result-var-name</replaceable>.
+The <code>async</code> attribute works similar to the call method.
+</para>
+</sect1>
 
 
-
-<sect1><title>delete
-command</title>
+<sect1><title>delete command</title>
 <para>This command delete a specific node in a XML expression.</para>
 <@xmlcode>
-<delete node="<replaceable>xmlExpression</replaceable>"/>
+<delete node="<replaceable>nodeset-Expression</replaceable>"/>
 </@xmlcode>
 
 </sect1>

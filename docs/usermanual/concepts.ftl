@@ -111,6 +111,7 @@ only be used in commands that can handle a list of nodes, e.g. the delete, conve
   <delete node="/input/*country/*city/description"/>
 </@xmlcode>
 The above example will delete the description node in all city nodes in all country nodes.
+We call such an xml-expression with one or more * symbols a nodeset-expression.
 </para>
 
 
