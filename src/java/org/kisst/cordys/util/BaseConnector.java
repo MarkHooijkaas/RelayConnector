@@ -77,6 +77,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 				connector.open();
 
 			mlprops=new MultiLevelProps(getConfigStream());
+			init(getGlobalProps());
 			addDynamicModules(getGlobalProps());
 			for (int i=0; i<modules.size(); i++)
 				modules.get(i).init(getGlobalProps());
@@ -85,6 +86,8 @@ abstract public class BaseConnector extends ApplicationConnector {
 		catch (ExceptionGroup e) { throw new RuntimeException(e);	} 
 	}
 
+	protected void init(Props globalProps) {}
+	
 	private void addDynamicModules(Props props) {
 		String moduleList=(String) props.get("modules",null);
 		if (moduleList!=null && moduleList.trim().length()>0) {

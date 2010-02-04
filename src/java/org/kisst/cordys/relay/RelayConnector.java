@@ -20,6 +20,7 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cordys.relay;
 
 import org.kisst.cfg4j.LayeredProps;
+import org.kisst.cfg4j.Props;
 import org.kisst.cordys.util.BaseConnector;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
@@ -33,9 +34,12 @@ public class RelayConnector extends BaseConnector {
 
 	public RelayConnector() {
 		addModule(new RelayModule());
-		responseCache.init(getConnector(), getGlobalProps());
 	}
 	
+	@Override protected void init(Props globalProps) {
+		responseCache.init(getConnector(), getGlobalProps());
+	}
+
 	@Override protected String getConnectorName() { return "RelayConnector"; }
 
 
