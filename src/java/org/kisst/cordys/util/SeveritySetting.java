@@ -48,6 +48,8 @@ public class SeveritySetting extends Setting {
 		if (sev.equals("WARN"))  return Severity.WARN;
 		if (sev.equals("ERROR")) return Severity.ERROR;
 		if (sev.equals("FATAL")) return Severity.FATAL;
+		if (sev.equals("true"))  return Severity.DEBUG; // for backward comptability, used to be a boolean setting
+		if (sev.equals("false")) return Severity.ERROR; // for backward comptability, used to be a boolean setting
 		throw new RuntimeException("unknown Severity ["+sev+"] should be NONE, DEBUG, INFO, WARN, ERROR or FATAL");
 	}
 }
