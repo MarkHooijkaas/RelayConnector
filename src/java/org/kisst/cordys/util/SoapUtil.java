@@ -113,6 +113,10 @@ public class SoapUtil {
 	public static void mergeResponses(int originalResponse, int cordysResponse) {
 		originalResponse = Node.getRoot(originalResponse); // get Soap:Envelope
 		cordysResponse   = Node.getRoot(cordysResponse);   // get Soap:Envelope
+		mergeEnvelopes(originalResponse, cordysResponse);
+	}
+
+	public static void mergeEnvelopes(int originalResponse, int cordysResponse) {
 		copyHeaders(originalResponse, cordysResponse);
 		int srcbody=getBody(originalResponse);
 		int destbody=getBody(cordysResponse);
