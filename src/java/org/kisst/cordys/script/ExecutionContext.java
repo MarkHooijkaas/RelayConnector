@@ -116,8 +116,9 @@ public class ExecutionContext extends CallContext {
 	// Possible fix would be to not use sendAndCallback, but just send, and use a 
 	// default SOAPListener. This in considered not very urgent yet.
 
+	public void callMethodAsync(int method, final String resultVar) { callMethodAsync(method, resultVar); }
 	
-	public void callMethodAsync(int method, final String resultVar) {
+	public void callMethodAsync(int method, final String resultVar, final boolean ignoreSoapFault) {
 		traceInfo("sending request: ",method);
 		String methodName=Node.getLocalName(method);
 		MethodCache caller = getRelayConnector().responseCache;
@@ -126,7 +127,7 @@ public class ExecutionContext extends CallContext {
 			public boolean onReceive(int message)
 			{
 				try {
-					checkAndLogResponse(message, resultVar);
+					checkAndLogResponse(message, resultVar, ignoreSoapFault);
 					setXmlVar(resultVar, SoapUtil.getContent(message));
 				}
 				catch(Exception e) {

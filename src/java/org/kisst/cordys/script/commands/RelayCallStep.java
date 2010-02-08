@@ -24,6 +24,7 @@ import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
 import org.kisst.cordys.script.expression.XmlExpression;
 import org.kisst.cordys.script.xml.ElementAppender;
+import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.xml.nom.Node;
@@ -34,6 +35,7 @@ public class RelayCallStep implements Step {
 	private final boolean async;
 	private final ElementAppender appender;
 	private final String resultVar;
+	private final boolean ignoreSoapFault;
 
 	
 	public RelayCallStep(CompilationContext compiler, final int node) {
@@ -43,6 +45,7 @@ public class RelayCallStep implements Step {
 		message=new XmlExpression(compiler, str);
 		async=compiler.getSmartBooleanAttribute(node, "async", false);
 		appender=new ElementAppender(compiler, node);
+		ignoreSoapFault=NomUtil.getBooleanAttribute(node, "ignoreSoapFault", false);
 		
 		resultVar = Node.getAttribute(node,	"resultVar");
 		if (resultVar==null)
@@ -55,16 +58,17 @@ public class RelayCallStep implements Step {
 		int content=SoapUtil.getContent(msg);
 
 		int method = context.createMethod(Node.getNamespaceURI(content), Node.getLocalName(content)).node;
-		SoapUtil.mergeResponses(msg, method); // TODO: name of this method is strange
+		SoapUtil.mergeEnvelopes(msg, Node.getRoot(method));
 		appender.append(context, method);
 		callMethod(context, method);
+		//context.setXmlVar(resultVar, Node.getRoot(method));
 	}
 	
 	protected void callMethod(final ExecutionContext context, int method) {
 		if (async)
-			context.callMethodAsync(method, resultVar);
+			context.callMethodAsync(method, resultVar, ignoreSoapFault);
 		else {
-			int response = context.callMethod(method, resultVar);
+			int response = context.callMethod(method, resultVar, ignoreSoapFault);
 			context.setXmlVar(resultVar, SoapUtil.getContent(response));
 		}
 	}

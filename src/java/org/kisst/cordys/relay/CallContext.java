@@ -136,18 +136,20 @@ public class CallContext extends RelayTrace {
 				return null;
 
 		} 
-		catch (DirectoryException e) {  throw new RuntimeException("Error when handling method "+methodname,e); }
+		catch (DirectoryException e) {  throw new RuntimeException("Error when creating method call for "+methodname,e); }
 	}
-	
-	public int callMethod(int method, String resultVar) {
+
+	public int callMethod(int method, String resultVar) { return callMethod(method, resultVar, false); }
+
+	public int callMethod(int method, String resultVar, boolean ignoreSoapFault) {
 		traceInfo("sending request: ", method);
 		MethodCache caller = getRelayConnector().responseCache;
 		int response = caller.sendAndWait(method,RelaySettings.timeout.get(getProps()));
-		checkAndLogResponse(response, resultVar);
+		checkAndLogResponse(response, resultVar, ignoreSoapFault);
 		return response;
 	}
 	
-	public void checkAndLogResponse(int response, String resultVar) {
+	public void checkAndLogResponse(int response, String resultVar, boolean ignoreSoapFault) {
 		destroyWhenDone(new NomNode(response));
 		int responseBody=SoapUtil.getContent(response);
 		if (infoTraceEnabled()) 
@@ -155,7 +157,7 @@ public class CallContext extends RelayTrace {
 			traceInfo("received response: ",responseBody);
 		if (allreadyDestroyed)
 			return;
-		if (SoapUtil.isSoapFault(responseBody)) {
+		if ((! ignoreSoapFault) && SoapUtil.isSoapFault(responseBody)) {
 				trace(Severity.WARN, new RelayTrace.Item("Result of methodcall for "+resultVar+" returned Fault: ",responseBody));
 			throw new RelayedSoapFaultException(response);
 		}
