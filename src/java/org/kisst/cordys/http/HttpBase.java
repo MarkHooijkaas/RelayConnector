@@ -36,7 +36,7 @@ import org.kisst.cordys.script.expression.XmlExpression;
 import com.eibus.xml.nom.Node;
 
 public class HttpBase {
-    private static final HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
+    protected static final HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
     
     public static void reset() {
     	// TODO: better way to clear all. This will not affect active connections
@@ -48,7 +48,7 @@ public class HttpBase {
 	
     private final XmlExpression body;
     private final boolean prettyPrint;
-    private final int timeout;
+    protected final int timeout;
     protected final Props props;
 	
 	public HttpBase(CompilationContext compiler, final int node) {
