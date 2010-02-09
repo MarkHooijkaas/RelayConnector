@@ -19,8 +19,12 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.http;
 
+import java.io.IOException;
+
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.kisst.cordys.relay.RelaySettings;
 import org.kisst.cordys.script.CompilationContext;
@@ -45,6 +49,7 @@ public class HttpBase2 extends HttpBase {
     private final HttpHeader headers[];
 	private final Expression urlExpression;
 	private final Expression applicationExpression ;
+	private final boolean doPost;
 	
 	public HttpBase2(CompilationContext compiler, final int node) {
 		super(compiler, node);
@@ -56,6 +61,7 @@ public class HttpBase2 extends HttpBase {
 				headers[idx++]=new HttpHeader(compiler, child);
 			child=Node.getNextSibling(child);
 		}
+		doPost="POST".equals(Node.getAttribute(node, "method", "POST"));
 		urlExpression = ExpressionParser.parse(compiler, Node.getAttribute(node, "url"));
 		applicationExpression  = ExpressionParser.parse(compiler, Node.getAttribute(node, "application"));
 		//TODO: body=new XmlExpression(compiler, Node.getElement(node, "body"));
@@ -76,6 +82,24 @@ public class HttpBase2 extends HttpBase {
 		return method;
 	}
 
+	protected GetMethod createGetMethod(ExecutionContext context, HttpState state) {
+		HostSettings host=getHost(context);
+		String url=urlExpression.getString(context);
+		String urlstart=host.url.get(props);
+		if (urlstart==null || urlstart.trim().length()==0)
+			throw new RuntimeException("Could not find http configuration "+applicationExpression.getString(context));
+	    GetMethod method = new GetMethod(urlstart+url); // TODO: handle slashes /
+	    method.getParams().setSoTimeout(timeout);
+
+		for (HttpHeader h:headers) {
+	    	method.addRequestHeader(h.key, h.value.getString(context));
+		}
+		if (state!=null)
+			method.setDoAuthentication(true);
+		return method;
+	}
+
+	
 	protected HttpState createState(final ExecutionContext context) {
 		HostSettings host=getHost(context);
 		if (host.username.get(props) != null) {
@@ -101,8 +125,24 @@ public class HttpBase2 extends HttpBase {
     		context.traceInfo("Sending HTTP request: ",reqnode);
     	}
 		HttpState state=createState(context);
-	    PostMethod method = createPostMethod(context, state, bodyNode);
-	    HttpResponse result=httpCall(method, state);
+		HttpResponse result;
+	    if (doPost) {
+	    	PostMethod method = createPostMethod(context, state, bodyNode);
+	    	result=httpCall(method, state);
+	    }
+	    else {
+	    	GetMethod method = createGetMethod(context, state);
+		    try {
+		    	//int statusCode = client.executeMethod(method.getHostConfiguration(), method, state);
+		    	int statusCode = client.executeMethod(null, method, state);
+				return new HttpResponse(statusCode, method.getResponseBody());
+		    }
+		    catch (HttpException e) { throw new RuntimeException(e); } 
+		    catch (IOException e) {  throw new RuntimeException(e); }
+		    finally {
+		    	method.releaseConnection(); // TODO: what if connection not yet borrowed?
+		    }
+	    }	    
     	if (context.infoTraceEnabled()) {
     		try {
     			context.traceInfo("Received HTTP response: "+result.getCode()+" "+result.getResponseString());
