@@ -116,10 +116,10 @@ public class SoapUtil {
 		mergeEnvelopes(originalResponse, cordysResponse);
 	}
 
-	public static void mergeEnvelopes(int originalResponse, int cordysResponse) {
-		copyHeaders(originalResponse, cordysResponse);
-		int srcbody=getBody(originalResponse);
-		int destbody=getBody(cordysResponse);
+	public static void mergeEnvelopes(int src, int dest) {
+		copyHeaders(src, dest);
+		int srcbody=getBody(src);
+		int destbody=getBody(dest);
 		NomUtil.copyXmlnsAttributes(srcbody, destbody);
 		NomUtil.deleteChildren(destbody); // remove boilerplate response 
 		Node.duplicateAndAppendToChildren(Node.getFirstChild(srcbody), Node.getLastChild(srcbody), destbody );
@@ -131,12 +131,11 @@ public class SoapUtil {
 	 * because this function first does a getRoot on both parameters.  
 	 */
 	public static void copyHeaders(int src, int dest) {
-		src=getHeader(Node.getRoot(src)); // get Soap:Header
-		if (src==0)
+		int srcheader=getHeader(src); // get Soap:Header
+		if (srcheader==0)
 			return; // no Header to copy
-		int destheader=getHeader(Node.getRoot(dest)); // get Soap:Header
+		int destheader=getHeader(dest); // get Soap:Header
 		if (destheader==0) {
-			dest=Node.getRoot(dest);
 			destheader=Node.createElement("Header", dest);
 			NomUtil.setNamespace(destheader, soapNamespace, "SOAP", true);
 		}
@@ -144,10 +143,10 @@ public class SoapUtil {
 		// copy Envelope and Header attributes for xmlns definitions 
 		// C2 will not do this for you 
 		// In C3 the dupplicateAndAppend will do this for each child
-		NomUtil.copyXmlnsAttributes(Node.getRoot(src), Node.getRoot(dest));
 		NomUtil.copyXmlnsAttributes(src, dest);
+		NomUtil.copyXmlnsAttributes(srcheader, destheader);
 		// copy children of Header
-		int child=Node.getFirstChild(src);
+		int child=Node.getFirstChild(srcheader);
 		while (child!=0) {
 			if (! isCordysHeader(child))
 				Node.duplicateAndAppendToChildren(child, child, destheader );
