@@ -23,6 +23,7 @@ import org.kisst.cordys.relay.RelayTrace;
 
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
+import com.eibus.xml.nom.NodeType;
 import com.eibus.xml.nom.XMLException;
 
 public class NomNode implements Destroyable {
@@ -37,6 +38,15 @@ public class NomNode implements Destroyable {
 	public NomNode appendElement(String name) {	return new NomNode(Node.createElement(name, node));	}
 	public void setText(String txt) {	Node.setDataElement(node, "", txt);	}
 	public void appendText(String txt) {	Node.setDataElement(node, "", getText()+txt);	}
+	public boolean containsOnlyText() {
+		int child=Node.getFirstChild(node);
+		while (child!=0) {
+			if (Node.getType(child)!=NodeType.DATA && Node.getType(child)!=NodeType.CDATA)
+				return false;
+			child=Node.getNextSibling(child);
+		}
+		return true;
+	}
 
 	public void rename(String name) {
 		String oldname=Node.getName(node);
