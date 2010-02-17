@@ -22,6 +22,8 @@ package org.kisst.cordys.script.commands;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
+import org.kisst.cordys.script.expression.Expression;
+import org.kisst.cordys.script.expression.ExpressionParser;
 import org.kisst.cordys.script.expression.XmlExpression;
 import org.kisst.cordys.script.xml.ElementAppender;
 import org.kisst.cordys.util.NomUtil;
@@ -36,6 +38,8 @@ public class RelayCallStep implements Step {
 	private final ElementAppender appender;
 	private final String resultVar;
 	private final boolean ignoreSoapFault;
+	private final Expression namespaceExpression;
+	private final Expression methodExpression;
 
 	
 	public RelayCallStep(CompilationContext compiler, final int node) {
@@ -46,6 +50,9 @@ public class RelayCallStep implements Step {
 		async=compiler.getSmartBooleanAttribute(node, "async", false);
 		appender=new ElementAppender(compiler, node);
 		ignoreSoapFault=NomUtil.getBooleanAttribute(node, "ignoreSoapFault", false);
+
+		methodExpression=ExpressionParser.parse(compiler,Node.getAttribute(node, "method"));
+		namespaceExpression=ExpressionParser.parse(compiler,Node.getAttribute(node, "namespace"));
 		
 		resultVar = Node.getAttribute(node,	"resultVar");
 		if (resultVar==null)
@@ -56,8 +63,15 @@ public class RelayCallStep implements Step {
 	public void executeStep(final ExecutionContext context) {
 		int msg=message.getNode(context);
 		int content=SoapUtil.getContent(msg);
-
-		int method = context.createMethod(Node.getNamespaceURI(content), Node.getLocalName(content)).node;
+		
+		String methodname=Node.getLocalName(content);
+		String namespace=Node.getNamespaceURI(content);
+		if (methodExpression!=null)
+			methodname=methodExpression.getString(context);
+		if (namespaceExpression!=null)
+			namespace=namespaceExpression.getString(context);
+		
+		int method = context.createMethod(namespace, methodname).node;
 		SoapUtil.mergeEnvelopes(msg, Node.getRoot(method));
 		appender.append(context, method);
 		callMethod(context, method);
