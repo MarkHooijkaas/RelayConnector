@@ -62,7 +62,7 @@ public class ConvertStep implements Step {
 		List<NomNode> nodeList=expr.getNodeList(context);
 		for (NomNode n: nodeList) {
 			if (n.containsOnlyText())
-				n.setText("TEST"+convertor.convert(n.getText()));
+				n.setText(convertor.convert(n.getText()));
 		}
 	}
 }
