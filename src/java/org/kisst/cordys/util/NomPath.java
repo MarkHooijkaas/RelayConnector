@@ -34,6 +34,7 @@ public class NomPath {
 		boolean isText=false;
 		boolean isParent=false;
 		boolean singlestar=false;
+		boolean superstar=false;
 		boolean isLast=false;
 		boolean isDot=false;
 		boolean isLocalname=false;
@@ -140,7 +141,14 @@ public class NomPath {
 					nodeResult=false;
 					e=e.substring(1);
 				}
-				if (e.startsWith("*")) {
+				if (e.equals("**")) {
+					parts[i].superstar=true;
+					parts[i].optional=true;
+					alwaysSingle=false;
+					e=e.substring(1);
+					continue;
+				}
+				else if (e.startsWith("*")) {
 					parts[i].singlestar=true;
 					parts[i].optional=true;
 					alwaysSingle=false;
@@ -280,10 +288,13 @@ public class NomPath {
 					atLeastOneMatch=true;
 					if (part.isLast)
 						result.add(new NomNode(child));
-					else
+					else {
 						fillNodeList(child, index+1, result, superstar);
+						if (part.superstar)
+							fillNodeList(child, index, result, true);
+					}
 				}
-				if (part.singlestar || ! match)
+				if (part.superstar || part.singlestar || ! match)
 					child=Node.getNextSibling(child);
 				else
 					child=0;
