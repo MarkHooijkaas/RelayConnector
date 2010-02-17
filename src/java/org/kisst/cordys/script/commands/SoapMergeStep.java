@@ -41,7 +41,7 @@ public class SoapMergeStep implements Step {
 	public void executeStep(ExecutionContext context) {
 		int src  = srcExpression.getNode(context);
 		int dest = destExpression.getNode(context);
-		SoapUtil.mergeResponses(src,dest);
+		SoapUtil.mergeEnvelopes(src,dest);
 		if (context.debugTraceEnabled()) {
 			if (context.getTrace()!=null)
 				context.getTrace().trace(Severity.DEBUG, "result after soap merge ", dest);
