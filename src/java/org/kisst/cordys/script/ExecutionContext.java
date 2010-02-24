@@ -116,7 +116,7 @@ public class ExecutionContext extends CallContext {
 	// Possible fix would be to not use sendAndCallback, but just send, and use a 
 	// default SOAPListener. This in considered not very urgent yet.
 
-	public void callMethodAsync(int method, final String resultVar) { callMethodAsync(method, resultVar); }
+	public void callMethodAsync(int method, final String resultVar) { callMethodAsync(method, resultVar, false); }
 	
 	public void callMethodAsync(int method, final String resultVar, final boolean ignoreSoapFault) {
 		traceInfo("sending request: ",method);
