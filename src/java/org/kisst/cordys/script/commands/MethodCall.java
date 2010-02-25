@@ -25,6 +25,7 @@ import org.kisst.cordys.script.expression.Expression;
 import org.kisst.cordys.script.expression.ExpressionParser;
 import org.kisst.cordys.script.expression.XmlExpression;
 import org.kisst.cordys.script.xml.ElementAppender;
+import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.xml.nom.Node;
@@ -40,6 +41,7 @@ public class MethodCall {
 	private final ElementAppender appender;
 	private final String resultVar;
 	private final XmlExpression headerExpression;
+	private final boolean ignoreSoapFault;
 
 	
 	public MethodCall(CompilationContext compiler, final int node) {
@@ -72,7 +74,7 @@ public class MethodCall {
 		if (namespace!=null && namespaceExpression!=null)
 			throw new RuntimeException("attribute namespace and namespaceExpression should not be set both");
 
-
+		ignoreSoapFault=NomUtil.getBooleanAttribute(node, "ignoreSoapFault", false);
 		async=compiler.getSmartBooleanAttribute(node, "async", false);
 		appender=new ElementAppender(compiler, node);
 		
@@ -117,9 +119,9 @@ public class MethodCall {
 
 	protected void callMethod(final ExecutionContext context, int method) {
 		if (async)
-			context.callMethodAsync(method, resultVar);
+			context.callMethodAsync(method, resultVar, ignoreSoapFault);
 		else {
-			int response = context.callMethod(method, resultVar);
+			int response = context.callMethod(method, resultVar, ignoreSoapFault);
 			context.setXmlVar(resultVar, SoapUtil.getContent(response));
 		}
 	}
