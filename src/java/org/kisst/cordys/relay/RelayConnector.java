@@ -22,6 +22,7 @@ package org.kisst.cordys.relay;
 import org.kisst.cfg4j.LayeredProps;
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.util.BaseConnector;
+import org.kisst.cordys.util.JamonUtil;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
@@ -56,5 +57,6 @@ public class RelayConnector extends BaseConnector {
 	@Override public void reset() {
 		super.reset();
 		responseCache.reset(getGlobalProps());
+		JamonUtil.logAndResetAllTimers("d:/Cordys/relay.timer.log");
 	}
 }

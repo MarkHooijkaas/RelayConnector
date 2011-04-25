@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="lib/jt400.jar"/>
 	<classpathentry kind="lib" path="lib/commons-pool-1.5.jar"/>
 	<classpathentry kind="lib" path="lib/quartz-1.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/jamon-2.7.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

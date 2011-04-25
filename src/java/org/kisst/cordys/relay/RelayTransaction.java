@@ -33,6 +33,8 @@ import com.eibus.soap.SOAPTransaction;
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 public class RelayTransaction implements ApplicationTransaction
 {
@@ -62,6 +64,8 @@ public class RelayTransaction implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
+    	final Monitor mon1 = MonitorFactory.start("IncomingCall:"+NomUtil.getUniversalName(request.getXMLNode()));
+		final Monitor mon2 = MonitorFactory.start("AllIncomingCalls");
     	if (RelaySettings.emergencyBreak.get(props)) {
     		String msg="Forbidden to call method "+context.fullMethodName+", see relay.forbidden property";
     		logger.log(Severity.WARN, msg);
@@ -111,6 +115,8 @@ public class RelayTransaction implements ApplicationTransaction
     	}
     	finally {
    			context.destroy();
+			mon1.stop();
+			mon2.stop();
     	}
 		if (context.getTimer()!=null)
 			context.getTimer().log(" finished "+result+context.getFullMethodName());

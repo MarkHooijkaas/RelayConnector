@@ -27,6 +27,7 @@ import org.kisst.cordys.relay.resourcepool.ResourcePool;
 import org.kisst.cordys.util.BaseConnector;
 import org.kisst.cordys.util.Destroyable;
 import org.kisst.cordys.util.NomNode;
+import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.connector.nom.Connector;
@@ -35,6 +36,8 @@ import com.eibus.soap.SOAPTransaction;
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Document;
 import com.eibus.xml.nom.Node;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 public class CallContext extends RelayTrace {
 	protected final ArrayList<Destroyable> destroyables = new ArrayList<Destroyable>();
@@ -144,7 +147,11 @@ public class CallContext extends RelayTrace {
 	public int callMethod(int method, String resultVar, boolean ignoreSoapFault) {
 		traceInfo("sending request: ", method);
 		MethodCache caller = getRelayConnector().responseCache;
+		Monitor mon1 = MonitorFactory.start("OutgoingCall:"+NomUtil.getUniversalName(method));
+		Monitor mon2 = MonitorFactory.start("AllOutgoingCalls");
 		int response = caller.sendAndWait(method,RelaySettings.timeout.get(getProps()));
+		mon1.stop();
+		mon2.stop();
 		checkAndLogResponse(response, resultVar, ignoreSoapFault);
 		return response;
 	}
