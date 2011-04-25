@@ -72,7 +72,10 @@ public class RelayCallStep implements Step {
 			namespace=namespaceExpression.getString(context);
 		
 		int method = context.createMethod(namespace, methodname).node;
-		SoapUtil.mergeEnvelopes(msg, Node.getRoot(method));
+		int methodRoot=Node.getRoot(method);
+		SoapUtil.mergeEnvelopes(msg, methodRoot);
+		// Note: the method node might have been moved, thus need to be recalculated
+		method=SoapUtil.getContent(methodRoot);
 		appender.append(context, method);
 		callMethod(context, method);
 		//context.setXmlVar(resultVar, Node.getRoot(method));
