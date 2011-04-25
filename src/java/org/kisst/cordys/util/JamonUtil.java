@@ -22,10 +22,16 @@ public class JamonUtil {
 		}
         msg.append('\n');
 
+        FileOutputStream out = null;
 		try {
-			FileOutputStream out = new FileOutputStream(filename, true);
+			out = new FileOutputStream(filename, true);
 			out.write(msg.toString().getBytes());
-			out.close();
 		} catch (IOException e) { throw new RuntimeException(e);}
+		finally {
+			if (out!=null) {
+				try { out.close(); }
+				catch (IOException e) { throw new RuntimeException(e);}
+			}
+		}
 	}
 }
