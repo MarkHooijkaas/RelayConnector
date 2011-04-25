@@ -7,7 +7,7 @@
       <pathelement location="lib/commons-logging-1.0.4.jar"/>
       <pathelement location="lib/backport-util-concurrent.jar"/>
       <pathelement location="lib/ehcache-1.5.0.jar"/>
-      <pathelement location="lib/groovy-all-1.6.2.jar"/>
+      <pathelement location="lib/jamon-2.7.jar"/>
 	</jarfiles>
 	<javafiles>org/kisst/cordys/util/**,org/kisst/cordys/relay/**,org/kisst/cordys/script/**</javafiles>
 </project>
