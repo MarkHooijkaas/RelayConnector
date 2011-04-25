@@ -57,6 +57,6 @@ public class RelayConnector extends BaseConnector {
 	@Override public void reset() {
 		super.reset();
 		responseCache.reset(getGlobalProps());
-		JamonUtil.logAndResetAllTimers("d:/Cordys/relay.timer.log");
+		JamonUtil.logAndResetAllTimers("d:/Cordys/relay.jamon.log");
 	}
 }
