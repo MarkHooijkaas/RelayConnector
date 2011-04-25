@@ -181,8 +181,14 @@ abstract public class BaseConnector extends ApplicationConnector {
 			method=createMethod(namespace, methodName, dnUser);
 			Node.createTextElement("key", key, method);
 			response=callMethod(method);
-			int node=SoapUtil.getContent(response);
-			String config = Node.getData(node);
+			if (SoapUtil.isSoapFault(response))
+				throw new RuntimeException("Soap Fault while reading config form xmlstore "+SoapUtil.getSoapFaultMessage(response));
+			int node=SoapUtil.getContent(response); 
+			int confignode =NomUtil.getElementByLocalName(node, "tuple");
+			confignode =NomUtil.getElementByLocalName(confignode, "old");
+			if (confignode==0)
+				throw new RuntimeException("Empty response (no tuple/old) while reading config form xmlstore "+SoapUtil.getSoapFaultMessage(response));
+			String config = Node.getData(confignode);
 			return new  java.io.ByteArrayInputStream(config.getBytes("UTF-8"));
 		}
 		catch (UnsupportedEncodingException e) { throw new RuntimeException(e); }
