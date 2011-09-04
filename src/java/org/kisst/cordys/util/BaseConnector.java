@@ -69,6 +69,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 	 */
 	public void open(Processor processor)
 	{
+		JamonUtil.logAndResetAllTimers("d:/Cordys/relay.jamon.log", "Starting RelayConnector");
 		dnOrganization=processor.getOrganization();
 		try {
 			initConfigLocation(getConfiguration());
@@ -118,6 +119,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 	{
 		for (int i=0; i<modules.size(); i++)
 			modules.get(i).destroy();
+		JamonUtil.logAndResetAllTimers("d:/Cordys/relay.jamon.log", "STOP called, dumping all statistics");
 	}    
 
 
