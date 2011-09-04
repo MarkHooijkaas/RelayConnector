@@ -55,10 +55,13 @@ abstract public class BaseConnector extends ApplicationConnector {
 
 	private Connector connector;
 	private String configLocation;
-	private String dnOrganization;
+	String dnOrganization;
+	String processorName;
 	private ArrayList<Module> modules=new ArrayList<Module>();
 	protected MultiLevelProps mlprops;
+	private JamonUtil.JamonThread jamonThread;
 
+	
 	/**
 	 * This method gets called when the processor is started. It reads the
 	 * configuration of the processor and creates the connector with the proper
@@ -69,8 +72,8 @@ abstract public class BaseConnector extends ApplicationConnector {
 	 */
 	public void open(Processor processor)
 	{
-		JamonUtil.logAndResetAllTimers("d:/Cordys/relay.jamon.log", "Starting RelayConnector");
 		dnOrganization=processor.getOrganization();
+		processorName = processor.getSOAPProcessorEntry().getDN();
 		try {
 			initConfigLocation(getConfiguration());
 			connector= Connector.getInstance(getConnectorName());
@@ -85,6 +88,11 @@ abstract public class BaseConnector extends ApplicationConnector {
 		}
 		catch (DirectoryException e) { throw new RuntimeException(e);	}
 		catch (ExceptionGroup e) { throw new RuntimeException(e);	} 
+		JamonUtil.jamonLog(this, "Starting Connector");
+		jamonThread=new JamonUtil.JamonThread(this);
+		Thread t = new Thread(jamonThread);
+		t.setDaemon(true);
+		t.start();
 	}
 
 	protected void init(Props globalProps) {}
@@ -113,13 +121,16 @@ abstract public class BaseConnector extends ApplicationConnector {
 		mlprops =new MultiLevelProps(getConfigStream());
 		for (int i=0; i<modules.size(); i++)
 			modules.get(i).reset(getGlobalProps());
+		JamonUtil.jamonLog(this,"RESET called, dumping all statistics");
+		jamonThread.reset();
 	}
 
 	public void close(Processor processor)
 	{
 		for (int i=0; i<modules.size(); i++)
 			modules.get(i).destroy();
-		JamonUtil.logAndResetAllTimers("d:/Cordys/relay.jamon.log", "STOP called, dumping all statistics");
+		JamonUtil.	jamonLog(this, "STOP called, dumping all statistics");
+		jamonThread.stop();
 	}    
 
 

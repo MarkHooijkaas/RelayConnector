@@ -50,6 +50,10 @@ public class RelaySettings {
 	public final static IntSetting sleepAfterCall=new IntSetting(relay, "sleepAfterCall",0);
 	
 	public final static MappedSetting<ResourcePoolSettings> resourcepool=
-		new MappedSetting<ResourcePoolSettings>(relay, "resourcepool", ResourcePoolSettings.class);;
+		new MappedSetting<ResourcePoolSettings>(relay, "resourcepool", ResourcePoolSettings.class);
 
+	private final static CompositeSetting jamon=new CompositeSetting(null,"jamon");
+	public final static BooleanSetting jamonEnabled=new BooleanSetting(jamon, "enabled",true);
+	public final static StringSetting jamonfilename=new StringSetting(jamon, "filename", "${cordys.home}/Logs/jamon/${org}-${processor}-${yyyy}-${mm}-${dd}.log");
+	public final static IntSetting jamonIntervalInSeconds=new IntSetting(jamon, "intervalInSeconds",300);
 }

@@ -26,6 +26,7 @@ import org.kisst.cfg4j.Props;
 import org.kisst.cordys.relay.resourcepool.ResourcePool;
 import org.kisst.cordys.util.BaseConnector;
 import org.kisst.cordys.util.Destroyable;
+import org.kisst.cordys.util.JamonUtil;
 import org.kisst.cordys.util.NomNode;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
@@ -145,13 +146,18 @@ public class CallContext extends RelayTrace {
 	public int callMethod(int method, String resultVar) { return callMethod(method, resultVar, false); }
 
 	public int callMethod(int method, String resultVar, boolean ignoreSoapFault) {
+    	String user=JamonUtil.getFirstDnPart(getOrganizationalUser());
 		traceInfo("sending request: ", method);
 		MethodCache caller = getRelayConnector().responseCache;
 		Monitor mon1 = MonitorFactory.start("OutgoingCall:"+NomUtil.getUniversalName(method));
 		Monitor mon2 = MonitorFactory.start("AllOutgoingCalls");
+		Monitor monu1 = MonitorFactory.start("OutgoingCallForUser:"+user+":"+NomUtil.getUniversalName(method));
+		Monitor monu2 = MonitorFactory.start("AllOutgoingCallsForUser:"+user);
 		int response = caller.sendAndWait(method,RelaySettings.timeout.get(getProps()));
 		mon1.stop();
 		mon2.stop();
+		monu1.stop();
+		monu2.stop();
 		checkAndLogResponse(response, resultVar, ignoreSoapFault);
 		return response;
 	}

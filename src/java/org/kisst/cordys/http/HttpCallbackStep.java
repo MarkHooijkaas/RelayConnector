@@ -55,7 +55,7 @@ public class HttpCallbackStep extends HttpBase2 implements Step {
 				method=createApplicationPostMethod(url.substring(12), bodyNode);
 			else
 				method=createPostMethod(url, bodyNode);
-			HttpResponse response=httpCall(method, null);
+			HttpResponse response=httpCall(method, null, context);
 			int cordysResponse=context.getXmlVar("output");
 			httpResponse = response.getResponseXml(context.getDocument());
 			if (response.getCode()>=300) {

@@ -27,6 +27,7 @@ import org.kisst.cordys.relay.CallContext;
 import org.kisst.cordys.relay.MethodCache;
 import org.kisst.cordys.relay.RelayConnector;
 import org.kisst.cordys.relay.RelaySettings;
+import org.kisst.cordys.util.JamonUtil;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
@@ -126,14 +127,19 @@ public class ExecutionContext extends CallContext {
 		String methodName=Node.getLocalName(method);
 		MethodCache caller = getRelayConnector().responseCache;
 		createXmlSlot(resultVar, methodName, new Date().getTime()+RelaySettings.timeout.get(getProps()));
+    	String user=JamonUtil.getFirstDnPart(getOrganizationalUser());
 		final Monitor mon1 = MonitorFactory.start("OutgoingCall:"+NomUtil.getUniversalName(method));
 		final Monitor mon2 = MonitorFactory.start("AllOutgoingCalls");
+		final Monitor monu1 = MonitorFactory.start("OutgoingCallForUser:"+user+":"+NomUtil.getUniversalName(method));
+		final Monitor monu2 = MonitorFactory.start("AllOutgoingCallsForUser:"+user);
 		caller.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {
 			public boolean onReceive(int message)
 			{
 				try {
 					mon1.stop();
 					mon2.stop();
+					monu1.stop();
+					monu2.stop();
 					checkAndLogResponse(message, resultVar, ignoreSoapFault);
 					setXmlVar(resultVar, SoapUtil.getContent(message));
 				}

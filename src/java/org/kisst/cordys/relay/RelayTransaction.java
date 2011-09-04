@@ -25,6 +25,7 @@ import java.io.StringWriter;
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Script;
+import org.kisst.cordys.util.JamonUtil;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.soap.ApplicationTransaction;
@@ -64,8 +65,11 @@ public class RelayTransaction implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
+    	String user=JamonUtil.getFirstDnPart(context.getOrganizationalUser());
     	final Monitor mon1 = MonitorFactory.start("IncomingCall:"+NomUtil.getUniversalName(request.getXMLNode()));
 		final Monitor mon2 = MonitorFactory.start("AllIncomingCalls");
+    	final Monitor monu1 = MonitorFactory.start("IncomingCallForUser:"+user+":"+NomUtil.getUniversalName(request.getXMLNode()));
+		final Monitor monu2 = MonitorFactory.start("AllIncomingCallsForUser:"+user);
     	if (RelaySettings.emergencyBreak.get(props)) {
     		String msg="Forbidden to call method "+context.fullMethodName+", see relay.forbidden property";
     		logger.log(Severity.WARN, msg);
@@ -117,6 +121,8 @@ public class RelayTransaction implements ApplicationTransaction
    			context.destroy();
 			mon1.stop();
 			mon2.stop();
+			monu1.stop();
+			monu2.stop();
     	}
 		if (context.getTimer()!=null)
 			context.getTimer().log(" finished "+result+context.getFullMethodName());

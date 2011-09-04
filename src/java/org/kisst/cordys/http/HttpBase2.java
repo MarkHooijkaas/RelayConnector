@@ -31,9 +31,12 @@ import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.Expression;
 import org.kisst.cordys.script.expression.ExpressionParser;
+import org.kisst.cordys.util.JamonUtil;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.xml.nom.Node;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 public class HttpBase2 extends HttpBase {
     private static class HttpHeader {
@@ -128,10 +131,15 @@ public class HttpBase2 extends HttpBase {
 		HttpResponse result;
 	    if (doPost) {
 	    	PostMethod method = createPostMethod(context, state, bodyNode);
-	    	result=httpCall(method, state);
+	    	result=httpCall(method, state, context);
 	    }
 	    else {
 	    	GetMethod method = createGetMethod(context, state);
+	    	String user=JamonUtil.getFirstDnPart(context.getOrganizationalUser());
+	    	final Monitor mon1 = MonitorFactory.start("HttpCall:"+context.getFullMethodName());
+			final Monitor mon2 = MonitorFactory.start("AllHttpCalls");
+	    	final Monitor monu1 = MonitorFactory.start("HttpCallForUser:"+user+":"+context.getFullMethodName());
+			final Monitor monu2 = MonitorFactory.start("AllHttpCallsForUser:"+user);
 		    try {
 		    	//int statusCode = client.executeMethod(method.getHostConfiguration(), method, state);
 		    	int statusCode = client.executeMethod(null, method, state);
@@ -141,6 +149,10 @@ public class HttpBase2 extends HttpBase {
 		    catch (IOException e) {  throw new RuntimeException(e); }
 		    finally {
 		    	method.releaseConnection(); // TODO: what if connection not yet borrowed?
+				mon1.stop();
+				mon2.stop();
+				monu1.stop();
+				monu2.stop();
 		    }
 	    }	    
     	if (context.infoTraceEnabled()) {
