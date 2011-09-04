@@ -24,8 +24,8 @@ import java.util.HashMap;
 
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.BaseSettings;
+import org.kisst.cordys.connector.CallContext;
 import org.kisst.cordys.connector.MethodCache;
-import org.kisst.cordys.relay.CallContext;
 import org.kisst.cordys.relay.RelayConnector;
 import org.kisst.cordys.util.DnUtil;
 import org.kisst.cordys.util.NomUtil;
@@ -61,15 +61,12 @@ public class ExecutionContext extends CallContext {
 	public ExecutionContext(RelayConnector connector, String fullMethodName, Props props, SOAPTransaction transaction) {
     	super(connector, fullMethodName, props, transaction);
     }
+
+	@Override
 	public void setCallDetails(BodyBlock request, BodyBlock response) {
-    	int inputNode = request.getXMLNode();
-		int outputNode = response.getXMLNode();
-		setXmlVar("input", inputNode);
-		setXmlVar("output", outputNode);
-		// This fixes some strange behavior that prefix of input is not used in output
-		String inputPrefix= Node.getPrefix(inputNode);
-		if (inputPrefix!=null)
-			Node.setName(outputNode, inputPrefix+":"+Node.getLocalName(outputNode));
+		super.setCallDetails(request, response);
+		setXmlVar("input", request.getXMLNode());
+		setXmlVar("output", response.getXMLNode());
 	}
 
 	synchronized public void createXmlSlot(String name, String method, long timeoutTime) {
@@ -122,7 +119,7 @@ public class ExecutionContext extends CallContext {
 
 	public void callMethodAsync(int method, final String resultVar) { callMethodAsync(method, resultVar, false); }
 	
-	public void callMethodAsync(int method, final String resultVar, final boolean ignoreSoapFault) {
+	public void callMethodAsync(final int method, final String resultVar, final boolean ignoreSoapFault) {
 		traceInfo("sending request: ",method);
 		String methodName=Node.getLocalName(method);
 		MethodCache caller = getBaseConnector().responseCache;
@@ -132,10 +129,12 @@ public class ExecutionContext extends CallContext {
 		final Monitor mon2 = MonitorFactory.start("AllOutgoingCalls");
 		final Monitor monu1 = MonitorFactory.start("OutgoingCallForUser:"+user+":"+NomUtil.getUniversalName(method));
 		final Monitor monu2 = MonitorFactory.start("AllOutgoingCallsForUser:"+user);
+    	final Date startTime=new Date();
 		caller.sendAndCallback(Node.getParent(method),new SOAPMessageListener() {
 			public boolean onReceive(int message)
 			{
 				try {
+					getBaseConnector().logPerformance("CALL-ASYNC", ExecutionContext.this, startTime, method, true);
 					mon1.stop();
 					mon2.stop();
 					monu1.stop();

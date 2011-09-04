@@ -23,6 +23,8 @@ import org.kisst.cordys.as400.pcml.PcmlProgram;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
+import org.kisst.cordys.script.expression.XmlExpression;
+import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.xml.nom.Node;
 import com.ibm.as400.access.ProgramCall;
@@ -30,20 +32,23 @@ import com.ibm.as400.access.ProgramCall;
 public class ProgramStep implements Step {
 
 	private final PcmlProgram program;
-	private final String input;
-	private final String output;
+	private final XmlExpression inputExpression;
+	private final XmlExpression outputExpression;
 	
-	public ProgramStep(CompilationContext context, final int programNode) {
-    	program = new PcmlProgram(context, programNode);
-    	input=Node.getAttribute(programNode,"input");
-    	output=Node.getAttribute(programNode,"output");
+	public ProgramStep(CompilationContext compiler, final int node) {
+		int pcmlNode=NomUtil.getElementByLocalName(node, "pcml");
+		int programNode = NomUtil.getElementByLocalName(pcmlNode, "program");
+    	program = new PcmlProgram(compiler, programNode);
+		inputExpression=new XmlExpression(compiler, Node.getAttribute(node, "input", "/input"));
+		outputExpression=new XmlExpression(compiler, Node.getAttribute(node, "output", "/output"));
 	}
 
 	public void executeStep(ExecutionContext context) {
-		int requestNode = context.getXmlVar(input);
-		ProgramCall call = program.prepareProgramCall(requestNode);
+		int inputNode = inputExpression.getNode(context);
+		int outputNode = outputExpression.getNode(context);
+		ProgramCall call = program.prepareProgramCall(inputNode);
 		As400Module.getConnection(context).execute(call);
-		program.processCallResult(call.getParameterList(), context.getXmlVar(output));
+		program.processCallResult(call.getParameterList(), outputNode);
 	}
 
 }

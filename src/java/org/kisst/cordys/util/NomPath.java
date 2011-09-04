@@ -84,6 +84,12 @@ public class NomPath {
 					parts[i].optional=true;
 					e=e.substring(1);
 				}
+				// TODO: Do we want this second notation? we might need it for backward compatibility
+				// Probably not: I grepped through all methodsets and it seems neve toe be used
+				//if (e.endsWith("?")) {
+				//	parts[i].optional=true;
+				//	e=e.substring(0,e.length()-1);
+				//}
 				if (e.endsWith("$")) {
 					parts[i].searchLast=true;
 					e=e.substring(0,e.length()-1);

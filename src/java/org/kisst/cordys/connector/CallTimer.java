@@ -17,12 +17,18 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cordys.connector.resourcepool;
+package org.kisst.cordys.connector;
 
-import org.kisst.cordys.connector.CallContext;
+import com.eibus.util.logger.CordysLogger;
+import com.eibus.util.logger.Severity;
 
+public class CallTimer {
+	private static final CordysLogger logger = CordysLogger.getCordysLogger(CallTimer.class);
+	
+	private final long start=System.currentTimeMillis();
 
-public interface ResourcePool {
-	public void add(CallContext ctxt);
-	public void remove(CallContext ctxt);
+	public void log(String msg) {
+		logger.log(Severity.INFO, (System.currentTimeMillis()-start)+msg);
+	}
+
 }

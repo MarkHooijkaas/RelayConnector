@@ -20,6 +20,7 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cordys.http;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpState;
@@ -140,15 +141,19 @@ public class HttpBase2 extends HttpBase {
 			final Monitor mon2 = MonitorFactory.start("AllHttpCalls");
 	    	final Monitor monu1 = MonitorFactory.start("HttpCallForUser:"+user+":"+context.getFullMethodName());
 			final Monitor monu2 = MonitorFactory.start("AllHttpCallsForUser:"+user);
+			boolean success=false;
+			final Date startTime=new Date();
 		    try {
 		    	//int statusCode = client.executeMethod(method.getHostConfiguration(), method, state);
 		    	int statusCode = client.executeMethod(null, method, state);
+		    	success=true;
 				return new HttpResponse(statusCode, method.getResponseBody());
 		    }
 		    catch (HttpException e) { throw new RuntimeException(e); } 
 		    catch (IOException e) {  throw new RuntimeException(e); }
 		    finally {
 		    	method.releaseConnection(); // TODO: what if connection not yet borrowed?
+				context.getBaseConnector().logPerformance("HTTP", context, startTime, context.getRequest().getXMLNode(), success);
 				mon1.stop();
 				mon2.stop();
 				monu1.stop();

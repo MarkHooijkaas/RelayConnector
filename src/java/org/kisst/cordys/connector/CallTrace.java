@@ -17,12 +17,11 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cordys.relay;
+package org.kisst.cordys.connector;
 
 import java.util.ArrayList;
 
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.connector.BaseSettings;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.util.logger.CordysLogger;
@@ -35,19 +34,19 @@ import com.eibus.xml.nom.Node;
  * individual methods. 
  * Furthermore, the trace should be appended to any response or SOAP:Fault that the method returns.
  */
-public class RelayTrace {
-	public static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTrace.class);
+public class CallTrace {
+	public static final CordysLogger logger = CordysLogger.getCordysLogger(CallTrace.class);
 
 	public static class Item {
 		final String msg;
 		final int node;
 		Item(String msg) { this.msg=msg; this.node=0; }
-		Item(String msg, int node) { this.msg=msg; this.node=node; }
+		public Item(String msg, int node) { this.msg=msg; this.node=node; }
 	}
 	private final ArrayList<Item> items=new ArrayList<Item>();
 	private final Severity traceLevel;
 
-	public RelayTrace(Severity traceLevel) {
+	public CallTrace(Severity traceLevel) {
 		this.traceLevel=traceLevel;
 	}
 	
@@ -56,7 +55,7 @@ public class RelayTrace {
 			trace(Severity.DEBUG,msg);
 	} 
 	public void traceInfo(String msg) {	trace(Severity.INFO,msg); }
-	public void traceInfo(String msg, int node)  { trace(Severity.INFO, new RelayTrace.Item(msg,node));	}
+	public void traceInfo(String msg, int node)  { trace(Severity.INFO, new CallTrace.Item(msg,node));	}
 
 	public synchronized void trace(Severity level, String msg, int node) { trace(level, new Item(msg, node)); }
 	public synchronized void trace(Severity level, String msg) { trace(level, new Item(msg)); }

@@ -15,42 +15,46 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package org.kisst.cfg4j;
 
 
 
 public class Setting {
-  protected final CompositeSetting parent;
-  protected final String fullName;
-  protected final String name;
-  //private final boolean required;
+	protected final CompositeSetting parent;
+	protected final String fullName;
+	protected final String name;
+	private final boolean required;
 
-  public Setting(CompositeSetting parent, String name) {
-	this.parent=parent;
-	this.name=name;
-	//this.required=required;
-	if(parent==null) 
-	  fullName=name;
-	else {
-		parent.add(this);
-		if (parent.fullName==null)
-			fullName=name;
-		else
-			fullName=parent.fullName+"."+name;
+	public Setting(CompositeSetting parent, String name) {
+		this(parent,name,false);  
 	}
-  }
-  
-  public String getName() { return name; }
-  public String getFullName() { return fullName; }
-  public CompositeSetting getParent() { return parent; }
-  
-  public boolean exists(Props props) {
-	  return props.get(fullName,null)!=null;
-  }
-  //public boolean ok() { return ! this.required; }
 
+	public Setting(CompositeSetting parent, String name, boolean required) {
+		this.parent=parent;
+		this.name=name;
+		this.required=required;
+		if(parent==null) 
+			fullName=name;
+		else {
+			parent.add(this);
+			if (parent.fullName==null)
+				fullName=name;
+			else
+				fullName=parent.fullName+"."+name;
+		}
+	}
 
-  //abstract public String asString();
+	public String getName() { return name; }
+	public String getFullName() { return fullName; }
+	public CompositeSetting getParent() { return parent; }
+
+	public boolean exists(Props props) {
+		return props.get(fullName,null)!=null;
+	}
+
+	public boolean isRequired() { return required; }
+	
+	// TODO: implement defaultValue as in StringSetting
 }

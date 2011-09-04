@@ -34,10 +34,10 @@ import org.kisst.cfg4j.LongSetting;
 import org.kisst.cfg4j.MappedSetting;
 import org.kisst.cfg4j.Props;
 import org.kisst.cfg4j.StringSetting;
+import org.kisst.cordys.connector.CallTrace;
 import org.kisst.cordys.http.HostSettings;
 import org.kisst.cordys.http.HttpResponse;
 import org.kisst.cordys.http.HttpSoapFaultException;
-import org.kisst.cordys.relay.RelayTrace;
 import org.kisst.cordys.relay.RelayedSoapFaultException;
 import org.kisst.cordys.util.SoapUtil;
 
@@ -77,7 +77,7 @@ public class EsbTransaction  implements ApplicationTransaction {
     		e.createResponse(response);
     	}
     	catch (Exception e) {
-    		RelayTrace.logger.log(Severity.ERROR, "TECHERR.ESB", e);
+    		CallTrace.logger.log(Severity.ERROR, "TECHERR.ESB", e);
     		response.createSOAPFault("TECHERR.ESB",e.toString());
     	}
         return true; // connector has to send the response
@@ -107,7 +107,7 @@ public class EsbTransaction  implements ApplicationTransaction {
 			}
 			catch(RuntimeException e) {
 				if (i<hostnames.length-1)
-					RelayTrace.logger.log(Severity.WARN, "Error trying to call host "+hostname+" trying next host "+hostnames[i+1],e);
+					CallTrace.logger.log(Severity.WARN, "Error trying to call host "+hostname+" trying next host "+hostnames[i+1],e);
 				else
 					throw e;
 			}

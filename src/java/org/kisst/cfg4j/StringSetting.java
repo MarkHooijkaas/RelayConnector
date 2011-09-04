@@ -22,9 +22,22 @@ package org.kisst.cfg4j;
 public class StringSetting extends Setting {
 	private final String defaultValue;
 
+	public StringSetting(CompositeSetting parent, String name) {
+		super(parent, name, true);
+		this.defaultValue=null;
+	}
+
 	public StringSetting(CompositeSetting parent, String name, String defaultValue) {
 		super(parent, name);
 		this.defaultValue=defaultValue;
 	}
-	public String get(Props props) {	return props.getString(fullName, defaultValue);  }
+	public String get(Props props) {
+		String result = props.getString(fullName, null);
+		if (result!=null)
+			return result;
+		if (isRequired())
+			throw new RuntimeException("config value "+fullName+" is required but missing");
+		else
+			return defaultValue;
+	}
 }

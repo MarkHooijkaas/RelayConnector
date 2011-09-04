@@ -19,7 +19,7 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.connector.resourcepool;
 
-import org.kisst.cordys.relay.CallContext;
+import org.kisst.cordys.connector.CallContext;
 
 
 public class SimpleResourcePool implements ResourcePool {

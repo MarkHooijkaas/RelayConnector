@@ -19,7 +19,7 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.util;
 
-import org.kisst.cordys.relay.RelayTrace;
+import org.kisst.cordys.connector.CallTrace;
 
 import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
@@ -69,7 +69,7 @@ public class NomNode implements Destroyable {
 				throw new XMLException();
 		}
 		catch(XMLException e) {
-			RelayTrace.logger.log(Severity.ERROR, "Error when deleting node (probably double delete), ignoring this error ",e);
+			CallTrace.logger.log(Severity.ERROR, "Error when deleting node (probably double delete), ignoring this error ",e);
 		}
 	}
 

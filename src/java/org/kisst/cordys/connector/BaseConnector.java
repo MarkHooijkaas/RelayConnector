@@ -279,7 +279,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 
 	private ArrayList<PerformanceLogger> loggers = new ArrayList<PerformanceLogger>();
 	public void addPerformanceLogger(PerformanceLogger log) { loggers.add(log); }
-	public void logPerformance(String type, ExecutionContext context, Date startTime, int node, boolean status) {
+	public void logPerformance(String type, CallContext context, Date startTime, int node, boolean status) {
 		for (PerformanceLogger log: loggers)
 			log.log(type, context, startTime, node, status);
 	}

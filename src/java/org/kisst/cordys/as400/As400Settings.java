@@ -17,18 +17,19 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cordys.relay;
+package org.kisst.cordys.as400;
 
-import com.eibus.util.logger.CordysLogger;
-import com.eibus.util.logger.Severity;
+import org.kisst.cfg4j.BooleanSetting;
+import org.kisst.cfg4j.CompositeSetting;
+import org.kisst.cfg4j.IntSetting;
+import org.kisst.cfg4j.MappedSetting;
 
-public class RelayTimer {
-	private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTimer.class);
-	
-	private final long start=System.currentTimeMillis();
+public class As400Settings {
+	private final static CompositeSetting as400=new CompositeSetting(null,"as400");
 
-	public void log(String msg) {
-		logger.log(Severity.INFO, (System.currentTimeMillis()-start)+msg);
-	}
+	public final static MappedSetting<As400HostSettings> host=new MappedSetting<As400HostSettings>(as400, "host", As400HostSettings.class);;
+	public final static BooleanSetting  ignoreReturnCode=new BooleanSetting(as400, "ignoreReturnCode", false);
+	//public final static IntSetting  timeout=new IntSetting(as400, "timeout", 30000);
+	public final static IntSetting ccsid = new IntSetting(as400, "ccsid", -1); //1140?
 
 }

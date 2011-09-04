@@ -25,8 +25,8 @@ import groovy.lang.Script;
 import java.io.ByteArrayInputStream;
 
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.relay.CallContext;
-import org.kisst.cordys.relay.RelayTrace;
+import org.kisst.cordys.connector.CallContext;
+import org.kisst.cordys.connector.CallTrace;
 import org.kisst.cordys.relay.RelayedSoapFaultException;
 import org.kisst.cordys.util.NomNode;
 
@@ -69,7 +69,7 @@ public class GroovyTransaction  implements ApplicationTransaction {
     		e.createResponse(response);
     	}
     	catch (Exception e) {
-    		RelayTrace.logger.log(Severity.ERROR, "TECHERR.GROOVY", e);
+    		CallTrace.logger.log(Severity.ERROR, "TECHERR.GROOVY", e);
     		response.createSOAPFault("TECHERR.GROOVY",e.toString());
     	}
         return true; // connector has to send the response

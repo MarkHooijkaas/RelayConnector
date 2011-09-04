@@ -25,12 +25,12 @@ import java.util.Stack;
 
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.BaseSettings;
-import org.kisst.cordys.relay.RelayTrace;
+import org.kisst.cordys.connector.CallTrace;
 import org.kisst.cordys.script.commands.CommandList;
 
 import com.eibus.xml.nom.Node;
 
-public class CompilationContext extends RelayTrace implements PrefixContext {
+public class CompilationContext extends CallTrace implements PrefixContext {
 	private final HashMap<String,String> prefixes=new HashMap<String,String>();
 	private final CommandList commands;
 	private final HashSet<String> txtvars=new HashSet<String>();

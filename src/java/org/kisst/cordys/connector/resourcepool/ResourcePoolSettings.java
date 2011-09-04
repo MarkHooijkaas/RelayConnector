@@ -24,7 +24,7 @@ import org.kisst.cfg4j.IntSetting;
 import org.kisst.cfg4j.Props;
 import org.kisst.cfg4j.StringSetting;
 
-import org.kisst.cordys.relay.RelayTrace;
+import org.kisst.cordys.connector.CallTrace;
 import org.kisst.cordys.util.ReflectionUtil;
 
 import com.eibus.util.logger.Severity;
@@ -52,7 +52,7 @@ public class ResourcePoolSettings extends CompositeSetting {
 		if (max.exists(props))
 			return new SimpleResourcePool(name,max.get(props));
 		else {
-			RelayTrace.logger.log(Severity.WARN, "Property "+max.getFullName()+" is not defined");
+			CallTrace.logger.log(Severity.WARN, "Property "+max.getFullName()+" is not defined");
 			return null;
 		}
 	}

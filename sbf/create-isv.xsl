@@ -87,10 +87,10 @@
                     <spycategory />
                     <loggercategory>
                       <categorygroup displayname="RelayTrace">
-                         <category>org.kisst.cordys.relay.RelayTrace</category>
+                         <category>org.kisst.cordys.connector.CallTrace</category>
                       </categorygroup>
                       <categorygroup displayname="RelayTimer">
-                         <category>org.kisst.cordys.relay.RelayTimer</category>
+                         <category>org.kisst.cordys.connector.CallTimer</category>
                       </categorygroup>
                       <categorygroup displayname="HttpWire">
                          <category>httpclient.wire</category>

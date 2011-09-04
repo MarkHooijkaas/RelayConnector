@@ -24,10 +24,11 @@ import java.util.HashMap;
 import org.kisst.cordys.as400.conn.As400Connection;
 import org.kisst.cordys.as400.conn.As400ConnectionPool;
 import org.kisst.cordys.as400.conn.BorrowedAs400Connection;
-import org.kisst.cordys.as400.conn.SmartPool;
 import org.kisst.cordys.connector.BaseConnector;
 import org.kisst.cordys.connector.Module;
 import org.kisst.cordys.script.ExecutionContext;
+import org.kisst.cordys.script.GenericCommand;
+import org.kisst.cordys.script.commands.CommandList;
 
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
@@ -35,28 +36,26 @@ import com.eibus.util.logger.Severity;
 public class As400Module implements Module {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(As400Module.class);
 	public static final String SOAP_NAMESPACE = "http://schemas.xmlsoap.org/soap/envelope/";
-    private static int ccsid;
+    private BaseConnector connector; // TODO: make final, needs change in module loading
     
-    static public int getCcsid() { return ccsid; }
 
-	public final As400Configuration conf=new As400Configuration();
 	public static final HashMap<String, As400ConnectionPool> pools=new HashMap<String, As400ConnectionPool>();
-	
-
+    private static int ccsid;
+    static public int getCcsid() { return ccsid; }
 
 	public String getName() {
 		return "As400Module";
 	}
 
-	public void init(BaseConnector conn) {
+	public void init(BaseConnector connector) {
+		this.connector = connector;
 		createPools();
-		ccsid=determineCcsid();
-		logger.log(Severity.INFO, "using ccsid value: "+ccsid);
+    	CommandList.addBasicCommand("as400prog",  new GenericCommand(ProgramStep.class));
+    	CommandList.addBasicCommand("as400cmd",  new GenericCommand(CommandStep.class));
 	}
 
 	public void reset() {
 		destroyPools();
-		conf.reload();
 		createPools();
 	}
 
@@ -67,47 +66,25 @@ public class As400Module implements Module {
 
 	private void createPools() {
 		pools.clear();
-		String[] poolNames = conf.getPoolNames();
+		String[] poolNames = new String[] {"main"};
 		for (int i=0;i<poolNames.length; i++){
 			String name=poolNames[i];
-			SmartPool pool = new SmartPool(conf.getPoolConfiguration(name));
+			As400ConnectionPool pool = new As400ConnectionPool(As400Settings.host.get(name), connector.getGlobalProps() );
 			pool.init();
 			logger.log(Severity.DEBUG, "aanmaken pool " + name);
 			pools.put(name, pool);
 		}
+		ccsid = determineCcsid();
 	}
 	
 	private void destroyPools() {
-		String[] poolNames = conf.getPoolNames();
+		String[] poolNames = new String[] {"main"};
 		for (int i=0;i<poolNames.length; i++){
 			String name=poolNames[i];
 			getPool(name).destroy();
 		}
 	}
 
-	private int determineCcsid() {
-    	if (conf.getCcsId()>=0) {
-    		logger.debug("ccsid determined from configuration file");
-    		return conf.getCcsId();
-    	}
-		boolean allCallsDone = false;
-		logger.debug("Determining ccsid ousing connection");
-		As400ConnectionPool mainPool = getPool("main");
-    	As400Connection conn=mainPool.borrowConnection(conf.getDefaultTimeout()); //TODO moet dit aan een pool hangen
-       	try {
-       		int result = conn.getCcsid();
-			allCallsDone = true;
-			return result;
-		}
-       	finally {
-			if (allCallsDone)
-				mainPool.releaseConnection(conn);
-			else
-				mainPool.invalidateConnection(conn);
-       	}
-	}
-	
-    
 	public As400ConnectionPool getPool(String name) { return pools.get(name); }
 
 	public static As400Connection getConnection(ExecutionContext context) {
@@ -118,10 +95,35 @@ public class As400Module implements Module {
 		As400Connection conn= (As400Connection) context.getObject(key);
 		if (conn!=null)
 			return conn;
-		As400ConnectionPool pool = pools.get("TODO");
-		conn=pool.borrowConnection(30000);
+		As400ConnectionPool pool = pools.get("main");
+		conn=pool.borrowConnection(context.getProps());
 		context.destroyWhenDone(new BorrowedAs400Connection(pool, conn));
 		context.setObject(key, conn);
 		return conn;
 	}
+	
+	private int determineCcsid() {
+		int result = As400Settings.ccsid.get(connector.getGlobalProps());
+
+    	if (result>=0) {
+    		logger.debug("ccsid determined from configuration file");
+    		return result;
+    	}
+		boolean allCallsDone = false;
+		logger.debug("Determining ccsid ousing connection");
+		As400ConnectionPool mainPool = getPool("main");
+    	As400Connection conn=mainPool.borrowConnection(connector.getGlobalProps());
+       	try {
+       		result = conn.getCcsid();
+			allCallsDone = true;
+			return result;
+		}
+       	finally {
+			if (allCallsDone)
+				mainPool.releaseConnection(conn);
+			else
+				mainPool.invalidateConnection(conn);
+       	}
+	}
+
 }

@@ -25,6 +25,7 @@ import java.util.Date;
 
 import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.BaseSettings;
+import org.kisst.cordys.connector.CallTrace;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Script;
 import org.kisst.cordys.util.DnUtil;
@@ -74,7 +75,7 @@ public class RelayTransaction implements ApplicationTransaction
     	final Monitor monu1 = MonitorFactory.start("IncomingCallForUser:"+user+":"+NomUtil.getUniversalName(request.getXMLNode()));
 		final Monitor monu2 = MonitorFactory.start("AllIncomingCallsForUser:"+user);
     	if (BaseSettings.emergencyBreak.get(props)) {
-    		String msg="Forbidden to call method "+context.fullMethodName+", see relay.forbidden property";
+    		String msg="Forbidden to call method "+context.getFullMethodName()+", see relay.forbidden property";
     		logger.log(Severity.WARN, msg);
     		response.createSOAPFault("ESB.TECHERR.FORBIDDEN",msg);
     		return true;
@@ -106,7 +107,7 @@ public class RelayTransaction implements ApplicationTransaction
     	catch (RelayedSoapFaultException e) {
     		Severity sev=BaseSettings.logRelayedSoapFaults.get(props);
     		if (sev!=null)
-    			RelayTrace.logger.log(sev, "Relaying Soapfault "+e.getMessage());
+    			CallTrace.logger.log(sev, "Relaying Soapfault "+e.getMessage());
     		e.createResponse(response);
     	}
     	catch (SoapFaultException e) {
@@ -126,13 +127,13 @@ public class RelayTransaction implements ApplicationTransaction
 			mon2.stop();
 			monu1.stop();
 			monu2.stop();
-			context.getBaseConnector().logPerformance("INCOMING", context, startTime, request.getXMLNode(), "OK".equals(result));
+			context.getBaseConnector().logPerformance("INCOMING", context, startTime, request.getXMLNode(), "SUCCESS".equals(result));
     	}
 		if (context.getTimer()!=null)
 			context.getTimer().log(" finished "+result+context.getFullMethodName());
 		int sleep=BaseSettings.sleepAfterCall.get(props);
 		if (sleep>0) {
-			RelayTrace.logger.log(Severity.WARN, "Sleeping for "+sleep+" milliseconds");
+			CallTrace.logger.log(Severity.WARN, "Sleeping for "+sleep+" milliseconds");
 		  	try {
 				Thread.sleep(BaseSettings.sleepAfterCall.get(props));
 			} catch (InterruptedException e) { throw new RuntimeException(e); }
@@ -142,14 +143,14 @@ public class RelayTransaction implements ApplicationTransaction
 
 	private int createErrorDetails(int details, ExecutionContext context, Throwable e) {
 		String msg=e.getMessage()+" while handling "+context.getFullMethodName();
-		if (BaseSettings.logRequestOnError.get(context.props)) {
+		if (BaseSettings.logRequestOnError.get(context.getProps())) {
 			int input=context.getXmlVar("input");
 			input=NomUtil.getRootNode(input);
 			msg+="\n"+Node.writeToString(input,false);
 		}
 		if (BaseSettings.logTrace.get(props))
 			msg+="\n"+context.getTraceAsString(props);
-		RelayTrace.logger.log(Severity.ERROR, msg, e);
+		CallTrace.logger.log(Severity.ERROR, msg, e);
 		if (BaseSettings.showStacktrace.get(props))
 			Node.createTextElement("stacktrace", getStackTraceAsString(e), details);
 		if (BaseSettings.showTrace.get(props))

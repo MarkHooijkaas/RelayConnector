@@ -20,17 +20,20 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cordys.as400.conn;
 
 import org.apache.commons.pool.PoolableObjectFactory;
+import org.kisst.cfg4j.Props;
+import org.kisst.cordys.as400.As400HostSettings;
 
 public class As400ConnectionFactory implements PoolableObjectFactory {
 
-	private final PoolConfiguration conf;
-
-	public As400ConnectionFactory(PoolConfiguration conf) {
-		this.conf=conf;
-	}
+	private final As400HostSettings settings;
+	private final Props props;
+	
+	public As400ConnectionFactory(As400HostSettings settings, Props props) {
+		this.settings=settings;
+		this.props=props;	}
 	
 	public Object makeObject() {
-		return new As400Connection(conf);
+		return new As400Connection(settings, props);
 	}
 
 	public void activateObject(Object obj) {
