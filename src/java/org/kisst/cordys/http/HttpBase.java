@@ -32,7 +32,7 @@ import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.XmlExpression;
-import org.kisst.cordys.util.JamonUtil;
+import org.kisst.cordys.util.DnUtil;
 
 import com.eibus.xml.nom.Node;
 import com.jamonapi.Monitor;
@@ -79,7 +79,7 @@ public class HttpBase {
 	}
 	
 	protected HttpResponse httpCall(final PostMethod method, HttpState state, ExecutionContext context) {
-    	String user=JamonUtil.getFirstDnPart(context.getOrganizationalUser());
+    	String user=DnUtil.getFirstDnPart(context.getOrganizationalUser());
     	final Monitor mon1 = MonitorFactory.start("HttpCall:"+context.getFullMethodName());
 		final Monitor mon2 = MonitorFactory.start("AllHttpCalls");
     	final Monitor monu1 = MonitorFactory.start("HttpCallForUser:"+user+":"+context.getFullMethodName());

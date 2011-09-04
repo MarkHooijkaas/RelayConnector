@@ -19,8 +19,8 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.http;
 
-import org.kisst.cfg4j.Props;
-import org.kisst.cordys.relay.Module;
+import org.kisst.cordys.connector.BaseConnector;
+import org.kisst.cordys.connector.Module;
 import org.kisst.cordys.script.GenericCommand;
 import org.kisst.cordys.script.commands.CommandList;
 
@@ -32,14 +32,14 @@ public class HttpModule implements Module {
 
 	public String getName() { return "HttpModule";	}
 
-	public void init(Props  props) {
+	public void init(BaseConnector conn) {
     	CommandList.addBasicCommand("http",  new GenericCommand(HttpStep.class));
     	CommandList.addBasicCommand("http-relay",  new GenericCommand(HttpRelayStep.class));
     	CommandList.addBasicCommand("http-callback",  new GenericCommand(HttpCallbackStep.class));
-    	reset(props);
+    	reset();
 	}
 
-	public void reset(Props  props) {
+	public void reset() {
 		HttpBase.reset();
     	//settings=new MultiLevelSettings<HttpSettings>(mlprops,"http", HttpSettings.class);
 	}

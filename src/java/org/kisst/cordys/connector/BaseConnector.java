@@ -17,21 +17,27 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.kisst.cordys.util;
+package org.kisst.cordys.connector;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.kisst.cfg4j.MultiLevelProps;
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.relay.Module;
-import org.kisst.cordys.relay.RelaySettings;
-import org.kisst.cordys.relay.resourcepool.ResourcePool;
-import org.kisst.cordys.relay.resourcepool.ResourcePoolSettings;
+import org.kisst.cordys.connector.resourcepool.ResourcePool;
+import org.kisst.cordys.connector.resourcepool.ResourcePoolSettings;
+import org.kisst.cordys.script.ExecutionContext;
+import org.kisst.cordys.util.DnUtil;
+import org.kisst.cordys.util.JamonUtil;
+import org.kisst.cordys.util.LogbackUtil;
+import org.kisst.cordys.util.NomUtil;
+import org.kisst.cordys.util.SoapUtil;
 
 import com.eibus.connector.nom.Connector;
 import com.eibus.directory.soap.DirectoryException;
@@ -55,11 +61,15 @@ abstract public class BaseConnector extends ApplicationConnector {
 
 	private Connector connector;
 	private String configLocation;
-	String dnOrganization;
-	String processorName;
+	private String dnOrganization;
+	private String processorName;
 	private ArrayList<Module> modules=new ArrayList<Module>();
 	protected MultiLevelProps mlprops;
 	private JamonUtil.JamonThread jamonThread;
+	public final MethodCache responseCache=new MethodCache();
+
+	public String getDnOrganization() { return dnOrganization; }
+	public String getProcessorName() { return processorName; }
 
 	
 	/**
@@ -72,7 +82,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 	 */
 	public void open(Processor processor)
 	{
-		dnOrganization=processor.getOrganization();
+		dnOrganization =processor.getOrganization();
 		processorName = processor.getSOAPProcessorEntry().getDN();
 		try {
 			initConfigLocation(getConfiguration());
@@ -81,10 +91,11 @@ abstract public class BaseConnector extends ApplicationConnector {
 				connector.open();
 
 			mlprops=new MultiLevelProps(getConfigStream());
+			reconfigureLogback();
 			init(getGlobalProps());
 			addDynamicModules(getGlobalProps());
 			for (int i=0; i<modules.size(); i++)
-				modules.get(i).init(getGlobalProps());
+				modules.get(i).init(this);
 		}
 		catch (DirectoryException e) { throw new RuntimeException(e);	}
 		catch (ExceptionGroup e) { throw new RuntimeException(e);	} 
@@ -93,6 +104,17 @@ abstract public class BaseConnector extends ApplicationConnector {
 		Thread t = new Thread(jamonThread);
 		t.setDaemon(true);
 		t.start();
+	}
+
+	
+	private void reconfigureLogback() {
+	    HashMap<String, String> logbackProps = new HashMap<String,String>();
+	    logbackProps.put("org", DnUtil.getFirstDnPart(getDnOrganization()).toLowerCase().replace(' ', '-'));
+	    logbackProps.put("soapproc", DnUtil.getFirstDnPart(getProcessorName()).toLowerCase().replace(' ', '-'));
+
+		String logbackConfigFile = getGlobalProps().getString("relay.logback.configFile", "d:/Cordys/logback.xml");
+		if (new File(logbackConfigFile).isFile())
+			LogbackUtil.configure(logbackConfigFile, logbackProps);
 	}
 
 	protected void init(Props globalProps) {}
@@ -114,17 +136,21 @@ abstract public class BaseConnector extends ApplicationConnector {
 	protected void addModule(Module m) { modules.add(m); }
 
 	@Override
-	public void reset(Processor processor) { reset(); }
+	public void reset(Processor processor) {
+		reconfigureLogback();
+		reset(); 
+	}
 
 
 	public void reset() {
 		mlprops =new MultiLevelProps(getConfigStream());
 		for (int i=0; i<modules.size(); i++)
-			modules.get(i).reset(getGlobalProps());
+			modules.get(i).reset();
 		JamonUtil.jamonLog(this,"RESET called, dumping all statistics");
 		jamonThread.reset();
 	}
 
+	@Override
 	public void close(Processor processor)
 	{
 		for (int i=0; i<modules.size(); i++)
@@ -133,7 +159,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 		jamonThread.stop();
 	}    
 
-
+	@Override
 	protected IManagedComponent createManagedComponent() {
 		IManagedComponent mc=super.createManagedComponent();
 		return mc;
@@ -146,7 +172,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 	@Override protected String getManagementName() { return getConnectorName(); }
 
 	public Connector getConnector() { return connector; }
-	public String getOrganization() { return dnOrganization; }
+	public String getOrganization() { return getDnOrganization(); }
 
 	private void initConfigLocation(int configNode) 
 	{
@@ -213,7 +239,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 	}
 	public int createMethod(String namespace, String methodName, String dnUser) {
 		final String marker="cn=organizational users,";
-		String org=dnOrganization;
+		String org=getDnOrganization();
 		int pos= dnUser.indexOf(marker);
 		// if the username is a fully qualified dn, use the organisation from this dn
 		// otherwise add the connectors organization to the username 
@@ -244,10 +270,25 @@ abstract public class BaseConnector extends ApplicationConnector {
 			ResourcePool result=resourcePoolMap.get(poolName);
 			if (result!=null)
 				return result;
-			ResourcePoolSettings settings=RelaySettings.resourcepool.get(poolName);
+			ResourcePoolSettings settings=BaseSettings.resourcepool.get(poolName);
 			ResourcePool pool=settings.create(getGlobalProps());
 			resourcePoolMap.put(poolName,pool);
 			return pool;
 		}		
 	}
+
+	private ArrayList<PerformanceLogger> loggers = new ArrayList<PerformanceLogger>();
+	public void addPerformanceLogger(PerformanceLogger log) { loggers.add(log); }
+	public void logPerformance(String type, ExecutionContext context, Date startTime, int node, boolean status) {
+		for (PerformanceLogger log: loggers)
+			log.log(type, context, startTime, node, status);
+	}
+
+	private ArrayList<XmlInterceptor> interceptors = new ArrayList<XmlInterceptor>();
+	public void addXmlInterceptor(XmlInterceptor interceptor) { interceptors.add(interceptor); }
+	public void interceptXml(ExecutionContext context, int node) {
+		for (XmlInterceptor interceptor: interceptors)
+			interceptor.intercept(context, node);
+	}
+
 }

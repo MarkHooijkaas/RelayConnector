@@ -21,12 +21,12 @@ package org.kisst.cordys.as400;
 
 import java.util.HashMap;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.as400.conn.As400Connection;
 import org.kisst.cordys.as400.conn.As400ConnectionPool;
-import org.kisst.cordys.as400.conn.SmartPool;
 import org.kisst.cordys.as400.conn.BorrowedAs400Connection;
-import org.kisst.cordys.relay.Module;
+import org.kisst.cordys.as400.conn.SmartPool;
+import org.kisst.cordys.connector.BaseConnector;
+import org.kisst.cordys.connector.Module;
 import org.kisst.cordys.script.ExecutionContext;
 
 import com.eibus.util.logger.CordysLogger;
@@ -48,13 +48,13 @@ public class As400Module implements Module {
 		return "As400Module";
 	}
 
-	public void init(Props props) {
+	public void init(BaseConnector conn) {
 		createPools();
 		ccsid=determineCcsid();
 		logger.log(Severity.INFO, "using ccsid value: "+ccsid);
 	}
 
-	public void reset(Props props) {
+	public void reset() {
 		destroyPools();
 		conf.reload();
 		createPools();

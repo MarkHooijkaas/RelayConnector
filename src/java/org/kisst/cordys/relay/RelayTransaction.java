@@ -21,11 +21,13 @@ package org.kisst.cordys.relay;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Date;
 
 import org.kisst.cfg4j.Props;
+import org.kisst.cordys.connector.BaseSettings;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Script;
-import org.kisst.cordys.util.JamonUtil;
+import org.kisst.cordys.util.DnUtil;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.soap.ApplicationTransaction;
@@ -65,12 +67,13 @@ public class RelayTransaction implements ApplicationTransaction
      *         If someone else sends the response false is returned.
      */
     public boolean process(BodyBlock request, BodyBlock response) {
-    	String user=JamonUtil.getFirstDnPart(context.getOrganizationalUser());
+    	final Date startTime=new Date();
+    	String user=DnUtil.getFirstDnPart(context.getOrganizationalUser());
     	final Monitor mon1 = MonitorFactory.start("IncomingCall:"+NomUtil.getUniversalName(request.getXMLNode()));
 		final Monitor mon2 = MonitorFactory.start("AllIncomingCalls");
     	final Monitor monu1 = MonitorFactory.start("IncomingCallForUser:"+user+":"+NomUtil.getUniversalName(request.getXMLNode()));
 		final Monitor monu2 = MonitorFactory.start("AllIncomingCallsForUser:"+user);
-    	if (RelaySettings.emergencyBreak.get(props)) {
+    	if (BaseSettings.emergencyBreak.get(props)) {
     		String msg="Forbidden to call method "+context.fullMethodName+", see relay.forbidden property";
     		logger.log(Severity.WARN, msg);
     		response.createSOAPFault("ESB.TECHERR.FORBIDDEN",msg);
@@ -81,27 +84,27 @@ public class RelayTransaction implements ApplicationTransaction
 		int impl = request.getMethodDefinition().getImplementation();
 		String result="ERROR ";
     	try {
-    		String pool= RelaySettings.resourcepool.get(props);
+    		String pool= BaseSettings.resourcepool.get(props);
     		if (pool!=null)
     			context.changeResourcePool(pool);
         	Script script=compileScript(impl);
         	if (context.infoTraceEnabled()) {
         		int reqnode=request.getXMLNode();
-        		if (RelaySettings.traceShowEnvelope.get(props))
+        		if (BaseSettings.traceShowEnvelope.get(props))
         			reqnode=NomUtil.getRootNode(reqnode);
         		context.traceInfo("Received request: ",reqnode);
         	}
     		script.executeStep(context);
         	if (context.infoTraceEnabled()) {
         		int respnode=response.getXMLNode();
-        		if (RelaySettings.traceShowEnvelope.get(props))
+        		if (BaseSettings.traceShowEnvelope.get(props))
         			respnode=NomUtil.getRootNode(respnode);
         		context.traceInfo("Replied with response: ", respnode);
         	}
         	result="SUCCESS ";
     	}
     	catch (RelayedSoapFaultException e) {
-    		Severity sev=RelaySettings.logRelayedSoapFaults.get(props);
+    		Severity sev=BaseSettings.logRelayedSoapFaults.get(props);
     		if (sev!=null)
     			RelayTrace.logger.log(sev, "Relaying Soapfault "+e.getMessage());
     		e.createResponse(response);
@@ -112,7 +115,7 @@ public class RelayTransaction implements ApplicationTransaction
    			e.fillDetails(soapfault);
     	}
     	catch (Throwable e) { //catch Throwable to also catch NoClassDefError
-    		String prefix=RelaySettings.soapFaultcodePrefix.get(props);
+    		String prefix=BaseSettings.soapFaultcodePrefix.get(props);
     		NomUtil.deleteChildren(response.getXMLNode());// TODO: is this still necessary in C3?
     		int soapfault=response.createSOAPFault(prefix+e.getClass().getSimpleName(), e.getMessage());
     		createErrorDetails(soapfault, context, e);
@@ -123,14 +126,15 @@ public class RelayTransaction implements ApplicationTransaction
 			mon2.stop();
 			monu1.stop();
 			monu2.stop();
+			context.getBaseConnector().logPerformance("INCOMING", context, startTime, request.getXMLNode(), "OK".equals(result));
     	}
 		if (context.getTimer()!=null)
 			context.getTimer().log(" finished "+result+context.getFullMethodName());
-		int sleep=RelaySettings.sleepAfterCall.get(props);
+		int sleep=BaseSettings.sleepAfterCall.get(props);
 		if (sleep>0) {
-			RelayTrace.logger.log(Severity.WARN, "Sleeping for "+sleep+" seconds");
+			RelayTrace.logger.log(Severity.WARN, "Sleeping for "+sleep+" milliseconds");
 		  	try {
-				Thread.sleep(RelaySettings.sleepAfterCall.get(props));
+				Thread.sleep(BaseSettings.sleepAfterCall.get(props));
 			} catch (InterruptedException e) { throw new RuntimeException(e); }
 		}
 		return true; // connector has to send the response
@@ -138,17 +142,17 @@ public class RelayTransaction implements ApplicationTransaction
 
 	private int createErrorDetails(int details, ExecutionContext context, Throwable e) {
 		String msg=e.getMessage()+" while handling "+context.getFullMethodName();
-		if (RelaySettings.logRequestOnError.get(context.props)) {
+		if (BaseSettings.logRequestOnError.get(context.props)) {
 			int input=context.getXmlVar("input");
 			input=NomUtil.getRootNode(input);
 			msg+="\n"+Node.writeToString(input,false);
 		}
-		if (RelaySettings.logTrace.get(props))
+		if (BaseSettings.logTrace.get(props))
 			msg+="\n"+context.getTraceAsString(props);
 		RelayTrace.logger.log(Severity.ERROR, msg, e);
-		if (RelaySettings.showStacktrace.get(props))
+		if (BaseSettings.showStacktrace.get(props))
 			Node.createTextElement("stacktrace", getStackTraceAsString(e), details);
-		if (RelaySettings.showTrace.get(props))
+		if (BaseSettings.showTrace.get(props))
 			context.addToNode(Node.createElement("trace", details), props);
 		return details;
 	}
@@ -163,7 +167,7 @@ public class RelayTransaction implements ApplicationTransaction
 		Script script=RelayModule.scriptCache.get(context.getFullMethodName());
 		if (script==null) {
 			script=new Script(node, props);
-			if (RelaySettings.cacheScripts.get(props))
+			if (BaseSettings.cacheScripts.get(props))
 				RelayModule.scriptCache.put(context.getFullMethodName(), script);
 		}
 		return script;

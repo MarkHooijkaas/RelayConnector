@@ -17,19 +17,19 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cordys.relay;
+package org.kisst.cordys.connector;
 
 import org.kisst.cfg4j.BooleanSetting;
 import org.kisst.cfg4j.CompositeSetting;
 import org.kisst.cfg4j.IntSetting;
 import org.kisst.cfg4j.MappedSetting;
 import org.kisst.cfg4j.StringSetting;
-import org.kisst.cordys.relay.resourcepool.ResourcePoolSettings;
+import org.kisst.cordys.connector.resourcepool.ResourcePoolSettings;
 import org.kisst.cordys.util.SeveritySetting;
 
 import com.eibus.util.logger.Severity;
 
-public class RelaySettings {
+public class BaseSettings {
 	private final static CompositeSetting relay=new CompositeSetting(null,"relay");
 
 	public final static IntSetting timeout=new IntSetting(relay, "timeout",20000);

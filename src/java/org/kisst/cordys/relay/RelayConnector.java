@@ -21,7 +21,7 @@ package org.kisst.cordys.relay;
 
 import org.kisst.cfg4j.LayeredProps;
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.util.BaseConnector;
+import org.kisst.cordys.connector.BaseConnector;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
@@ -30,7 +30,6 @@ import com.eibus.soap.SOAPTransaction;
 import com.eibus.xml.nom.Node;
 
 public class RelayConnector extends BaseConnector {
-	public final MethodCache responseCache=new MethodCache();
 
 	public RelayConnector() {
 		addModule(new RelayModule());

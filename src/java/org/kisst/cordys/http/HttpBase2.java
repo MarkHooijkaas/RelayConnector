@@ -26,12 +26,12 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.kisst.cordys.relay.RelaySettings;
+import org.kisst.cordys.connector.BaseSettings;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.Expression;
 import org.kisst.cordys.script.expression.ExpressionParser;
-import org.kisst.cordys.util.JamonUtil;
+import org.kisst.cordys.util.DnUtil;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.xml.nom.Node;
@@ -123,7 +123,7 @@ public class HttpBase2 extends HttpBase {
 	protected HttpResponse call(final ExecutionContext context, int bodyNode) {
     	if (context.infoTraceEnabled()) {
     		int reqnode=bodyNode;
-    		if (RelaySettings.traceShowEnvelope.get(props))
+    		if (BaseSettings.traceShowEnvelope.get(props))
     			reqnode=NomUtil.getRootNode(bodyNode);
     		context.traceInfo("Sending HTTP request: ",reqnode);
     	}
@@ -135,7 +135,7 @@ public class HttpBase2 extends HttpBase {
 	    }
 	    else {
 	    	GetMethod method = createGetMethod(context, state);
-	    	String user=JamonUtil.getFirstDnPart(context.getOrganizationalUser());
+	    	String user=DnUtil.getFirstDnPart(context.getOrganizationalUser());
 	    	final Monitor mon1 = MonitorFactory.start("HttpCall:"+context.getFullMethodName());
 			final Monitor mon2 = MonitorFactory.start("AllHttpCalls");
 	    	final Monitor monu1 = MonitorFactory.start("HttpCallForUser:"+user+":"+context.getFullMethodName());

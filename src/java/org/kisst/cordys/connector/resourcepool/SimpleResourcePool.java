@@ -17,13 +17,26 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cordys.relay;
+package org.kisst.cordys.connector.resourcepool;
 
-import org.kisst.cfg4j.Props;
+import org.kisst.cordys.relay.CallContext;
 
-public interface Module {
-	public String getName();
-	public void init(Props props);
-	public void reset(Props props);
-	public void destroy();
+
+public class SimpleResourcePool implements ResourcePool {
+	private int count=0;
+	final private int max;
+	final private String name;
+	
+	SimpleResourcePool(String name, int max) {
+		this.name=name;
+		this.max=max;
+	}
+	public synchronized void add(CallContext ctxt) {
+		count++; // count isincreased here, because the remove method will be called even if exception is thrown
+		if (count>max)
+			throw new RuntimeException("ResourcePool "+name+" already contains "+max+" calls, aborting new call");
+	}
+	public synchronized void remove(CallContext ctxt) {
+		count--;
+	}
 }

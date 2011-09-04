@@ -23,11 +23,11 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.kisst.cfg4j.Props;
+import org.kisst.cordys.connector.BaseSettings;
+import org.kisst.cordys.connector.MethodCache;
 import org.kisst.cordys.relay.CallContext;
-import org.kisst.cordys.relay.MethodCache;
 import org.kisst.cordys.relay.RelayConnector;
-import org.kisst.cordys.relay.RelaySettings;
-import org.kisst.cordys.util.JamonUtil;
+import org.kisst.cordys.util.DnUtil;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 
@@ -125,9 +125,9 @@ public class ExecutionContext extends CallContext {
 	public void callMethodAsync(int method, final String resultVar, final boolean ignoreSoapFault) {
 		traceInfo("sending request: ",method);
 		String methodName=Node.getLocalName(method);
-		MethodCache caller = getRelayConnector().responseCache;
-		createXmlSlot(resultVar, methodName, new Date().getTime()+RelaySettings.timeout.get(getProps()));
-    	String user=JamonUtil.getFirstDnPart(getOrganizationalUser());
+		MethodCache caller = getBaseConnector().responseCache;
+		createXmlSlot(resultVar, methodName, new Date().getTime()+BaseSettings.timeout.get(getProps()));
+    	String user=DnUtil.getFirstDnPart(getOrganizationalUser());
 		final Monitor mon1 = MonitorFactory.start("OutgoingCall:"+NomUtil.getUniversalName(method));
 		final Monitor mon2 = MonitorFactory.start("AllOutgoingCalls");
 		final Monitor monu1 = MonitorFactory.start("OutgoingCallForUser:"+user+":"+NomUtil.getUniversalName(method));

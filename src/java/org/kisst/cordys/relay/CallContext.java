@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.relay.resourcepool.ResourcePool;
-import org.kisst.cordys.util.BaseConnector;
+import org.kisst.cordys.connector.BaseConnector;
+import org.kisst.cordys.connector.BaseSettings;
+import org.kisst.cordys.connector.MethodCache;
+import org.kisst.cordys.connector.resourcepool.ResourcePool;
 import org.kisst.cordys.util.Destroyable;
-import org.kisst.cordys.util.JamonUtil;
+import org.kisst.cordys.util.DnUtil;
 import org.kisst.cordys.util.NomNode;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
@@ -55,7 +57,7 @@ public class CallContext extends RelayTrace {
 	
 	private final HashMap<String,Object> objects=new HashMap<String,Object>();
 
-	public RelayConnector getRelayConnector() {	return (RelayConnector) baseConnector; }
+	public BaseConnector getBaseConnector() { return baseConnector; }
 	public String getFullMethodName() {	return fullMethodName;	}
 	public Props getProps() { return props;	}
 	public RelayTrace getTrace() {return this;} // TODO: remove
@@ -66,13 +68,13 @@ public class CallContext extends RelayTrace {
 	public boolean allreadyDestroyed() { return allreadyDestroyed; }
 
 	public CallContext(BaseConnector connector, String fullMethodName, Props props, SOAPTransaction stTransaction) {
-		super(RelaySettings.trace.get(props));
+		super(BaseSettings.trace.get(props));
 		this.baseConnector=connector;
 		this.fullMethodName=fullMethodName;
 		this.props=props;
 		this.soapTransaction=stTransaction;
 
-		if (RelaySettings.timer.get(props))
+		if (BaseSettings.timer.get(props))
 			timer=new RelayTimer();
 		else
 			timer=null;
@@ -129,7 +131,7 @@ public class CallContext extends RelayTrace {
 	public NomNode createMethod(String namespace, String methodname) {
 		String dnUser=getOrganizationalUser();
 		String dnOrganization=getOrganization();
-		Connector connector = getRelayConnector().getConnector();
+		Connector connector = getBaseConnector().getConnector();
 		try {
 			int method = connector.createSOAPMethod(dnUser, dnOrganization, namespace, methodname);
 			if (method!=0) {
@@ -146,14 +148,14 @@ public class CallContext extends RelayTrace {
 	public int callMethod(int method, String resultVar) { return callMethod(method, resultVar, false); }
 
 	public int callMethod(int method, String resultVar, boolean ignoreSoapFault) {
-    	String user=JamonUtil.getFirstDnPart(getOrganizationalUser());
+    	String user=DnUtil.getFirstDnPart(getOrganizationalUser());
 		traceInfo("sending request: ", method);
-		MethodCache caller = getRelayConnector().responseCache;
+		MethodCache caller = getBaseConnector().responseCache;
 		Monitor mon1 = MonitorFactory.start("OutgoingCall:"+NomUtil.getUniversalName(method));
 		Monitor mon2 = MonitorFactory.start("AllOutgoingCalls");
 		Monitor monu1 = MonitorFactory.start("OutgoingCallForUser:"+user+":"+NomUtil.getUniversalName(method));
 		Monitor monu2 = MonitorFactory.start("AllOutgoingCallsForUser:"+user);
-		int response = caller.sendAndWait(method,RelaySettings.timeout.get(getProps()));
+		int response = caller.sendAndWait(method,BaseSettings.timeout.get(getProps()));
 		mon1.stop();
 		mon2.stop();
 		monu1.stop();

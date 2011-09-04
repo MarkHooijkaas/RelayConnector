@@ -118,6 +118,7 @@ public class MethodCall {
 	}
 
 	protected void callMethod(final ExecutionContext context, int method) {
+		context.getBaseConnector().interceptXml(context, method);
 		if (async)
 			context.callMethodAsync(method, resultVar, ignoreSoapFault);
 		else {

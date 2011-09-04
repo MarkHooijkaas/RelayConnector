@@ -22,6 +22,7 @@ package org.kisst.cordys.relay;
 import java.util.ArrayList;
 
 import org.kisst.cfg4j.Props;
+import org.kisst.cordys.connector.BaseSettings;
 import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.util.logger.CordysLogger;
@@ -74,7 +75,7 @@ public class RelayTrace {
 	public boolean debugTraceEnabled() { return (traceLevel!=null && Severity.DEBUG.isGreaterOrEqual(traceLevel)) || logger.isDebugEnabled(); }
 	public boolean infoTraceEnabled()  { return (traceLevel!=null && Severity.INFO. isGreaterOrEqual(traceLevel)) || logger.isInfoEnabled(); }
 	public String getTraceAsString(Props props) {
-		boolean showEnvelope=RelaySettings.traceShowEnvelope.get(props);
+		boolean showEnvelope=BaseSettings.traceShowEnvelope.get(props);
 		StringBuffer buf=new StringBuffer();
 		for (Item i:items) {
 			buf.append(i.msg);
@@ -90,7 +91,7 @@ public class RelayTrace {
 	}
 
 	public void addToNode(int node, Props props) {
-		boolean showEnvelope=RelaySettings.traceShowEnvelope.get(props);
+		boolean showEnvelope=BaseSettings.traceShowEnvelope.get(props);
 		for (Item i:items) {
 			int itemnode = Node.createTextElement("item", i.msg, node);
 			if (i.node!=0) {

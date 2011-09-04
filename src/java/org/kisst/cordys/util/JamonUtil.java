@@ -8,7 +8,8 @@ import java.util.Comparator;
 import java.util.Date;
 
 import org.kisst.cfg4j.Props;
-import org.kisst.cordys.relay.RelaySettings;
+import org.kisst.cordys.connector.BaseConnector;
+import org.kisst.cordys.connector.BaseSettings;
 
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorComposite;
@@ -74,12 +75,12 @@ public class JamonUtil {
 			//logger.warn("Could not perform jamon logging because properties are not available for jamonLog: "+message);
 			return;
 		}
-		if (! RelaySettings.jamonEnabled.get(props))
+		if (! BaseSettings.jamonEnabled.get(props))
 			return;
-		String filename=RelaySettings.jamonfilename.get(props);
+		String filename=BaseSettings.jamonfilename.get(props);
 		filename = filename.replace("${cordys.home}", System.getProperty("cordys.home").replaceAll("[\\\\]", "/"));
-		filename = filename.replace("${processor}", JamonUtil.getFirstDnPart(connector.processorName));
-		filename = filename.replace("${org}", JamonUtil.getFirstDnPart(connector.dnOrganization));
+		filename = filename.replace("${processor}", DnUtil.getFirstDnPart(connector.getProcessorName()));
+		filename = filename.replace("${org}", DnUtil.getFirstDnPart(connector.getDnOrganization()));
 		Date now = new Date();
 		filename = filename.replace("${yyyy}", ""+(now.getYear()+1900));
 		filename = filename.replace("${mm}", ""+(now.getMonth()+1));
@@ -99,7 +100,7 @@ public class JamonUtil {
 		public void run() {
 			myThread = Thread.currentThread();
 			while (running) {
-				int interval = RelaySettings.jamonIntervalInSeconds.get(connector.getGlobalProps());
+				int interval = BaseSettings.jamonIntervalInSeconds.get(connector.getGlobalProps());
 				try {
 					if (interval<=0)
 						Thread.sleep(600*1000); // sleep 10 minutes, could be any time

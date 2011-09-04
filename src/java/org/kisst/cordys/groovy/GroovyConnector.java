@@ -20,7 +20,7 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cordys.groovy;
 
 import org.kisst.cfg4j.LayeredProps;
-import org.kisst.cordys.util.BaseConnector;
+import org.kisst.cordys.connector.BaseConnector;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 

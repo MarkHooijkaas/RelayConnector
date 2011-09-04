@@ -1,7 +1,7 @@
 <project>
     <org>kisst.org</org>
     <name>Jt400Connector</name>
-    <version>1.0</version>
+    <version>1.1</version>
     <class>org.kisst.cordys.as400.As400Module</class>    
 	<jarfiles pathid="jarfiles">
       <pathelement location="lib/commons-logging-1.0.4.jar"/>
@@ -9,6 +9,9 @@
       <pathelement location="lib/ehcache-1.5.0.jar"/>
       <pathelement location="lib/jamon-2.7.jar"/>
       <pathelement location="lib/jt400.jar"/>
+      <pathelement location="lib/slf4j-api-1.6.1.jar"/>
+      <pathelement location="lib/logback-classic-0.9.29.jar"/>
+      <pathelement location="lib/logback-core-0.9.29.jar"/>
 	</jarfiles>
 	<javafiles>org/kisst/cordys/util/**,org/kisst/cordys/relay/**,org/kisst/cordys/script/**,org/kisst/cordys/as400/**</javafiles>
 </project>

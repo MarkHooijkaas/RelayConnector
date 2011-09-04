@@ -21,7 +21,8 @@ package org.kisst.cordys.relay;
 
 import java.util.HashMap;
 
-import org.kisst.cfg4j.Props;
+import org.kisst.cordys.connector.BaseConnector;
+import org.kisst.cordys.connector.Module;
 import org.kisst.cordys.script.Script;
 
 public class RelayModule implements Module {
@@ -29,11 +30,11 @@ public class RelayModule implements Module {
 
 	public String getName() { return "RelayModule";	}
 
-	public void init(Props props) {
-    	reset(props);
+	public void init(BaseConnector conn) {
+    	reset();
 	}
 
-	public void reset(Props props) {
+	public void reset() {
 		scriptCache.clear();
 	}
 
