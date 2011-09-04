@@ -25,7 +25,7 @@ import org.kisst.cfg4j.IntSetting;
 import org.kisst.cfg4j.LongSetting;
 import org.kisst.cfg4j.StringSetting;
 
-public class As400HostSettings extends CompositeSetting {
+public class As400PoolSettings extends CompositeSetting {
 	//private final String name;
 
 	public final StringSetting host = new StringSetting(this, "host");  
@@ -34,15 +34,18 @@ public class As400HostSettings extends CompositeSetting {
 	public final LongSetting timeout = new LongSetting(this, "timeout", 20000);
 
 	public final IntSetting connectionPoolSize = new IntSetting(this, "maxPoolSize", 10);
+	public final IntSetting maxIdle = new IntSetting(this, "maxIdle", 8);
+	public final LongSetting maxWait = new LongSetting(this, "maxWait", 20000);
 	public final LongSetting maxConnectionLifetimeMillis= new LongSetting(this, "maxConnectionLifetimeMillis", 1800000);
 	public final LongSetting minEvictableIdleTimeMillis= new LongSetting(this, "minEvictableIdleTimeMillis", 300000);
 	public final LongSetting timeBetweenEvictionRunsMillis= new LongSetting(this, "timeBetweenEvictionRunsMillis", 60000);
+	public final BooleanSetting lifo = new BooleanSetting(this, "lifo", true);
 	
 	public final BooleanSetting simulationFlag = new BooleanSetting(this, "simulationFlag", false);
 	public final IntSetting nrOfMessagesToLog = new IntSetting(this, "nrOfMessagesToLog", 10);
 
 
-	public As400HostSettings(CompositeSetting parent, String name) { 
+	public As400PoolSettings(CompositeSetting parent, String name) { 
 		super(parent, name); 
 	}
 	

@@ -19,7 +19,6 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.as400;
 
-import org.kisst.cfg4j.BooleanSetting;
 import org.kisst.cfg4j.CompositeSetting;
 import org.kisst.cfg4j.IntSetting;
 import org.kisst.cfg4j.MappedSetting;
@@ -27,8 +26,9 @@ import org.kisst.cfg4j.MappedSetting;
 public class As400Settings {
 	private final static CompositeSetting as400=new CompositeSetting(null,"as400");
 
-	public final static MappedSetting<As400HostSettings> host=new MappedSetting<As400HostSettings>(as400, "host", As400HostSettings.class);;
-	public final static BooleanSetting  ignoreReturnCode=new BooleanSetting(as400, "ignoreReturnCode", false);
+	public final static MappedSetting<As400PoolSettings> pools=new MappedSetting<As400PoolSettings>(as400, "pool", As400PoolSettings.class);
+	
+	//public final static BooleanSetting  ignoreReturnCode=new BooleanSetting(as400, "ignoreReturnCode", false);
 	//public final static IntSetting  timeout=new IntSetting(as400, "timeout", 30000);
 	public final static IntSetting ccsid = new IntSetting(as400, "ccsid", -1); //1140?
 

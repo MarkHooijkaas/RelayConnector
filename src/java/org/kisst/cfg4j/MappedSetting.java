@@ -23,6 +23,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
 import org.kisst.cordys.util.ReflectionUtil;
+import org.kisst.props4j.Props;
 
 
 public class MappedSetting<T extends Setting> extends CompositeSetting {
@@ -53,6 +54,8 @@ public class MappedSetting<T extends Setting> extends CompositeSetting {
 		}
 		return  result;
 	}
+	
+	public Iterable<String> keys(Props props) { return props.getProps(name).keys();}
 	
 	public void reset() { items.clear(); }
 }

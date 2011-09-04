@@ -19,7 +19,7 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.as400;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.kisst.cordys.as400.conn.As400Connection;
 import org.kisst.cordys.as400.conn.As400ConnectionPool;
@@ -29,17 +29,20 @@ import org.kisst.cordys.connector.Module;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.GenericCommand;
 import org.kisst.cordys.script.commands.CommandList;
+import org.kisst.props4j.Props;
 
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
 
 public class As400Module implements Module {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(As400Module.class);
+
+	public static final String AS400_POOL_NAME_KEY = "_as400PoolName";
 	public static final String SOAP_NAMESPACE = "http://schemas.xmlsoap.org/soap/envelope/";
     private BaseConnector connector; // TODO: make final, needs change in module loading
     
 
-	public static final HashMap<String, As400ConnectionPool> pools=new HashMap<String, As400ConnectionPool>();
+	public static final LinkedHashMap<String, As400ConnectionPool> pools=new LinkedHashMap<String, As400ConnectionPool>();
     private static int ccsid;
     static public int getCcsid() { return ccsid; }
 
@@ -65,11 +68,10 @@ public class As400Module implements Module {
 	}
 
 	private void createPools() {
+		Props props = connector.getGlobalProps();
 		pools.clear();
-		String[] poolNames = new String[] {"main"};
-		for (int i=0;i<poolNames.length; i++){
-			String name=poolNames[i];
-			As400ConnectionPool pool = new As400ConnectionPool(As400Settings.host.get(name), connector.getGlobalProps() );
+		for (String name: As400Settings.pools.keys(props)){
+			As400ConnectionPool pool = new As400ConnectionPool(As400Settings.pools.get(name), props );
 			pool.init();
 			logger.log(Severity.DEBUG, "aanmaken pool " + name);
 			pools.put(name, pool);
@@ -78,9 +80,8 @@ public class As400Module implements Module {
 	}
 	
 	private void destroyPools() {
-		String[] poolNames = new String[] {"main"};
-		for (int i=0;i<poolNames.length; i++){
-			String name=poolNames[i];
+		Props props = connector.getGlobalProps();
+		for (String name: As400Settings.pools.keys(props)){
 			getPool(name).destroy();
 		}
 	}
@@ -95,13 +96,27 @@ public class As400Module implements Module {
 		As400Connection conn= (As400Connection) context.getObject(key);
 		if (conn!=null)
 			return conn;
-		As400ConnectionPool pool = pools.get("main");
+		String poolName = context.getTextVar(AS400_POOL_NAME_KEY);
+		As400ConnectionPool pool = null;
+		if (poolName==null) {
+			if (pools.size()==1)
+				pool=getFirstPool();
+			else
+				throw new RuntimeException("Could not determine correct As400Connection pool and multiple pools exist");
+		}
+		else
+			pool = pools.get(poolName);
 		conn=pool.borrowConnection(context.getProps());
 		context.destroyWhenDone(new BorrowedAs400Connection(pool, conn));
 		context.setObject(key, conn);
 		return conn;
 	}
 	
+	private static As400ConnectionPool getFirstPool() {
+		for (As400ConnectionPool pool : pools.values())
+			return pool;
+		throw new RuntimeException("no connection pools defined");
+	}
 	private int determineCcsid() {
 		int result = As400Settings.ccsid.get(connector.getGlobalProps());
 
@@ -111,7 +126,8 @@ public class As400Module implements Module {
     	}
 		boolean allCallsDone = false;
 		logger.debug("Determining ccsid ousing connection");
-		As400ConnectionPool mainPool = getPool("main");
+		
+		As400ConnectionPool mainPool = getFirstPool();
     	As400Connection conn=mainPool.borrowConnection(connector.getGlobalProps());
        	try {
        		result = conn.getCcsid();

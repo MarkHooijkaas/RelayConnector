@@ -17,10 +17,11 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cordys.as400;
+package org.kisst.cordys.util;
 
 import java.util.Date;
 import java.util.HashMap;
+
 
 import com.eibus.management.IManagedComponent;
 import com.eibus.management.ISettingsCollection;

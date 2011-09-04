@@ -17,28 +17,48 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cfg4j;
+package org.kisst.props4j;
 
+import java.io.File;
 
+import org.kisst.util.FileUtil;
 
 public abstract class PropsBase implements Props {
 	private static final long serialVersionUID = 1L;
 	abstract public Object get(String key, Object defaultValue);
 
-	public String getString(String key) { return (String) get(key); }
+	public boolean hasKey(String key) { return get(key,null)!=null;	}
+
 	public int getInt(String key) { return Integer.parseInt(getString(key)); }
 	public long getLong(String key) { return Long.parseLong(getString(key)); }
-
+	public String getLocalName() {return null; } 
+	public String getFullName() {return null; } 
+	
 	public Object get(String key) {
 		Object result=get(key, null);
 		if (result!=null)
 			return result;
 		else
-			throw new RuntimeException("Could not find property "+key);
+			throw new RuntimeException("Could not find property "+key+" in context "+getFullName());
+	}
+
+	public String getString(String key) { 
+		String result=getString(key,null);
+		if (result!=null)
+			return result;
+		else
+			throw new RuntimeException("Could not find property "+key+" in context "+getFullName());
 	}
 
 	public String getString(String key, String defaultValue) {
-		return (String) get(key,defaultValue);
+		Object result = get(key,defaultValue);
+		if (result==null)
+			return null;
+		if (result instanceof String)
+			return (String) result;
+		if (result instanceof File)
+			return FileUtil.loadString((File) result);
+		throw new RuntimeException("type of key "+key+" is not a String but a "+result.getClass().getSimpleName());
 	}
 
 	public int getInt(String key, int defaultValue) {
@@ -76,5 +96,9 @@ public abstract class PropsBase implements Props {
 		else
 			throw new RuntimeException("property "+name+" should be true or false, not "+value);
 	}
+
+	public Props getProps(String name) { return (Props) get(name); }
+	public Sequence getSequence(String name) { return (Sequence) get(name); }
+
 
 }

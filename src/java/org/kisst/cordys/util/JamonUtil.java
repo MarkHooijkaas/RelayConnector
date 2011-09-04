@@ -7,9 +7,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.BaseConnector;
 import org.kisst.cordys.connector.BaseSettings;
+import org.kisst.props4j.Props;
 
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorComposite;

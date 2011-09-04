@@ -31,9 +31,9 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.util.NomPath;
 import org.kisst.cordys.util.NomUtil;
+import org.kisst.props4j.Props;
 
 import com.eibus.connector.nom.CancelRequestException;
 import com.eibus.connector.nom.Connector;

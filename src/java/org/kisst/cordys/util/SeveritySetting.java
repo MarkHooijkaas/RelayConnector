@@ -20,8 +20,8 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cordys.util;
 
 import org.kisst.cfg4j.CompositeSetting;
-import org.kisst.cfg4j.Props;
 import org.kisst.cfg4j.Setting;
+import org.kisst.props4j.Props;
 
 import com.eibus.util.logger.Severity;
 

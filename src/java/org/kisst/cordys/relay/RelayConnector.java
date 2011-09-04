@@ -19,11 +19,11 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.relay;
 
-import org.kisst.cfg4j.LayeredProps;
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.BaseConnector;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
+import org.kisst.props4j.LayeredProps;
+import org.kisst.props4j.Props;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.SOAPTransaction;

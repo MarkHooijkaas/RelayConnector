@@ -23,9 +23,9 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.net.SocketException;
 
-import org.kisst.cfg4j.Props;
-import org.kisst.cordys.as400.As400HostSettings;
+import org.kisst.cordys.as400.As400PoolSettings;
 import org.kisst.cordys.util.Destroyable;
+import org.kisst.props4j.Props;
 
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
@@ -49,7 +49,7 @@ public class As400Connection implements Destroyable {
 	private static int counter=0; // needed to create a unique name
 
 	private final String name;
-	private final As400HostSettings settings;
+	private final As400PoolSettings settings;
 	private final Props props;
 	private final AS400 as400;
 	public final long creationTime = new java.util.Date().getTime();
@@ -60,7 +60,7 @@ public class As400Connection implements Destroyable {
 
 	public boolean isExecuting() { return executingProgram!=null; }
 
-	public As400Connection(As400HostSettings settings, Props props) {
+	public As400Connection(As400PoolSettings settings, Props props) {
 		this.settings=settings;
 		this.props=props;
 		this.name="As400Connection-"+(counter++);

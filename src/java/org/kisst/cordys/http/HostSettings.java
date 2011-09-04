@@ -23,8 +23,8 @@ import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.kisst.cfg4j.CompositeSetting;
-import org.kisst.cfg4j.Props;
 import org.kisst.cfg4j.StringSetting;
+import org.kisst.props4j.Props;
 
 public class HostSettings extends CompositeSetting {
 	public final StringSetting url = new StringSetting(this, "url", null); // TODO: mandatory?; 

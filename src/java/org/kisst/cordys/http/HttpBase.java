@@ -29,11 +29,11 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.expression.XmlExpression;
 import org.kisst.cordys.util.DnUtil;
+import org.kisst.props4j.Props;
 
 import com.eibus.xml.nom.Node;
 import com.jamonapi.Monitor;
@@ -42,12 +42,12 @@ import com.jamonapi.MonitorFactory;
 public class HttpBase {
     protected static final HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
     
-    public static void reset() {
+    public static void reset(Props props) {
     	// TODO: better way to clear all. This will not affect active connections
     	client.getHttpConnectionManager().closeIdleConnections(0);
     	client.getParams().setAuthenticationPreemptive(true);
-    	client.getHttpConnectionManager().getParams().setDefaultMaxConnectionsPerHost(100); // TODO: make configurable
-    	client.getHttpConnectionManager().getParams().setMaxTotalConnections(100); // TODO: make configurable
+    	client.getHttpConnectionManager().getParams().setDefaultMaxConnectionsPerHost(HttpSettings.maxConnectionsPerHost.get(props)); 
+    	client.getHttpConnectionManager().getParams().setMaxTotalConnections(HttpSettings.maxTotalConnections.get(props)); 
     }
 	
     private final XmlExpression body;

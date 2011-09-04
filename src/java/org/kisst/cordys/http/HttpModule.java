@@ -25,14 +25,12 @@ import org.kisst.cordys.script.GenericCommand;
 import org.kisst.cordys.script.commands.CommandList;
 
 public class HttpModule implements Module {
-	//private static MultiLevelSettings<HttpSettings> settings=null;
-
-	//public static HttpSettings getSettings(String key) {return settings.get(key); }
-	//public static HttpSettings getGlobalSettings() {return settings.getGlobalSettings(); }
+	private BaseConnector connector;
 
 	public String getName() { return "HttpModule";	}
 
-	public void init(BaseConnector conn) {
+	public void init(BaseConnector connector) {
+		this.connector = connector;
     	CommandList.addBasicCommand("http",  new GenericCommand(HttpStep.class));
     	CommandList.addBasicCommand("http-relay",  new GenericCommand(HttpRelayStep.class));
     	CommandList.addBasicCommand("http-callback",  new GenericCommand(HttpCallbackStep.class));
@@ -40,7 +38,7 @@ public class HttpModule implements Module {
 	}
 
 	public void reset() {
-		HttpBase.reset();
+		HttpBase.reset(connector.getGlobalProps());
     	//settings=new MultiLevelSettings<HttpSettings>(mlprops,"http", HttpSettings.class);
 	}
 

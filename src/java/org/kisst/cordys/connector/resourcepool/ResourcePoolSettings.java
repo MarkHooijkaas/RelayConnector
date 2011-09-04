@@ -21,11 +21,11 @@ package org.kisst.cordys.connector.resourcepool;
 
 import org.kisst.cfg4j.CompositeSetting;
 import org.kisst.cfg4j.IntSetting;
-import org.kisst.cfg4j.Props;
 import org.kisst.cfg4j.StringSetting;
 
 import org.kisst.cordys.connector.CallTrace;
 import org.kisst.cordys.util.ReflectionUtil;
+import org.kisst.props4j.Props;
 
 import com.eibus.util.logger.Severity;
 

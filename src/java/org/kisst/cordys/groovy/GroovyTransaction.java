@@ -24,11 +24,11 @@ import groovy.lang.Script;
 
 import java.io.ByteArrayInputStream;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.CallContext;
 import org.kisst.cordys.connector.CallTrace;
 import org.kisst.cordys.relay.RelayedSoapFaultException;
 import org.kisst.cordys.util.NomNode;
+import org.kisst.props4j.Props;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;

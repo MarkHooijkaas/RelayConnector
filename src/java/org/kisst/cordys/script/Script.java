@@ -19,8 +19,8 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.script;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.util.NomUtil;
+import org.kisst.props4j.Props;
 
 import com.eibus.xml.nom.Node;
 

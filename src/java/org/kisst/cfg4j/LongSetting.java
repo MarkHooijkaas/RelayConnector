@@ -19,6 +19,8 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cfg4j;
 
+import org.kisst.props4j.Props;
+
 public class LongSetting extends Setting {
 	private final long defaultValue;
 

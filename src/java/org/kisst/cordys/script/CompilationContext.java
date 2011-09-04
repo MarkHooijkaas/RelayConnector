@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.BaseSettings;
 import org.kisst.cordys.connector.CallTrace;
 import org.kisst.cordys.script.commands.CommandList;
+import org.kisst.props4j.Props;
 
 import com.eibus.xml.nom.Node;
 

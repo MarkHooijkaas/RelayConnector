@@ -23,13 +23,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.BaseSettings;
 import org.kisst.cordys.connector.CallTrace;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Script;
 import org.kisst.cordys.util.DnUtil;
 import org.kisst.cordys.util.NomUtil;
+import org.kisst.props4j.Props;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;

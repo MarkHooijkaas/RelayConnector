@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.resourcepool.ResourcePool;
 import org.kisst.cordys.relay.RelayedSoapFaultException;
 import org.kisst.cordys.util.Destroyable;
@@ -31,6 +30,7 @@ import org.kisst.cordys.util.DnUtil;
 import org.kisst.cordys.util.NomNode;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
+import org.kisst.props4j.Props;
 
 import com.eibus.connector.nom.Connector;
 import com.eibus.directory.soap.DirectoryException;

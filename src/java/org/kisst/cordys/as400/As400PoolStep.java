@@ -17,18 +17,27 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cordys.http;
+package org.kisst.cordys.as400;
 
-import org.kisst.cordys.relay.RelayConnector;
+import org.kisst.cordys.script.CompilationContext;
+import org.kisst.cordys.script.ExecutionContext;
+import org.kisst.cordys.script.Step;
+import org.kisst.cordys.script.expression.Expression;
+import org.kisst.cordys.script.expression.ExpressionParser;
 
-public class HttpConnector extends RelayConnector {
-    public  static final String CONNECTOR_NAME = "HttpConnector";
-	private HttpModule httpModule= new HttpModule();
+import com.eibus.xml.nom.Node;
 
-    public HttpConnector(){
-    	addModule(httpModule);
-    }
-    
-    protected String getManagedComponentType() { return CONNECTOR_NAME; }
-    protected String getManagementName() { return CONNECTOR_NAME; }
+public class As400PoolStep implements Step {
+
+	private final Expression expr;
+	
+	public As400PoolStep(CompilationContext compiler, final int node) {
+		expr=ExpressionParser.parse(compiler, Node.getAttribute(node, "value"));
+		compiler.declareTextVar(As400Module.AS400_POOL_NAME_KEY);
+	}
+
+	public void executeStep(ExecutionContext context) {
+		context.setTextVar(As400Module.AS400_POOL_NAME_KEY, expr.getString(context));
+	}
+
 }

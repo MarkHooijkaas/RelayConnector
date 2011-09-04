@@ -17,35 +17,15 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cfg4j;
+package org.kisst.cordys.util;
 
-import java.util.ArrayList;
+import java.util.Locale;
+import com.eibus.localization.ILocalizableString;
 
-public class LayeredProps extends PropsBase {
-	private final Props global; 
-	private final ArrayList<Props> layers = new ArrayList<Props>();
-
-	public LayeredProps(Props global) {
-		this.global=global;
-	}
-	public void addTopLayer(Props props) { layers.add(0,props); }
-	public void addLayer(Props props)    { layers.add(props); }
-	
-	public Object get(String key, Object defaultValue) {
-		for (Props p:layers) {
-			Object result=p.get(key, null);
-			if (result!=null)
-				return result;
-		}
-		return global.get(key,defaultValue);
-	}
-
-	public Object get(String key) {
-		Object result=get(key, null);
-		if (result!=null)
-			return result;
-		else
-			return global.get(key);
-	}
-
+public class Message implements ILocalizableString {
+	final private static Locale[] locales = new Locale[] { Locale.ENGLISH }; 
+	final private String msg;
+	public Message(String msg) { this.msg=msg; }
+	public Locale[] getAvailableLocales() {	return locales;	}
+	public String getMessage(Locale arg0) {	return msg;	}
 }

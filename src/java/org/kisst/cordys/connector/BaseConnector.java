@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.kisst.cfg4j.MultiLevelProps;
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.resourcepool.ResourcePool;
 import org.kisst.cordys.connector.resourcepool.ResourcePoolSettings;
 import org.kisst.cordys.script.ExecutionContext;
@@ -38,6 +36,8 @@ import org.kisst.cordys.util.JamonUtil;
 import org.kisst.cordys.util.LogbackUtil;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
+import org.kisst.props4j.MultiLevelProps;
+import org.kisst.props4j.Props;
 
 import com.eibus.connector.nom.Connector;
 import com.eibus.directory.soap.DirectoryException;
@@ -134,6 +134,12 @@ abstract public class BaseConnector extends ApplicationConnector {
 	}
 
 	protected void addModule(Module m) { modules.add(m); }
+	public Module getModule(Class<?> cls) {
+		for (Module m: modules)
+			if (cls.isInstance(m))
+				return m;
+		throw new RuntimeException("Could not find a module of type "+cls.getSimpleName());
+	}
 
 	@Override
 	public void reset(Processor processor) {

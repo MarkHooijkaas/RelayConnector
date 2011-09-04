@@ -22,8 +22,8 @@ package org.kisst.cordys.as400.conn;
 import java.util.Date;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.kisst.cfg4j.Props;
-import org.kisst.cordys.as400.As400HostSettings;
+import org.kisst.cordys.as400.As400PoolSettings;
+import org.kisst.props4j.Props;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -37,14 +37,14 @@ import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
 
 public class As400ConnectionPool {
-	private final As400HostSettings settings;
+	private final As400PoolSettings settings;
 	private final Props globalProps;
 	
-	private final GenericObjectPool pool=new GenericObjectPool();
+	private final GenericObjectPool pool;
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(As400ConnectionPool.class);	
 	private final Scheduler scheduler;
 	
-	public As400ConnectionPool(As400HostSettings settings, Props props) {
+	public As400ConnectionPool(As400PoolSettings settings, Props props) {
 		this.settings=settings;
 		this.globalProps=props;
 		StdSchedulerFactory factory = new StdSchedulerFactory();
@@ -52,14 +52,17 @@ public class As400ConnectionPool {
 			scheduler= factory.getScheduler();
 			scheduler.start();
 		} catch (SchedulerException e) { throw new RuntimeException(e); }
-		pool.setFactory(new As400ConnectionFactory(settings, props));
+		pool=new GenericObjectPool(new As400ConnectionFactory(settings, props));
 	}
 
 
 	public void init() {
 		pool.setMaxActive(settings.connectionPoolSize.get(globalProps) );
+		pool.setMaxIdle(settings.maxIdle.get(globalProps));
+		pool.setMaxWait(settings.maxWait.get(globalProps));
 		pool.setMinEvictableIdleTimeMillis(settings.minEvictableIdleTimeMillis.get(globalProps));
 		pool.setTimeBetweenEvictionRunsMillis(settings.timeBetweenEvictionRunsMillis.get(globalProps));
+		pool.setLifo(settings.lifo.get(globalProps));
 	}
 
 	public As400Connection borrowConnection(Props callSpecificProps) {

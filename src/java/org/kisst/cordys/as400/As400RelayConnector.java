@@ -19,13 +19,20 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.as400;
 
-import java.util.Locale;
-import com.eibus.localization.ILocalizableString;
+import org.kisst.cordys.as400.conn.As400ConnectionPool;
+import org.kisst.cordys.relay.RelayConnector;
 
-public class Message implements ILocalizableString {
-	final private static Locale[] locales = new Locale[] { Locale.ENGLISH }; 
-	final private String msg;
-	public Message(String msg) { this.msg=msg; }
-	public Locale[] getAvailableLocales() {	return locales;	}
-	public String getMessage(Locale arg0) {	return msg;	}
+public class As400RelayConnector extends RelayConnector {
+    public  static final String CONNECTOR_NAME = "As400RelayConnector";
+	private As400Module as400Module= new As400Module();
+
+    public As400RelayConnector(){
+    	addModule(as400Module);
+    }
+    
+    protected String getManagedComponentType() { return CONNECTOR_NAME; }
+    protected String getManagementName() { return CONNECTOR_NAME; }
+    
+    public As400Module getAs400Module() { return as400Module; }
+    public As400ConnectionPool getPool(String name) { return as400Module.getPool(name); }
 }

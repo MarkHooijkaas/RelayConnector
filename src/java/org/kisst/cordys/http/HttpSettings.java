@@ -30,4 +30,6 @@ public class HttpSettings {
 	public final static MappedSetting<HostSettings> host=new MappedSetting<HostSettings>(http, "host", HostSettings.class);;
 	public final static BooleanSetting  ignoreReturnCode=new BooleanSetting(http, "ignoreReturnCode", false);
 	public final static IntSetting  timeout=new IntSetting(http, "timeout", 30000);
+	public final static IntSetting  maxConnectionsPerHost=new IntSetting(http, "maxConnectionsPerHost", 100);
+	public final static IntSetting  maxTotalConnections=new IntSetting(http, "maxTotalConnections", 100);
 }

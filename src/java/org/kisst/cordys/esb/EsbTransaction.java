@@ -32,7 +32,6 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.kisst.cfg4j.CompositeSetting;
 import org.kisst.cfg4j.LongSetting;
 import org.kisst.cfg4j.MappedSetting;
-import org.kisst.cfg4j.Props;
 import org.kisst.cfg4j.StringSetting;
 import org.kisst.cordys.connector.CallTrace;
 import org.kisst.cordys.http.HostSettings;
@@ -40,6 +39,7 @@ import org.kisst.cordys.http.HttpResponse;
 import org.kisst.cordys.http.HttpSoapFaultException;
 import org.kisst.cordys.relay.RelayedSoapFaultException;
 import org.kisst.cordys.util.SoapUtil;
+import org.kisst.props4j.Props;
 
 import com.eibus.soap.ApplicationTransaction;
 import com.eibus.soap.BodyBlock;

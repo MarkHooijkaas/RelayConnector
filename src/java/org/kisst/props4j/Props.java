@@ -17,24 +17,26 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cfg4j;
-
-import java.util.HashMap;
+package org.kisst.props4j;
 
 
-public class SimpleProps extends PropsBase {
-	private static final long serialVersionUID = 1L;
 
-	private final HashMap<String, Object> map=new HashMap<String, Object>();
-	public void put(String key, String value) {
-		map.put(key,value);
-	}
-
-	public Object get(String key, Object defaultValue) {
-		Object result=map.get(key);
-		if (result!=null)
-			return result;
-		else
-			return defaultValue;
-	}
+public interface Props extends MinimalProps {
+	public String getLocalName();
+	//public String getFullName();
+	
+	//public Object get(String key, Object defaultValue);
+	public String getString(String key, String defaultValue);
+	public int    getInt(String string, int defaultValue);
+	public long   getLong(String string, long defaultValue);
+	public boolean getBoolean(String name, boolean defaultValue);
+	public Props getProps(String name);
+	//public Iterable<String> keys();
+	
+	public Object get(String key);
+	public String getString(String key);
+	public int    getInt(String string);
+	public long   getLong(String string);
+	public boolean getBoolean(String name);
+	public Sequence getSequence(String name);
 }

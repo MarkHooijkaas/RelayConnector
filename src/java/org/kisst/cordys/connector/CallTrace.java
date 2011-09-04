@@ -21,8 +21,8 @@ package org.kisst.cordys.connector;
 
 import java.util.ArrayList;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.util.NomUtil;
+import org.kisst.props4j.Props;
 
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;

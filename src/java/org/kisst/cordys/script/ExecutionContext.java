@@ -22,7 +22,6 @@ package org.kisst.cordys.script;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.kisst.cfg4j.Props;
 import org.kisst.cordys.connector.BaseSettings;
 import org.kisst.cordys.connector.CallContext;
 import org.kisst.cordys.connector.MethodCache;
@@ -30,6 +29,7 @@ import org.kisst.cordys.relay.RelayConnector;
 import org.kisst.cordys.util.DnUtil;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
+import org.kisst.props4j.Props;
 
 import com.eibus.connector.nom.SOAPMessageListener;
 import com.eibus.soap.BodyBlock;
