@@ -37,24 +37,26 @@ import com.eibus.util.logger.Severity;
 public class As400Module implements Module {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(As400Module.class);
 
-	public static final String AS400_POOL_NAME_KEY = "_as400PoolName";
+	public static final String AS400_POOL_NAME_VARNAME = "_as400PoolName";
+	public static final String AS400_POOL_SUBKEY_VARNAME = "_as400PoolSubKey";
+	public static final String AS400_POOL_DEFAULT_SUBKEY = "default";
 	public static final String SOAP_NAMESPACE = "http://schemas.xmlsoap.org/soap/envelope/";
     private BaseConnector connector; // TODO: make final, needs change in module loading
     
 
-	public static final LinkedHashMap<String, As400ConnectionPool> pools=new LinkedHashMap<String, As400ConnectionPool>();
+	private static final LinkedHashMap<String, As400ConnectionPool> pools=new LinkedHashMap<String, As400ConnectionPool>();
     private static int ccsid;
+
     static public int getCcsid() { return ccsid; }
 
-	public String getName() {
-		return "As400Module";
-	}
+	public String getName() { return "As400Module";	}
 
 	public void init(BaseConnector connector) {
 		this.connector = connector;
 		createPools();
     	CommandList.addBasicCommand("as400prog",  new GenericCommand(ProgramStep.class));
     	CommandList.addBasicCommand("as400cmd",  new GenericCommand(CommandStep.class));
+    	CommandList.addBasicCommand("as400poolStatus",  new GenericCommand(StatusAs400PoolStep.class));
 	}
 
 	public void reset() {
@@ -96,7 +98,8 @@ public class As400Module implements Module {
 		As400Connection conn= (As400Connection) context.getObject(key);
 		if (conn!=null)
 			return conn;
-		String poolName = context.getTextVar(AS400_POOL_NAME_KEY);
+		String poolName = context.getTextVar(AS400_POOL_NAME_VARNAME);
+		String poolSubkeyName = context.getTextVar(AS400_POOL_SUBKEY_VARNAME, AS400_POOL_DEFAULT_SUBKEY);
 		As400ConnectionPool pool = null;
 		if (poolName==null) {
 			if (pools.size()==1)
@@ -106,7 +109,7 @@ public class As400Module implements Module {
 		}
 		else
 			pool = pools.get(poolName);
-		conn=pool.borrowConnection(context.getProps());
+		conn=pool.borrowConnection(context.getProps(),poolSubkeyName);
 		context.destroyWhenDone(new BorrowedAs400Connection(pool, conn));
 		context.setObject(key, conn);
 		return conn;
@@ -128,7 +131,7 @@ public class As400Module implements Module {
 		logger.debug("Determining ccsid ousing connection");
 		
 		As400ConnectionPool mainPool = getFirstPool();
-    	As400Connection conn=mainPool.borrowConnection(connector.getProps());
+    	As400Connection conn=mainPool.borrowConnection(connector.getProps(), AS400_POOL_DEFAULT_SUBKEY);
        	try {
        		result = conn.getCcsid();
 			allCallsDone = true;

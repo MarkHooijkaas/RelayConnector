@@ -19,11 +19,11 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.as400.conn;
 
-import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.kisst.cordys.as400.As400PoolSettings;
 import org.kisst.props4j.Props;
 
-public class As400ConnectionFactory implements PoolableObjectFactory {
+public class As400ConnectionFactory implements KeyedPoolableObjectFactory {
 
 	private final As400PoolSettings settings;
 	private final Props props;
@@ -32,23 +32,23 @@ public class As400ConnectionFactory implements PoolableObjectFactory {
 		this.settings=settings;
 		this.props=props;	}
 	
-	public Object makeObject() {
-		return new As400Connection(settings, props);
+	public Object makeObject(Object key) {
+		return new As400Connection(settings, props, (String) key);
 	}
 
-	public void activateObject(Object obj) {
+	public void activateObject(Object obj, Object key) {
 	}
 
-	public void passivateObject(Object obj) {
+	public void passivateObject(Object obj, Object key) {
 	}
 
-	public void destroyObject(Object obj) {
+	public void destroyObject(Object obj, Object key) {
 		As400Connection conn= (As400Connection) obj;
 		conn.close();
 	}
 
 
-	public boolean validateObject(Object obj) {
+	public boolean validateObject(Object obj, Object key) {
 		return true;
 	}
 

@@ -85,6 +85,14 @@ public class ExecutionContext extends CallContext {
 		textvars.put(name, new TextVar(value));
 	}
 
+	synchronized public String getTextVar(String name, String defaultValue) {
+		checkForException();
+		TextVar v = textvars.get(name);
+		if (v==null || v.str==null)
+			return defaultValue;
+		return v.str;
+	}
+
 	synchronized public String getTextVar(String name) {
 		checkForException();
 		TextVar v = textvars.get(name);

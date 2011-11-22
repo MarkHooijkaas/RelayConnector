@@ -20,8 +20,9 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cordys.as400.conn;
 
 import java.util.Date;
+import java.util.HashSet;
 
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.kisst.cordys.as400.As400PoolSettings;
 import org.kisst.props4j.Props;
 import org.quartz.Job;
@@ -39,8 +40,9 @@ import com.eibus.util.logger.Severity;
 public class As400ConnectionPool {
 	private final As400PoolSettings settings;
 	private final Props globalProps;
+	private final HashSet<String> keys=new HashSet<String>();
 	
-	private final GenericObjectPool pool;
+	private final GenericKeyedObjectPool pool;
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(As400ConnectionPool.class);	
 	private final Scheduler scheduler;
 	
@@ -52,38 +54,41 @@ public class As400ConnectionPool {
 			scheduler= factory.getScheduler();
 			scheduler.start();
 		} catch (SchedulerException e) { throw new RuntimeException(e); }
-		pool=new GenericObjectPool(new As400ConnectionFactory(settings, props));
+		pool=new GenericKeyedObjectPool(new As400ConnectionFactory(settings, props));
 	}
 
 
 	public void init() {
-		pool.setMaxActive(settings.maxSize.get(globalProps) );
-		pool.setMinIdle(settings.minIdle.get(globalProps));
+		pool.setMaxTotal(settings.maxTotal.get(globalProps));
+		pool.setMaxActive(settings.maxActive.get(globalProps) );
 		pool.setMaxIdle(settings.maxIdle.get(globalProps));
 		pool.setMaxWait(settings.maxWait.get(globalProps));
+		pool.setMinIdle(settings.minIdle.get(globalProps));
 		pool.setMinEvictableIdleTimeMillis(settings.minEvictableIdleTimeMillis.get(globalProps));
-		pool.setSoftMinEvictableIdleTimeMillis(settings.softMinEvictableIdleTimeMillis.get(globalProps));
 		pool.setTimeBetweenEvictionRunsMillis(settings.timeBetweenEvictionRunsMillis.get(globalProps));
 		pool.setNumTestsPerEvictionRun(settings.numTestsPerEvictionRun.get(globalProps));
 		pool.setLifo(settings.lifo.get(globalProps));
 	}
 
-	public As400Connection borrowConnection(Props callSpecificProps) {
+	public As400Connection borrowConnection(Props callSpecificProps, String key) {
 		long timeout=settings.timeout.get(callSpecificProps);
+		synchronized (keys) {
+			keys.add(key);
+		}
 		// TODO: now the pool checks the lifetime only when borrowing a connections
 		// so a connection can live much longer if it is not needed
 		logger.log(Severity.DEBUG, "Starting borrowing connection");
 		long notCreatedBefore=0;
 		long lifetime = settings.maxConnectionLifetimeMillis.get(globalProps);
 		if (lifetime>0) 
-			notCreatedBefore = new java.util.Date().getTime() - lifetime; 
+			notCreatedBefore = new java.util.Date().getTime() - lifetime;
 		while (true) {
 			try {
 				logger.log(Severity.DEBUG, "Borrowing connection from pool(NumActive,MaxIdle,MaxWait) "+pool.getNumActive()+ "--"+pool.getMaxIdle()+ "--"+pool.getMaxWait());
-				As400Connection conn = (As400Connection) pool.borrowObject();
+				As400Connection conn = (As400Connection) pool.borrowObject(key);
 				logger.log(Severity.DEBUG, "Borrowed a connection from pool(NumActive,MaxIdle,MaxWait) "+pool.getNumActive()+ "--"+pool.getMaxIdle()+ "--"+pool.getMaxWait());				
 				if (conn.creationTime < notCreatedBefore)
-					pool.invalidateObject(conn);
+					pool.invalidateObject(conn, key);
 				else {
 					scheduleTrigger(conn, timeout);
 					return conn;
@@ -125,7 +130,11 @@ public class As400ConnectionPool {
 		} catch (SchedulerException e) { throw new RuntimeException(e); }
 		finally {
 			try {
-				pool.returnObject(conn);
+				long maxNrofCalls = settings.maxNrofCallsPerConnection.get(globalProps);
+				if (maxNrofCalls>0 && conn.getNrOfCalls()>=maxNrofCalls)
+					pool.invalidateObject(conn, conn.getPoolKey());
+				else
+					pool.returnObject(conn, conn.getPoolKey());
 			} 
 			catch (IllegalStateException e) {
 				if ("Pool not open".equals(e.getMessage()))
@@ -143,7 +152,7 @@ public class As400ConnectionPool {
 		} catch (SchedulerException e) { throw new RuntimeException(e); }
 		finally {
 			try {
-				pool.invalidateObject(conn);
+				pool.invalidateObject(conn, conn.getPoolKey());
 			} 
 			catch (IllegalStateException e) {
 				if ("Pool not open".equals(e.getMessage()))
@@ -166,5 +175,25 @@ public class As400ConnectionPool {
 		try {
 			pool.close();
 		} catch (Exception e) { throw new RuntimeException(e); }
+	}
+	
+	public String status() {
+		StringBuilder result = new StringBuilder();
+		result.append("TOTAL\t");
+		result.append(pool.getNumActive());
+		result.append("\t");
+		result.append(pool.getNumIdle());
+		result.append("\n");
+		
+		for (String key: keys) {
+			result.append(key);
+			result.append("\t");
+			result.append(pool.getNumActive(key));
+			result.append("\t");
+			result.append(pool.getNumIdle(key));
+			result.append("\n");
+		}
+		
+		return result.toString();
 	}
 }

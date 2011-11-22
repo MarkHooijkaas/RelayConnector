@@ -126,7 +126,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 	    logbackProps.put("org", DnUtil.getFirstDnPart(getDnOrganization()).toLowerCase().replace(' ', '-'));
 	    logbackProps.put("soapproc", DnUtil.getFirstDnPart(getProcessorName()).toLowerCase().replace(' ', '-'));
 
-		String logbackConfigFile = getProps().getString("relay.logback.configFile", "d:/Cordys/logback.xml");
+		String logbackConfigFile = getProps().getString("relay.logback.configFile", "D:/Cordys/kisst.org/config/logback.xml");
 		if (new File(logbackConfigFile).isFile())
 			LogbackUtil.configure(logbackConfigFile, logbackProps);
 	}

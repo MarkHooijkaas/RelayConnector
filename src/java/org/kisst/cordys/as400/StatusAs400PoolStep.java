@@ -19,25 +19,32 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 
 package org.kisst.cordys.as400;
 
+import org.kisst.cordys.as400.conn.As400ConnectionPool;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
 import org.kisst.cordys.script.expression.Expression;
 import org.kisst.cordys.script.expression.ExpressionParser;
+import org.kisst.cordys.util.NomUtil;
 
 import com.eibus.xml.nom.Node;
 
-public class As400PoolStep implements Step {
+public class StatusAs400PoolStep implements Step {
 
-	private final Expression expr;
+	private final Expression poolNameExpr;
+	private final String varName;
 	
-	public As400PoolStep(CompilationContext compiler, final int node) {
-		expr=ExpressionParser.parse(compiler, Node.getAttribute(node, "value"));
-		compiler.declareTextVar(As400Module.AS400_POOL_NAME_VARNAME);
+	public StatusAs400PoolStep(CompilationContext compiler, final int node) {
+		poolNameExpr=ExpressionParser.parse(compiler, Node.getAttribute(node, "pool"));
+		varName=NomUtil.getStringAttribute(node, "var", "status");
+		compiler.declareTextVar(varName);
 	}
 
 	public void executeStep(ExecutionContext context) {
-		context.setTextVar(As400Module.AS400_POOL_NAME_VARNAME, expr.getString(context));
+		String poolName = poolNameExpr.getString(context);
+		As400Module module = (As400Module) context.getBaseConnector().getModule(As400Module.class);
+		As400ConnectionPool pool = module.getPool(poolName);
+		context.setTextVar(varName, pool.status());
 	}
 
 }

@@ -22,6 +22,7 @@ package org.kisst.cordys.as400.conn;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.HashMap;
 
 import org.kisst.cordys.as400.As400PoolSettings;
 import org.kisst.cordys.util.Destroyable;
@@ -49,21 +50,25 @@ public class As400Connection implements Destroyable {
 	private static int counter=0; // needed to create a unique name
 
 	private final String name;
+	private final String poolKey;
 	private final As400PoolSettings settings;
 	private final Props props;
 	private final AS400 as400;
-	public final long creationTime = new java.util.Date().getTime();
+	private final HashMap<String,Object> extensionProps = new HashMap<String,Object>(); 
+	final long creationTime = new java.util.Date().getTime();
 
 	private String executingProgram=null;
 	private Job myJob;
 	private String jobId;
-
+	private long nrofCalls=0;
+	
 	public boolean isExecuting() { return executingProgram!=null; }
 
-	public As400Connection(As400PoolSettings settings, Props props) {
+	public As400Connection(As400PoolSettings settings, Props props, String poolKey) {
 		this.settings=settings;
 		this.props=props;
-		this.name="As400Connection-"+(counter++);
+		this.name="As400Connection-"+poolKey+"-"+(counter++);
+		this.poolKey=poolKey;
 		String system = settings.host.get(props);
 		String user= settings.username.get(props);
 		String password = settings.password.get(props);
@@ -77,6 +82,11 @@ public class As400Connection implements Destroyable {
 	}
 
 	public String getJobId() { return jobId; }
+	public String getPoolKey() { return poolKey; }
+	public Object getExtensionProp(String key) { return extensionProps.get(key); }
+	public void setExtensionProp(String key, Object value) { extensionProps.put(key, value); }
+	public long getNrOfCalls() { return nrofCalls;}
+
 
 	// TODO: The Job object would normally not change, but it might if the AS400 object
 	// automatically reconnects after a connection problem. I don't know if this ever happens. I doubt it
@@ -117,6 +127,7 @@ public class As400Connection implements Destroyable {
 
 	// helper function to cast all the Checked exceptions to unchecked exceptions
 	public void execute(ProgramCall call) {
+		nrofCalls++;
 		String programName=call.getProgram();
 		if (as400==null) {
 			if (logger.isInfoEnabled()) {
@@ -184,7 +195,7 @@ public class As400Connection implements Destroyable {
 		// Get a brand new connection, because the original connection is probably hanging.
 		// Do not even use the ConnectionPool, because all connections might hang.
 		// Performance is not that important, since this event should be very rare.
-		As400Connection conn=new As400Connection(settings, props);     	
+		As400Connection conn=new As400Connection(settings, props, "jobKiller");
 		try {
 			myJob.setSystem(conn.as400);
 			String status = myJob.getStatus();
@@ -248,6 +259,8 @@ public class As400Connection implements Destroyable {
 
 	public void executeCommand(String command)
 	{
+		nrofCalls++;
+
 		if (as400==null) {
 			logger.log(Severity.INFO,command);
 			return; // do nothing because of simulation mode
@@ -307,7 +320,7 @@ public class As400Connection implements Destroyable {
 	public void close() {
 		if (as400==null)
 			return; // do nothing because of simulation mode
-		as400.disconnectAllServices();		
+		as400.disconnectAllServices();	
 	}
 
 	public int getCcsid() {

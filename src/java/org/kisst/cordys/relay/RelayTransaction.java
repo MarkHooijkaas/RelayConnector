@@ -117,9 +117,8 @@ public class RelayTransaction implements ApplicationTransaction
     	}
     	catch (Throwable e) { //catch Throwable to also catch NoClassDefError
     		String prefix=BaseSettings.soapFaultcodePrefix.get(props);
-    		//NomUtil.deleteChildren(response.getXMLNode());// TODO: is this still necessary in C3?
+    		NomUtil.deleteChildren(response.getXMLNode());// TODO: is this still necessary in C3?
     		int soapfault=response.createSOAPFault(prefix+e.getClass().getSimpleName(), e.getMessage());
-    		logger.error("Caught Throwable",e);
     		createErrorDetails(soapfault, context, e);
     	}
     	finally {
