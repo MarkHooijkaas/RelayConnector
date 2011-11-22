@@ -140,7 +140,7 @@ public class MethodCache {
 			response=getResponse(method);
 		try {
 			if (response==0) {
-				response = connector.sendAndWait(Node.getParent(method),timeout);
+				response = connector.sendAndWait(Node.getRoot(method),timeout);
 				if (response!=0)
 					putResponse(method, response);
 			}

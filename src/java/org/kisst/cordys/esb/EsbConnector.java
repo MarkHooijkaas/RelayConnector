@@ -20,7 +20,6 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cordys.esb;
 
 import org.kisst.cordys.connector.BaseConnector;
-import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 import org.kisst.props4j.LayeredProps;
 
@@ -37,11 +36,12 @@ public class EsbConnector extends BaseConnector {
     public ApplicationTransaction createTransaction(SOAPTransaction stTransaction) {
     	int env=stTransaction.getRequestEnvelope();
     	int req=SoapUtil.getContent(env);
-    	String fullMethodName=NomUtil.getUniversalName(req);
-    	LayeredProps props=new LayeredProps(mlprops.getGlobalProps());
-    	props.addLayer(mlprops.getProps("method:"+fullMethodName));
-    	props.addLayer(mlprops.getProps("namespace:"+Node.getNamespaceURI(req)));
-		return new EsbTransaction(props);
+    	String methodName=Node.getLocalName(req);
+    	LayeredProps lprops=new LayeredProps(props);
+    	lprops.addLayer(props.getProps("override.method."+methodName, null));
+    	// TODO: special characters String namespace=Node.getNamespaceURI(req);
+    	//lprops.addLayer(props.getProps("override.namespace."+namespace, null));
+		return new EsbTransaction(lprops);
 	}
 
 }

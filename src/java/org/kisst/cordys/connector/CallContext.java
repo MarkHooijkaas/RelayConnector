@@ -64,7 +64,6 @@ public class CallContext extends CallTrace {
 	public BodyBlock getResponse() { return response; }
 	public String getFullMethodName() {	return fullMethodName;	}
 	public Props getProps() { return props;	}
-	public CallTrace getTrace() {return this;} // TODO: remove
 	public CallTimer getTimer() { return timer;}
 	public String getOrganization() { return baseConnector.getOrganization(); }	
 	public String getOrganizationalUser() {	return soapTransaction.getUserCredentials().getOrganizationalUser();}

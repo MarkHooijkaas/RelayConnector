@@ -38,7 +38,7 @@ public class HttpModule implements Module {
 	}
 
 	public void reset() {
-		HttpBase.reset(connector.getGlobalProps());
+		HttpBase.reset(connector.getProps());
     	//settings=new MultiLevelSettings<HttpSettings>(mlprops,"http", HttpSettings.class);
 	}
 

@@ -36,9 +36,10 @@ import org.kisst.cordys.util.JamonUtil;
 import org.kisst.cordys.util.LogbackUtil;
 import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
-import org.kisst.props4j.MultiLevelProps;
+import org.kisst.props4j.Parser;
 import org.kisst.props4j.Props;
 
+import com.eibus.connector.nom.CancelRequestException;
 import com.eibus.connector.nom.Connector;
 import com.eibus.directory.soap.DirectoryException;
 import com.eibus.exception.ExceptionGroup;
@@ -50,6 +51,8 @@ import com.eibus.soap.Processor;
 import com.eibus.soap.SOAPTransaction;
 import com.eibus.util.logger.CordysLogger;
 import com.eibus.xml.nom.Node;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 abstract public class BaseConnector extends ApplicationConnector {
 	private static final CordysLogger logger = CordysLogger.getCordysLogger(BaseConnector.class);
@@ -64,7 +67,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 	private String dnOrganization;
 	private String processorName;
 	private ArrayList<Module> modules=new ArrayList<Module>();
-	protected MultiLevelProps mlprops;
+	protected Props props;
 	private JamonUtil.JamonThread jamonThread;
 	public final MethodCache responseCache=new MethodCache();
 
@@ -91,13 +94,15 @@ abstract public class BaseConnector extends ApplicationConnector {
 			if (!connector.isOpen())
 				connector.open();
 
-			mlprops=new MultiLevelProps(getConfigStream());
+			Parser parser = new Parser(getConfigStream());
+			props = parser.readMap(null, "root");
+			//mlprops=new MultiLevelProps(getConfigStream());
 			//CordysLogger specialLogger = CordysLogger.getCordysLogger(com.eibus.management.ManagedComponent.class);
 			if (logger.isInfoEnabled())
-				logger.info("starting with properties "+mlprops.getGlobalProps());
+				logger.info("starting with properties "+props);
 			reconfigureLogback();
-			init(getGlobalProps());
-			addDynamicModules(getGlobalProps());
+			init(getProps());
+			addDynamicModules(getProps());
 			for (int i=0; i<modules.size(); i++)
 				modules.get(i).init(this);
 		}
@@ -116,7 +121,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 	    logbackProps.put("org", DnUtil.getFirstDnPart(getDnOrganization()).toLowerCase().replace(' ', '-'));
 	    logbackProps.put("soapproc", DnUtil.getFirstDnPart(getProcessorName()).toLowerCase().replace(' ', '-'));
 
-		String logbackConfigFile = getGlobalProps().getString("relay.logback.configFile", "d:/Cordys/logback.xml");
+		String logbackConfigFile = getProps().getString("relay.logback.configFile", "d:/Cordys/logback.xml");
 		if (new File(logbackConfigFile).isFile())
 			LogbackUtil.configure(logbackConfigFile, logbackProps);
 	}
@@ -153,7 +158,9 @@ abstract public class BaseConnector extends ApplicationConnector {
 
 
 	public void reset() {
-		mlprops =new MultiLevelProps(getConfigStream());
+		Parser parser = new Parser(getConfigStream());
+		props = parser.readMap(null, "root");
+		//mlprops =new MultiLevelProps(getConfigStream());
 		for (int i=0; i<modules.size(); i++)
 			modules.get(i).reset();
 		JamonUtil.jamonLog(this,"RESET called, dumping all statistics");
@@ -229,7 +236,13 @@ abstract public class BaseConnector extends ApplicationConnector {
 		try {
 			method=createMethod(namespace, methodName, dnUser);
 			Node.createTextElement("key", key, method);
-			response=callMethod(method);
+			try {
+				response = connector.sendAndWait(Node.getRoot(method),20000);
+			}
+			catch (CancelRequestException e) {throw new RuntimeException(e); }
+			catch (TimeoutException e) {throw new RuntimeException(e); }
+			catch (ExceptionGroup e) { throw new RuntimeException(e); }
+			
 			if (SoapUtil.isSoapFault(response))
 				throw new RuntimeException("Soap Fault while reading config form xmlstore "+SoapUtil.getSoapFaultMessage(response));
 			int node=SoapUtil.getContent(response); 
@@ -262,16 +275,35 @@ abstract public class BaseConnector extends ApplicationConnector {
 		}
 		catch (DirectoryException e) {  throw new RuntimeException(e); }
 	}
-
-	public int callMethod(int method) {
+	
+	public int callMethod(CallContext context, int method) {
+    	String user=DnUtil.getFirstDnPart(context.getOrganizationalUser());
+		MethodCache caller = responseCache;
+		Monitor mon1 = MonitorFactory.start("OutgoingCall:"+NomUtil.getUniversalName(method));
+		Monitor mon2 = MonitorFactory.start("AllOutgoingCalls");
+		Monitor monu1 = MonitorFactory.start("OutgoingCallForUser:"+user+":"+NomUtil.getUniversalName(method));
+		Monitor monu2 = MonitorFactory.start("AllOutgoingCallsForUser:"+user);
+		boolean succes=false;
+    	final Date startTime=new Date();
 		try {
-			//logger.log(Severity.INFO, "sending request\n"+Node.writeToString(method, true));
-			return connector.sendAndWait(Node.getParent(method));
+			context.traceInfo("sending request: ", method);
+			//int response = connector.sendAndWait(Node.getParent(method));
+    		int response = caller.sendAndWait(Node.getParent(method),BaseSettings.timeout.get(context.getProps()));
+
+			context.traceInfo("received response: ", response);
+			succes=true;
+			return response;
 		}
-		catch (TimeoutException e) { throw new RuntimeException(e); }
-		catch (ExceptionGroup e) { throw new RuntimeException(e); }
+		finally {
+			logPerformance("CALL", context, startTime, method, succes);
+			mon1.stop();
+			mon2.stop();
+			monu1.stop();
+			monu2.stop();
+		}
+
 	}
-	public Props getGlobalProps() {	return mlprops.getGlobalProps();	}
+	public Props getProps() {	return props;	}
 
 	public ResourcePool getResourcePool(String poolName) {
 		if (poolName==null)
@@ -281,7 +313,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 			if (result!=null)
 				return result;
 			ResourcePoolSettings settings=BaseSettings.resourcepool.get(poolName);
-			ResourcePool pool=settings.create(getGlobalProps());
+			ResourcePool pool=settings.create(getProps());
 			resourcePoolMap.put(poolName,pool);
 			return pool;
 		}		

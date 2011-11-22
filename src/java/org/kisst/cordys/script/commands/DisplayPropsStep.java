@@ -22,28 +22,25 @@ package org.kisst.cordys.script.commands;
 import org.kisst.cordys.script.CompilationContext;
 import org.kisst.cordys.script.ExecutionContext;
 import org.kisst.cordys.script.Step;
-import org.kisst.cordys.script.expression.XmlExpression;
-import org.kisst.cordys.util.SoapUtil;
+import org.kisst.props4j.SimpleProps;
 
-import com.eibus.util.logger.Severity;
 import com.eibus.xml.nom.Node;
 
-public class SoapMergeStep implements Step {
-	private final XmlExpression srcExpression;
-	private final XmlExpression destExpression;
-	
-	
-	public SoapMergeStep(CompilationContext compiler, final int node) {
-		srcExpression = new XmlExpression(compiler, Node.getAttribute(node, "src"));
-		destExpression = new XmlExpression(compiler, Node.getAttribute(node, "dest"));
+
+public class DisplayPropsStep implements Step {
+
+	private final String name;
+    
+	public DisplayPropsStep(CompilationContext compiler, final int node) {
+		name =Node.getAttribute(node, "name");
+		compiler.declareTextVar(name);
 	}
 
-	public void executeStep(ExecutionContext context) {
-		int src  = srcExpression.getNode(context);
-		int dest = destExpression.getNode(context);
-		SoapUtil.mergeEnvelopes(src,dest);
-		if (context.debugTraceEnabled()) {
-			context.trace(Severity.DEBUG, "result after soap merge ", dest);
-		}
+	public void executeStep(final ExecutionContext context) {
+		SimpleProps props=(SimpleProps) context.getBaseConnector().getProps();
+		String value=props.toPropertiesString();
+		if (context.debugTraceEnabled())
+			context.traceDebug("setting text var "+name+" to value "+value );
+		context.setTextVar(name, value);
 	}
 }

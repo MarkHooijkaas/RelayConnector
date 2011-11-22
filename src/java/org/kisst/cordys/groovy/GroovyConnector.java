@@ -35,10 +35,12 @@ public class GroovyConnector extends BaseConnector {
     	int env=stTransaction.getRequestEnvelope();
     	int req=SoapUtil.getContent(env);
     	String fullMethodName=NomUtil.getUniversalName(req);
-    	LayeredProps props=new LayeredProps(mlprops.getGlobalProps());
-    	props.addLayer(mlprops.getProps("method:"+fullMethodName));
-    	props.addLayer(mlprops.getProps("namespace:"+Node.getNamespaceURI(req)));
-		return 	new GroovyTransaction(this, fullMethodName, props, stTransaction);
+    	String methodName=Node.getLocalName(req);
+    	LayeredProps lprops=new LayeredProps(props);
+    	lprops.addLayer(props.getProps("override.method."+methodName, null));
+    	// TODO: special characters String namespace=Node.getNamespaceURI(req);
+    	//lprops.addLayer(props.getProps("override.namespace."+namespace, null));
+		return 	new GroovyTransaction(this, fullMethodName, lprops, stTransaction);
 		}
 
 }

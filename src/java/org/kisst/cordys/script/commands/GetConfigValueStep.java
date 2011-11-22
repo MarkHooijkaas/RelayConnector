@@ -47,7 +47,7 @@ public class GetConfigValueStep implements Step {
 	public void executeStep(final ExecutionContext context) {
 		String key=expr.getString(context);
 		if (context.debugTraceEnabled())
-			context.traceDebug("looking up config value"+key);
+			context.traceDebug("looking up config value "+key);
 		String value=context.getProps().getString(key,null);
 		if (value==null) {
 			if (defaultValue==null)

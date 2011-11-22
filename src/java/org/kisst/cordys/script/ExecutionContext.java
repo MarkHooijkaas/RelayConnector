@@ -74,12 +74,14 @@ public class ExecutionContext extends CallContext {
 	}
 	synchronized public void setXmlVar(String name, int node) {
 		xmlvars.put(name, new XmlVar(node));
+		this.traceInfo("Setting xmlvar "+name, node);
 		this.notifyAll(); // notify should suffice as well instead of notifyAll
 	}
 
 	synchronized public void setTextVar(String name, String value) {
 		if (allreadyDestroyed())
 			logger.log(Severity.WARN, "Trying to set text var ["+name+"] on allready destroyed context to value ["+value+"]");
+		this.traceInfo("Setting textvar "+name+" to "+value);
 		textvars.put(name, new TextVar(value));
 	}
 

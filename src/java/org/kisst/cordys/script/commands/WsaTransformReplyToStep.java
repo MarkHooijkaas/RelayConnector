@@ -51,8 +51,7 @@ public class WsaTransformReplyToStep implements Step {
 
 		SoapUtil.wsaTransformReplyTo(node, replyTo, faultTo);
 		if (context.debugTraceEnabled()) {
-			if (context.getTrace()!=null)
-				context.getTrace().trace(Severity.DEBUG, "result after wsa transform ", node);
+				context.trace(Severity.DEBUG, "result after wsa transform ", node);
 		}
 	}
 }

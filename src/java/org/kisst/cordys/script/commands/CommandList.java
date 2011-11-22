@@ -50,6 +50,7 @@ public class CommandList {
 		basicCommands.addCommand("wsaTransformReplyTo", new GenericCommand(WsaTransformReplyToStep.class));
 		basicCommands.addCommand("soapMerge", new GenericCommand(SoapMergeStep.class));
 		basicCommands.addCommand("convert", new GenericCommand(ConvertStep.class));
+		basicCommands.addCommand("globalProps", new GenericCommand(DisplayPropsStep.class));
 	}
 	public static void addBasicCommand(String name, Command type) {	basicCommands.addCommand(name, type); }
 

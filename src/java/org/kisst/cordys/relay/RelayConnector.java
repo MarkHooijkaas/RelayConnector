@@ -36,7 +36,7 @@ public class RelayConnector extends BaseConnector {
 	}
 	
 	@Override protected void init(Props globalProps) {
-		responseCache.init(getConnector(), getGlobalProps());
+		responseCache.init(getConnector(), getProps()); // TODO: why not use the globalProps?
 	}
 
 	@Override protected String getConnectorName() { return "RelayConnector"; }
@@ -46,14 +46,16 @@ public class RelayConnector extends BaseConnector {
     	int env=stTransaction.getRequestEnvelope();
     	int req=SoapUtil.getContent(env);
     	String fullMethodName=NomUtil.getUniversalName(req);
-    	LayeredProps props=new LayeredProps(mlprops.getGlobalProps());
-    	props.addLayer(mlprops.getProps("method:"+fullMethodName));
-    	props.addLayer(mlprops.getProps("namespace:"+Node.getNamespaceURI(req)));
-		return new RelayTransaction(this, fullMethodName, props, stTransaction);
+    	String methodName=Node.getLocalName(req);
+    	LayeredProps lprops=new LayeredProps(props);
+    	lprops.addLayer(props.getProps("override.method."+methodName, null));
+    	// TODO: special characters String namespace=Node.getNamespaceURI(req);
+    	//lprops.addLayer(props.getProps("override.namespace."+namespace, null));
+		return new RelayTransaction(this, fullMethodName, lprops, stTransaction);
 	}
 
 	@Override public void reset() {
 		super.reset();
-		responseCache.reset(getGlobalProps());
+		responseCache.reset(getProps());
 	}
 }

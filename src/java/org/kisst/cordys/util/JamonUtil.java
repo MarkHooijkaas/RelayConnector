@@ -70,7 +70,7 @@ public class JamonUtil {
 	
 	@SuppressWarnings("deprecation")
 	public static void jamonLog(BaseConnector connector, String message) {
-		Props props = connector.getGlobalProps();
+		Props props = connector.getProps();
 		if (props==null) {
 			//logger.warn("Could not perform jamon logging because properties are not available for jamonLog: "+message);
 			return;
@@ -100,7 +100,7 @@ public class JamonUtil {
 		public void run() {
 			myThread = Thread.currentThread();
 			while (running) {
-				int interval = BaseSettings.jamonIntervalInSeconds.get(connector.getGlobalProps());
+				int interval = BaseSettings.jamonIntervalInSeconds.get(connector.getProps());
 				try {
 					if (interval<=0)
 						Thread.sleep(600*1000); // sleep 10 minutes, could be any time
