@@ -33,12 +33,15 @@ public class As400PoolSettings extends CompositeSetting {
 	public final StringSetting password = new StringSetting(this, "password");
 	public final LongSetting timeout = new LongSetting(this, "timeout", 20000);
 
-	public final IntSetting connectionPoolSize = new IntSetting(this, "maxPoolSize", 10);
+	public final IntSetting maxSize = new IntSetting(this, "maxSize", 10);
 	public final IntSetting maxIdle = new IntSetting(this, "maxIdle", 8);
+	public final IntSetting minIdle = new IntSetting(this, "minIdle", 0);
 	public final LongSetting maxWait = new LongSetting(this, "maxWait", 20000);
 	public final LongSetting maxConnectionLifetimeMillis= new LongSetting(this, "maxConnectionLifetimeMillis", 1800000);
 	public final LongSetting minEvictableIdleTimeMillis= new LongSetting(this, "minEvictableIdleTimeMillis", 300000);
+	public final LongSetting softMinEvictableIdleTimeMillis= new LongSetting(this, "softMinEvictableIdleTimeMillis", 300000);
 	public final LongSetting timeBetweenEvictionRunsMillis= new LongSetting(this, "timeBetweenEvictionRunsMillis", 60000);
+	public final IntSetting numTestsPerEvictionRun = new IntSetting(this, "numTestsPerEvictionRun", 3);
 	public final BooleanSetting lifo = new BooleanSetting(this, "lifo", true);
 	
 	public final BooleanSetting simulationFlag = new BooleanSetting(this, "simulationFlag", false);

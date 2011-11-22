@@ -57,11 +57,14 @@ public class As400ConnectionPool {
 
 
 	public void init() {
-		pool.setMaxActive(settings.connectionPoolSize.get(globalProps) );
+		pool.setMaxActive(settings.maxSize.get(globalProps) );
+		pool.setMinIdle(settings.minIdle.get(globalProps));
 		pool.setMaxIdle(settings.maxIdle.get(globalProps));
 		pool.setMaxWait(settings.maxWait.get(globalProps));
 		pool.setMinEvictableIdleTimeMillis(settings.minEvictableIdleTimeMillis.get(globalProps));
+		pool.setSoftMinEvictableIdleTimeMillis(settings.softMinEvictableIdleTimeMillis.get(globalProps));
 		pool.setTimeBetweenEvictionRunsMillis(settings.timeBetweenEvictionRunsMillis.get(globalProps));
+		pool.setNumTestsPerEvictionRun(settings.numTestsPerEvictionRun.get(globalProps));
 		pool.setLifo(settings.lifo.get(globalProps));
 	}
 

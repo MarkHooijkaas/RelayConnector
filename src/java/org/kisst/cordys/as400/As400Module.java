@@ -68,7 +68,7 @@ public class As400Module implements Module {
 	}
 
 	private void createPools() {
-		Props props = connector.getGlobalProps();
+		Props props = connector.getProps();
 		pools.clear();
 		for (String name: As400Settings.pools.keys(props)){
 			As400ConnectionPool pool = new As400ConnectionPool(As400Settings.pools.get(name), props );
@@ -80,7 +80,7 @@ public class As400Module implements Module {
 	}
 	
 	private void destroyPools() {
-		Props props = connector.getGlobalProps();
+		Props props = connector.getProps();
 		for (String name: As400Settings.pools.keys(props)){
 			getPool(name).destroy();
 		}
@@ -118,7 +118,7 @@ public class As400Module implements Module {
 		throw new RuntimeException("no connection pools defined");
 	}
 	private int determineCcsid() {
-		int result = As400Settings.ccsid.get(connector.getGlobalProps());
+		int result = As400Settings.ccsid.get(connector.getProps());
 
     	if (result>=0) {
     		logger.debug("ccsid determined from configuration file");
@@ -128,7 +128,7 @@ public class As400Module implements Module {
 		logger.debug("Determining ccsid ousing connection");
 		
 		As400ConnectionPool mainPool = getFirstPool();
-    	As400Connection conn=mainPool.borrowConnection(connector.getGlobalProps());
+    	As400Connection conn=mainPool.borrowConnection(connector.getProps());
        	try {
        		result = conn.getCcsid();
 			allCallsDone = true;

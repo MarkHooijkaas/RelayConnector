@@ -55,7 +55,7 @@ public class As400Connection implements Destroyable {
 	public final long creationTime = new java.util.Date().getTime();
 
 	private String executingProgram=null;
-	private Job activeJob;
+	private Job myJob;
 	private String jobId;
 
 	public boolean isExecuting() { return executingProgram!=null; }
@@ -76,6 +76,23 @@ public class As400Connection implements Destroyable {
 			as400= new AS400(system, user, password);
 	}
 
+	public String getJobId() { return jobId; }
+
+	// TODO: The Job object would normally not change, but it might if the AS400 object
+	// automatically reconnects after a connection problem. I don't know if this ever happens. I doubt it
+	private synchronized void rememberJob(CommandCall call) throws AS400SecurityException, ErrorCompletingRequestException, IOException, InterruptedException {
+		if (myJob==null) {
+			myJob = call.getServerJob();
+			jobId=myJob.getNumber();
+		}
+	}
+	private synchronized void rememberJob(ProgramCall call) throws AS400SecurityException, ErrorCompletingRequestException, IOException, InterruptedException {
+		if (myJob==null) {
+			myJob = call.getServerJob();
+			jobId=myJob.getNumber();
+		}
+	}
+
 
 	public void execute(String programPath, ProgramParameter[] as400par) {
 		ProgramCall call= new ProgramCall();
@@ -86,8 +103,9 @@ public class As400Connection implements Destroyable {
 		execute(call);
 	}
 
-	private static String getJobLogId(ProgramCall call) {
+	private String getJobLogId(ProgramCall call) {
 		try {
+			rememberJob(call);
 			JobLog jobLog = call.getServerJob().getJobLog();
 			return jobLog.getUser()+":"+jobLog.getName()+":"+jobLog.getNumber();
 		} 
@@ -123,11 +141,10 @@ public class As400Connection implements Destroyable {
 		Monitor mon1 = null;
 		Monitor mon2 = null;
 		try {
+			rememberJob(call);
 			executingProgram=call.getProgram();
 			call.setSystem(as400);
-			activeJob = call.getServerJob();
-			jobId = activeJob.getNumber();
-
+			
 			mon1 = MonitorFactory.start("As400ProgramCall:"+programName);
 			mon2 = MonitorFactory.start("AllAs400ProgramCalls");
 			done=call.run();
@@ -141,7 +158,6 @@ public class As400Connection implements Destroyable {
 		catch (ObjectDoesNotExistException e) { throw new RuntimeException( getJobLogId(call)+" "+e.getMessage(), e); }
 		catch (PropertyVetoException e) { throw new RuntimeException(e); }
 		finally {
-			activeJob=null;
 			executingProgram=null;
 			if (mon1!=null) mon1.stop();
 			if (mon2!=null) mon2.stop();
@@ -162,11 +178,7 @@ public class As400Connection implements Destroyable {
 	 * @return true if a MessageWaiting was indeed cancelled, false otherwise
 	 */
 	public boolean killJob() {
-		// TODO: It should also be possible to kill the job when there is not
-		// an program or command running, but we can only get a Job object from a call object.
-		// This Job object would normally not change, but it might if the AS400 object
-		// automatically reconnects after a connection problem.
-		if (activeJob==null)
+		if (myJob==null)
 			return false;
 
 		// Get a brand new connection, because the original connection is probably hanging.
@@ -174,17 +186,16 @@ public class As400Connection implements Destroyable {
 		// Performance is not that important, since this event should be very rare.
 		As400Connection conn=new As400Connection(settings, props);     	
 		try {
-			activeJob.setSystem(conn.as400);
-			JobLog jobLog = activeJob.getJobLog();
-			String status = activeJob.getStatus();
+			myJob.setSystem(conn.as400);
+			String status = myJob.getStatus();
 
 			String logging="ENDING JOB ["+jobId+"] with status ["+status+"]";
 			logging+=" while executing ["+executingProgram+"]\nLast loglines:\n";
 
 			int nrofMessages=settings.nrOfMessagesToLog.get(props);
-			logging += getLogLines(jobLog, nrofMessages);
+			logging += getLogLines(nrofMessages);
 			logger.log(Severity.ERROR, logging);
-			activeJob.end(0);
+			myJob.end(0);
 			return true;
 		}
 		catch (AS400SecurityException e) { throw new RuntimeException(e); }
@@ -199,8 +210,11 @@ public class As400Connection implements Destroyable {
 	}
 
 
-	private String getLogLines(JobLog jobLog, int nrofMessages) {
+	private String getLogLines(int nrofMessages) {
+		if (myJob==null)
+			return null;
 		try {
+			JobLog jobLog = myJob.getJobLog();
 			StringBuilder logging=new StringBuilder();
 			//JobLog jobLog = as400.getJobLog();
 			int  l=jobLog.getLength();
@@ -243,9 +257,8 @@ public class As400Connection implements Destroyable {
 
 		boolean ok=true; // needs to be set here, otherwise compiler warns that it might not be set
 		try {
+			rememberJob(call);
 			executingProgram=command;
-			activeJob = call.getServerJob();
-			jobId = activeJob.getNumber();
 			int nrofTries=2; // TODO: make configurable
 			Monitor mon1=null;
 			Monitor mon2=null;
@@ -279,7 +292,6 @@ public class As400Connection implements Destroyable {
 			throw new RuntimeException("CommandCall failed: " + command+": "+e.toString(),e);
 		}
 		finally {
-			activeJob=null;
 			executingProgram=null;
 		}
 		if (!ok) {
