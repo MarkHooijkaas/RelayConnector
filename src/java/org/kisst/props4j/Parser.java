@@ -84,7 +84,7 @@ public class Parser {
 		StringBuilder result=new StringBuilder();
 		while (! eof()){
 			char ch=read();
-			if (Character.isLetterOrDigit(ch) || ch=='.' || ch=='_')
+			if (Character.isLetterOrDigit(ch) || ch=='.' || ch=='_' || ch=='-')
 				result.append(ch);
 			else {
 				unread();
@@ -244,7 +244,7 @@ public class Parser {
 					throw new ParseException("+= not yet supported");
 				}
 				else 
-					throw new ParseException("field assignment "+key+" in map "+map.getFullName()+" should have =, : or +=, not "+ch);
+					throw new ParseException("field assignment "+key+" in map "+map.getFullName()+" ends with character \""+getLastChar()+"\" (char code "+((int)getLastChar())+"), but this should be =, : or +=");
 			}
 			else if (eof())
 				break;
@@ -261,9 +261,8 @@ public class Parser {
 			throw new RuntimeException("layer should have { symbol on same line in config line: @"+str);
 		str=str.substring(0,str.length()-1).trim();
 		String name=str.substring(1+str.lastIndexOf('}'));
-		map.put("demo."+name, "klaas");
-
-		map.put("override.method."+name, readMap(map, name));
+		String key="override.method."+name;
+		map.put(key, readMap(map, name));
 	}
 
 	
