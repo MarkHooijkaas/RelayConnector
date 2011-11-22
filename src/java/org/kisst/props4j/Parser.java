@@ -224,7 +224,9 @@ public class Parser {
 			else if (ch=='@'){
 				String cmd=readIdentifierPath();
 				if (cmd.equals("include")) 
-					include(map,this);
+					include(map);
+				else if (cmd.equals("override"))
+					override(map);
 				continue;
 			}
 			else if (ch==';')
@@ -253,15 +255,27 @@ public class Parser {
 
 
 
-	private void include(SimpleProps map, Parser inp) {
+	private void override(SimpleProps map) {
+		String str=readUntil("\n").trim();
+		if (!str.endsWith("{"))
+			throw new RuntimeException("layer should have { symbol on same line in config line: @"+str);
+		str=str.substring(0,str.length()-1).trim();
+		String name=str.substring(1+str.lastIndexOf('}'));
+		map.put("demo."+name, "klaas");
+
+		map.put("override.method."+name, readMap(map, name));
+	}
+
+	
+	private void include(SimpleProps map) {
 		Object o=readObject();
 		File f=null;
 		if (o instanceof File)
 			f=(File) o;
 		else if (o instanceof String)
-			f=inp.getPath(o.toString());
+			f=getPath(o.toString());
 		else
-			throw inp.new ParseException("unknown type of object to include "+o);
+			throw new ParseException("unknown type of object to include "+o);
 		if (f.isFile())
 			map.load(f);
 		else if (f.isDirectory()) {

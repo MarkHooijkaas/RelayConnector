@@ -22,12 +22,8 @@ package org.kisst.props4j;
 import java.io.File;
 
 import org.kisst.util.FileUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class PropsBase implements Props {
-	private static final Logger log=LoggerFactory.getLogger(PropsBase.class);
-	
 	private static final long serialVersionUID = 1L;
 	abstract public Object get(String key, Object defaultValue);
 
@@ -62,6 +58,8 @@ public abstract class PropsBase implements Props {
 			return (String) result;
 		if (result instanceof File)
 			return FileUtil.loadString((File) result);
+		if (result instanceof SimpleProps)
+			return ((SimpleProps) result).stringValue;
 		throw new RuntimeException("type of key "+key+" is not a String but a "+result.getClass().getSimpleName());
 	}
 
@@ -101,6 +99,7 @@ public abstract class PropsBase implements Props {
 			throw new RuntimeException("property "+name+" should be true or false, not "+value);
 	}
 
+	public Props getProps(String name, Props defaultValue) { return (Props) get(name,defaultValue); }
 	public Props getProps(String name) { return (Props) get(name); }
 	public Sequence getSequence(String name) { return (Sequence) get(name); }
 

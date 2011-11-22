@@ -30,7 +30,7 @@ public interface Props extends MinimalProps {
 	public int    getInt(String string, int defaultValue);
 	public long   getLong(String string, long defaultValue);
 	public boolean getBoolean(String name, boolean defaultValue);
-	public Props getProps(String name);
+	public Props getProps(String name, Props defaultValue);
 	//public Iterable<String> keys();
 	
 	public Object get(String key);
@@ -39,4 +39,5 @@ public interface Props extends MinimalProps {
 	public long   getLong(String string);
 	public boolean getBoolean(String name);
 	public Sequence getSequence(String name);
+	public Props getProps(String name);
 }
