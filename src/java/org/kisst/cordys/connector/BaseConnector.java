@@ -38,6 +38,7 @@ import org.kisst.cordys.util.NomUtil;
 import org.kisst.cordys.util.SoapUtil;
 import org.kisst.props4j.Parser;
 import org.kisst.props4j.Props;
+import org.kisst.props4j.SimpleProps;
 
 import com.eibus.connector.nom.CancelRequestException;
 import com.eibus.connector.nom.Connector;
@@ -94,9 +95,13 @@ abstract public class BaseConnector extends ApplicationConnector {
 			if (!connector.isOpen())
 				connector.open();
 
-			Parser parser = new Parser(getConfigStream());
-			props = parser.readMap(null, "root");
-			//mlprops=new MultiLevelProps(getConfigStream());
+			InputStream stream = getConfigStream();
+			if (stream==null)
+				props=new SimpleProps();
+			else {
+				Parser parser = new Parser(stream);
+				props = parser.readMap(null, null);
+			}
 			//CordysLogger specialLogger = CordysLogger.getCordysLogger(com.eibus.management.ManagedComponent.class);
 			if (logger.isInfoEnabled())
 				logger.info("starting with properties "+props);
