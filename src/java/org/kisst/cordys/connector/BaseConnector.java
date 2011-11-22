@@ -80,6 +80,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 	 *
 	 * @param processor The processor that is started.
 	 */
+	@SuppressWarnings("deprecation")
 	public void open(Processor processor)
 	{
 		dnOrganization =processor.getOrganization();
@@ -91,6 +92,9 @@ abstract public class BaseConnector extends ApplicationConnector {
 				connector.open();
 
 			mlprops=new MultiLevelProps(getConfigStream());
+			//CordysLogger specialLogger = CordysLogger.getCordysLogger(com.eibus.management.ManagedComponent.class);
+			if (logger.isInfoEnabled())
+				logger.info("starting with properties "+mlprops.getGlobalProps());
 			reconfigureLogback();
 			init(getGlobalProps());
 			addDynamicModules(getGlobalProps());

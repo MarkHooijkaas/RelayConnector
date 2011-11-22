@@ -22,8 +22,12 @@ package org.kisst.props4j;
 import java.io.File;
 
 import org.kisst.util.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class PropsBase implements Props {
+	private static final Logger log=LoggerFactory.getLogger(PropsBase.class);
+	
 	private static final long serialVersionUID = 1L;
 	abstract public Object get(String key, Object defaultValue);
 
@@ -39,7 +43,7 @@ public abstract class PropsBase implements Props {
 		if (result!=null)
 			return result;
 		else
-			throw new RuntimeException("Could not find property "+key+" in context "+getFullName());
+			throw new RuntimeException("Could not find property "+key+" in context "+getFullName()+"\n"+this);
 	}
 
 	public String getString(String key) { 

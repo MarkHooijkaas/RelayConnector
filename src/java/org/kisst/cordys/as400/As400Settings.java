@@ -26,7 +26,7 @@ import org.kisst.cfg4j.MappedSetting;
 public class As400Settings {
 	private final static CompositeSetting as400=new CompositeSetting(null,"as400");
 
-	public final static MappedSetting<As400PoolSettings> pools=new MappedSetting<As400PoolSettings>(as400, "pool", As400PoolSettings.class);
+	public final static MappedSetting<As400PoolSettings> pools=new MappedSetting<As400PoolSettings>(null, "as400.pool", As400PoolSettings.class);
 	
 	//public final static BooleanSetting  ignoreReturnCode=new BooleanSetting(as400, "ignoreReturnCode", false);
 	//public final static IntSetting  timeout=new IntSetting(as400, "timeout", 30000);

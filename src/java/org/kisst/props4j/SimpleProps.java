@@ -47,8 +47,8 @@ public class SimpleProps extends PropsBase {
 		else
 			this.name=name;
 	}
-	public String getLocalName() { return name; }
-	public String getFullName() {
+	@Override public String getLocalName() { return name; }
+	@Override public String getFullName() {
 		if (parent==null)
 			return name;
 		else { 
@@ -58,6 +58,13 @@ public class SimpleProps extends PropsBase {
 			else
 				return prefix+"."+name;
 		}
+	}
+
+	public SimpleProps shallowClone() {
+		SimpleProps result=new SimpleProps(parent,name);
+		for (String key: keys())
+			result.put(key, this.get(key));
+		return result;
 	}
 
 	public Iterable<String> keys() { return values.keySet(); }
@@ -109,7 +116,7 @@ public class SimpleProps extends PropsBase {
 		if (o==null)
 			return defaultValue;
 		else if (o instanceof SimpleProps)
-			return ((SimpleProps)o).get(keyremainder,null);
+			return ((SimpleProps)o).get(keyremainder,defaultValue);
 		else
 			return defaultValue;
 	}

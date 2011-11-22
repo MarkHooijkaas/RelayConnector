@@ -6,7 +6,7 @@
 	<javafiles>org/kisst/cordys/util/**,org/kisst/cordys/relay/**,org/kisst/cordys/script/**,org/kisst/cordys/http/**</javafiles>
 	<jarfiles pathid="jarfiles">
       <pathelement location="lib/commons-httpclient-3.1.jar"/>
-      <pathelement location="lib/commons-logging-1.0.4.jar"/>
+      <pathelement location="lib/commons-logging-1.1.1.jar"/>
       <pathelement location="lib/commons-codec-1.2.jar"/>
       <pathelement location="lib/ehcache-1.5.0.jar"/>
       <pathelement location="lib/jamon-2.7.jar"/>
