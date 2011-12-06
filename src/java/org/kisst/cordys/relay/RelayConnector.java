@@ -58,4 +58,8 @@ public class RelayConnector extends BaseConnector {
 		super.reset();
 		responseCache.reset(getProps());
 	}
+
+	public boolean checkCallType(String callType) {
+    	return "RelayCall".equals(callType);
+	}
 }

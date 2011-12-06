@@ -21,18 +21,21 @@ package org.kisst.props4j;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.kisst.util.FileUtil;
+import org.kisst.cordys.relay.RelayTransaction;
+import org.kisst.props4j.parser.ResourceNode;
 import org.kisst.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.eibus.util.logger.CordysLogger;
+import com.eibus.util.logger.Severity;
 
 public class SimpleProps extends PropsBase {
-	private static final Logger logger = LoggerFactory.getLogger(SimpleProps.class);
+	//private static final Logger logger = LoggerFactory.getLogger(SimpleProps.class);
+	private static final CordysLogger logger = CordysLogger.getCordysLogger(RelayTransaction.class);
+
 	private static final long serialVersionUID = 1L;
 
 	private final SimpleProps parent;
@@ -75,12 +78,12 @@ public class SimpleProps extends PropsBase {
 		if (pos<0) {
 			if (value==null) {
 				if (logger.isInfoEnabled())
-					logger.info("removing {}",getFullName()+"."+key);
+					logger.log(Severity.INFO,"removing "+getFullName()+"."+key);
 				values.remove(key);
 			}
 			else {
 				if (logger.isInfoEnabled())
-					logger.info("put {} = {}",getFullName()+"."+key,value);
+					logger.log(Severity.INFO,"put "+getFullName()+"."+key+" = "+value);
 				Object old=values.get(key);
 				if (old instanceof SimpleProps && value instanceof String)
 					((SimpleProps) old).stringValue=(String) value;
@@ -106,12 +109,12 @@ public class SimpleProps extends PropsBase {
 	}
 
 	public Object get(String key, Object defaultValue) {
-		logger.debug("getting {}",key);
+		//logger.debug("getting {}",key);
 		int pos=key.indexOf('.');
 		if (pos<0) {
 			Object result=values.get(key);
 			if (logger.isInfoEnabled())
-				logger.info("returned prop {} with value {}",getFullName()+"."+key,result);
+				logger.log(Severity.INFO,"returned prop "+getFullName()+"."+key+"with value "+result);
 			if (result==null)
 				return defaultValue;
 			else
@@ -128,11 +131,11 @@ public class SimpleProps extends PropsBase {
 			return defaultValue;
 	}
 
-	public void load(String filename)  { load(new File(filename));	}
-	public void load(File file) {
-		InputStreamReader f = new InputStreamReader(FileUtil.open(file));
+	//public void load(String filename)  { load(new File(filename));	}
+	public void load(ResourceNode resource) {
+		Reader f = resource.getReader();
 		try {
-			new Parser(f, file).fillMap(this);
+			new Parser(resource).fillMap(this);
 		}
 		finally {
 			try {
@@ -140,7 +143,7 @@ public class SimpleProps extends PropsBase {
 			} catch (IOException e) { throw new RuntimeException(e); }
 		}
 	}
-	public void read(InputStream inp)  { new Parser(inp).fillMap(this);} 
+	//public void read(InputStream inp)  { new Parser(inp).fillMap(this);} 
 
 
 	public String toString() { return toString("");	}

@@ -3,7 +3,7 @@ package org.kisst.props4j;
 public class PrintProps {
 	public static void main(String[] args) {
 		SimpleProps props=new SimpleProps();
-		props.read(System.in);
+		// TODO: props.read(System.in);
 		props.put("dummy", "OK");
 		for (String arg:args) {
 			if (".".equals(arg))

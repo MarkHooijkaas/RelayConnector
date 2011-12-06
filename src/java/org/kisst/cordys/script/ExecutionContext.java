@@ -144,6 +144,7 @@ public class ExecutionContext extends CallContext {
 			public boolean onReceive(int message)
 			{
 				try {
+					// TODO: when is the call not a succes for the performance log
 					getBaseConnector().logPerformance("CALL-ASYNC", ExecutionContext.this, startTime, method, true);
 					mon1.stop();
 					mon2.stop();

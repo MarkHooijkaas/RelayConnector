@@ -20,8 +20,6 @@ along with the RelayConnector framework.  If not, see <http://www.gnu.org/licens
 package org.kisst.cordys.connector;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -39,6 +37,8 @@ import org.kisst.cordys.util.SoapUtil;
 import org.kisst.props4j.Parser;
 import org.kisst.props4j.Props;
 import org.kisst.props4j.SimpleProps;
+import org.kisst.props4j.parser.FileResourceNode;
+import org.kisst.props4j.parser.ResourceNode;
 
 import com.eibus.connector.nom.CancelRequestException;
 import com.eibus.connector.nom.Connector;
@@ -87,6 +87,10 @@ abstract public class BaseConnector extends ApplicationConnector {
 	@SuppressWarnings("deprecation")
 	public void open(Processor processor)
 	{
+		XmlStoreResourceNode.initConnector(this);
+		ResourceNode.registerType("file", FileResourceNode.class);
+		ResourceNode.registerType("xmlstore", XmlStoreResourceNode.class);
+		
 		dnOrganization =processor.getOrganization();
 		processorName = processor.getSOAPProcessorEntry().getDN();
 		try {
@@ -95,13 +99,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 			if (!connector.isOpen())
 				connector.open();
 
-			InputStream stream = getConfigStream();
-			if (stream==null)
-				props=new SimpleProps();
-			else {
-				Parser parser = new Parser(stream);
-				props = parser.readMap(null, null);
-			}
+			loadProps();
 			//CordysLogger specialLogger = CordysLogger.getCordysLogger(com.eibus.management.ManagedComponent.class);
 			if (logger.isInfoEnabled())
 				logger.info("starting with properties "+props);
@@ -120,13 +118,26 @@ abstract public class BaseConnector extends ApplicationConnector {
 		t.start();
 	}
 
+
+	
+	private void loadProps() {
+		if (configLocation==null || configLocation.trim().length()==0)
+			props=new SimpleProps();
+		else {
+			ResourceNode resource= ResourceNode.create(configLocation);
+			if (resource==null)
+				resource=new FileResourceNode(configLocation);
+			Parser parser = new Parser(resource);
+			props = parser.readMap(null, null);
+		}
+	}
 	
 	private void reconfigureLogback() {
 	    HashMap<String, String> logbackProps = new HashMap<String,String>();
 	    logbackProps.put("org", DnUtil.getFirstDnPart(getDnOrganization()).toLowerCase().replace(' ', '-'));
 	    logbackProps.put("soapproc", DnUtil.getFirstDnPart(getProcessorName()).toLowerCase().replace(' ', '-'));
 
-		String logbackConfigFile = getProps().getString("relay.logback.configFile", "D:/Cordys/kisst.org/config/logback.xml");
+		String logbackConfigFile = BaseSettings.logback.configfile.get(getProps());
 		if (new File(logbackConfigFile).isFile())
 			LogbackUtil.configure(logbackConfigFile, logbackProps);
 	}
@@ -163,8 +174,7 @@ abstract public class BaseConnector extends ApplicationConnector {
 
 
 	public void reset() {
-		Parser parser = new Parser(getConfigStream());
-		props = parser.readMap(null, "root");
+		loadProps();
 		//mlprops =new MultiLevelProps(getConfigStream());
 		for (int i=0; i<modules.size(); i++)
 			modules.get(i).reset();
@@ -215,25 +225,8 @@ abstract public class BaseConnector extends ApplicationConnector {
 	}
 
 
-	private InputStream getConfigStream() {
-		if (configLocation==null || configLocation.trim().length()==0)
-			return null;
-		if (configLocation.startsWith("xmlstore:")) {
-			return getConfigFileFromXmlStore();
-		}
-		else {
-			try {
-				return new FileInputStream(configLocation);
-			} catch (FileNotFoundException e) { throw new RuntimeException(e); }
-		}
-	}	
-	private InputStream getConfigFileFromXmlStore() {
-		String location=configLocation.substring(9); // strip xmlstore: prefix
-		String parts[]= location.split("[@]");
-		if (parts.length !=2)
-			throw new RuntimeException("Correct xmlstore configLocation format is xmlstore:dnUser@key");
-		String dnUser=parts[0];
-		String key=parts[1];
+
+	public InputStream getDataFromXmlStore(String key, String dnUser) {
 		String namespace = "http://schemas.cordys.com/1.0/xmlstore";
 		String methodName="GetXMLObject";
 		int method=0;

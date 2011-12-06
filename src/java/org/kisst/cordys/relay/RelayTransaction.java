@@ -46,17 +46,16 @@ public class RelayTransaction implements ApplicationTransaction
 
 	private final Props props;
 	private final ExecutionContext context;
+	private final RelayConnector relayConnector;
 
 	public RelayTransaction(RelayConnector connector, String fullMethodName, Props props, SOAPTransaction transaction) {
     	context=new ExecutionContext(connector, fullMethodName, props, transaction);
+    	this.relayConnector=connector;
 		this.props=props;
 	}
 
 	public boolean canProcess(String callType) {
-    	if ("RelayCall".equals(callType))
-    		return true;
-    	else
-    		return false;
+		return relayConnector.checkCallType(callType);
     }
     
     public void commit() {}
@@ -127,7 +126,7 @@ public class RelayTransaction implements ApplicationTransaction
 			mon2.stop();
 			monu1.stop();
 			monu2.stop();
-			context.getBaseConnector().logPerformance("INCOMING", context, startTime, request.getXMLNode(), "SUCCESS".equals(result));
+			context.getBaseConnector().logPerformance("INCOMING", context, startTime, request.getXMLNode(), "SUCCESS ".equals(result));
     	}
 		if (context.getTimer()!=null)
 			context.getTimer().log(" finished "+result+context.getFullMethodName());

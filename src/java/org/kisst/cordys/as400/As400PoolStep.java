@@ -32,7 +32,7 @@ public class As400PoolStep implements Step {
 	private final Expression expr;
 	
 	public As400PoolStep(CompilationContext compiler, final int node) {
-		expr=ExpressionParser.parse(compiler, Node.getAttribute(node, "value"));
+		expr=ExpressionParser.parse(compiler, Node.getAttribute(node, "name"));
 		compiler.declareTextVar(As400Module.AS400_POOL_NAME_VARNAME);
 	}
 

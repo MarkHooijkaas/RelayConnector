@@ -3,12 +3,14 @@ package org.kisst.props4j;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 
+import org.kisst.props4j.parser.FileResourceNode;
+import org.kisst.props4j.parser.ResourceNode;
+
 public class Parser {
-	private final File file;
+	//private final File file;
+	private final ResourceNode resource;
 	private final BufferedReader inp;
 	private char lastchar;
 	private boolean eof=false;
@@ -17,23 +19,20 @@ public class Parser {
 	private int pos=0;
 
 
-	public Parser(Reader inp, File f) {
-		this.file=f; 
-		if (inp instanceof BufferedReader)
-			this.inp=(BufferedReader) inp;
+	public Parser(ResourceNode resource) {
+		//this.file=f;
+		this.resource=resource;
+		Reader tmp = resource.getReader();
+		if (tmp instanceof BufferedReader)
+			this.inp=(BufferedReader) tmp;
 		else
-			this.inp=new BufferedReader(inp);
+			this.inp=new BufferedReader(tmp);
 	}
-	public Parser(InputStream inpstream) { this(new InputStreamReader(inpstream), null); }
+	//public Parser(InputStream inpstream) { this(new InputStreamReader(inpstream), null); }
 	
-	public File getFile() { return file; }
-	public File getPath(String path) {
-		if (file==null)
-			return new File(path);
-		else if (file.isDirectory())
-			return new File(file,path);
-		else
-			return new File(file.getParent(), path);
+	//public File getFile() { return file; }
+	public ResourceNode getPath(String path) {
+		return resource.getPath(path);
 	}
 	
 	public char getLastChar() { return lastchar; }
@@ -147,10 +146,10 @@ public class Parser {
 	public class ParseException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 		public ParseException(String message) {
-			super("Parse exception: file "+file+", line:"+line+" pos: "+pos+": "+message);
+			super("Parse exception: "+resource.getFullName()+", line:"+line+" pos: "+pos+": "+message);
 		}
 		public ParseException(Exception e) {
-			super("Parse exception: file "+file+", line:"+line+" pos: "+pos+": "+e.getMessage(), e);
+			super("Parse exception: file "+resource.getFullName()+", line:"+line+" pos: "+pos+": "+e.getMessage(), e);
 		}
 	}
 	
@@ -261,26 +260,27 @@ public class Parser {
 			throw new RuntimeException("layer should have { symbol on same line in config line: @"+str);
 		str=str.substring(0,str.length()-1).trim();
 		String name=str.substring(1+str.lastIndexOf('}'));
+		map.put("override.method.dummy", "dummy"); // TODO: should be better way to make sure map exists
+		SimpleProps override=(SimpleProps) map.getProps("override.method");
 		String key="override.method."+name;
-		map.put(key, readMap(map, name));
+		map.put(key, readMap(override, name));
 	}
 
 	
 	private void include(SimpleProps map) {
 		Object o=readObject();
-		File f=null;
+		ResourceNode f=null;
 		if (o instanceof File)
-			f=(File) o;
+			f=new FileResourceNode((File) o);
 		else if (o instanceof String)
-			f=getPath(o.toString());
+			f=resource.getPath(o.toString());
 		else
 			throw new ParseException("unknown type of object to include "+o);
-		if (f.isFile())
+		if (f.isLeaf())
 			map.load(f);
 		else if (f.isDirectory()) {
-			File[] files = f.listFiles(); // TODO: filter
-			for (File f2: files) {
-				if (f2.isFile())
+			for (ResourceNode f2: f.getChildren(null)) {
+				if (f2.isLeaf())
 					map.load(f2);
 			}
 		}

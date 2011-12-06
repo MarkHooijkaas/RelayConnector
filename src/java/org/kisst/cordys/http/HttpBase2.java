@@ -73,7 +73,9 @@ public class HttpBase2 extends HttpBase {
 	
 	protected PostMethod createPostMethod(ExecutionContext context, HttpState state, int bodyNode) {
 		HostSettings host=getHost(context);
-		String url=urlExpression.getString(context);
+		String url="";
+		if (urlExpression!=null)
+			url=urlExpression.getString(context);
 		String urlstart=host.url.get(props);
 		if (urlstart==null || urlstart.trim().length()==0)
 			throw new RuntimeException("Could not find http configuration "+applicationExpression.getString(context));
@@ -88,7 +90,9 @@ public class HttpBase2 extends HttpBase {
 
 	protected GetMethod createGetMethod(ExecutionContext context, HttpState state) {
 		HostSettings host=getHost(context);
-		String url=urlExpression.getString(context);
+		String url="";
+		if (urlExpression!=null)
+			url=urlExpression.getString(context);
 		String urlstart=host.url.get(props);
 		if (urlstart==null || urlstart.trim().length()==0)
 			throw new RuntimeException("Could not find http configuration "+applicationExpression.getString(context));

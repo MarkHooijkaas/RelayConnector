@@ -71,6 +71,7 @@ public class As400ConnectionPool {
 	}
 
 	public As400Connection borrowConnection(Props callSpecificProps, String key) {
+		key = key.replace(' ', '_');
 		long timeout=settings.timeout.get(callSpecificProps);
 		synchronized (keys) {
 			keys.add(key);
@@ -84,11 +85,13 @@ public class As400ConnectionPool {
 			notCreatedBefore = new java.util.Date().getTime() - lifetime;
 		while (true) {
 			try {
-				logger.log(Severity.DEBUG, "Borrowing connection from pool(NumActive,MaxIdle,MaxWait) "+pool.getNumActive()+ "--"+pool.getMaxIdle()+ "--"+pool.getMaxWait());
+				if (logger.isDebugEnabled())
+					logger.log(Severity.DEBUG, "Borrowing connection from pool(NumActive,MaxIdle,MaxWait) "+pool.getNumActive()+ "--"+pool.getMaxIdle()+ "--"+pool.getMaxWait());
 				As400Connection conn = (As400Connection) pool.borrowObject(key);
-				logger.log(Severity.DEBUG, "Borrowed a connection from pool(NumActive,MaxIdle,MaxWait) "+pool.getNumActive()+ "--"+pool.getMaxIdle()+ "--"+pool.getMaxWait());				
+				if (logger.isDebugEnabled())
+					logger.log(Severity.DEBUG, "Borrowed a connection from pool(NumActive,MaxIdle,MaxWait) "+pool.getNumActive()+ "--"+pool.getMaxIdle()+ "--"+pool.getMaxWait());				
 				if (conn.creationTime < notCreatedBefore)
-					pool.invalidateObject(conn, key);
+					pool.invalidateObject(key, conn);
 				else {
 					scheduleTrigger(conn, timeout);
 					return conn;
@@ -130,11 +133,12 @@ public class As400ConnectionPool {
 		} catch (SchedulerException e) { throw new RuntimeException(e); }
 		finally {
 			try {
+				//logger.info("releasing connection "+conn.getName());
 				long maxNrofCalls = settings.maxNrofCallsPerConnection.get(globalProps);
 				if (maxNrofCalls>0 && conn.getNrOfCalls()>=maxNrofCalls)
-					pool.invalidateObject(conn, conn.getPoolKey());
+					pool.invalidateObject(conn.getPoolKey(), conn);
 				else
-					pool.returnObject(conn, conn.getPoolKey());
+					pool.returnObject(conn.getPoolKey(), conn);
 			} 
 			catch (IllegalStateException e) {
 				if ("Pool not open".equals(e.getMessage()))
@@ -152,7 +156,7 @@ public class As400ConnectionPool {
 		} catch (SchedulerException e) { throw new RuntimeException(e); }
 		finally {
 			try {
-				pool.invalidateObject(conn, conn.getPoolKey());
+				pool.invalidateObject(conn.getPoolKey(), conn);
 			} 
 			catch (IllegalStateException e) {
 				if ("Pool not open".equals(e.getMessage()))
@@ -179,6 +183,7 @@ public class As400ConnectionPool {
 	
 	public String status() {
 		StringBuilder result = new StringBuilder();
+		result.append("POOL\tActive\tIdle\n");
 		result.append("TOTAL\t");
 		result.append(pool.getNumActive());
 		result.append("\t");

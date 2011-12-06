@@ -43,7 +43,7 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 
 public class CallContext extends CallTrace {
-	protected final ArrayList<Destroyable> destroyables = new ArrayList<Destroyable>();
+	private final ArrayList<Destroyable> destroyables = new ArrayList<Destroyable>();
 	private Exception asynchronousError=null;
 	protected boolean allreadyDestroyed=false;
 

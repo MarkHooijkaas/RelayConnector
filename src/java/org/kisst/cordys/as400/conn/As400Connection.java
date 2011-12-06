@@ -196,16 +196,24 @@ public class As400Connection implements Destroyable {
 		// Do not even use the ConnectionPool, because all connections might hang.
 		// Performance is not that important, since this event should be very rare.
 		As400Connection conn=new As400Connection(settings, props, "jobKiller");
+		
+		String logging="ENDING JOB ["+jobId+"] while executing ["+executingProgram+"]";
 		try {
 			myJob.setSystem(conn.as400);
-			String status = myJob.getStatus();
+			
+			try {
+				String status = myJob.getStatus();
+	    		logging+=" with status ["+status+"]\nLast loglines:\n";
 
-			String logging="ENDING JOB ["+jobId+"] with status ["+status+"]";
-			logging+=" while executing ["+executingProgram+"]\nLast loglines:\n";
-
-			int nrofMessages=settings.nrOfMessagesToLog.get(props);
-			logging += getLogLines(nrofMessages);
+				int nrofMessages=settings.nrOfMessagesToLog.get(props);
+				logging += getLogLines(nrofMessages);
+			}
+			catch (Exception e) {
+	    		logger.log(Severity.ERROR, "could not get logging info when killing job ", e);
+	    		// continue to kill this job
+			}
 			logger.log(Severity.ERROR, logging);
+
 			myJob.end(0);
 			return true;
 		}

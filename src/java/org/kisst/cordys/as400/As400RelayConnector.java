@@ -35,4 +35,11 @@ public class As400RelayConnector extends RelayConnector {
     
     public As400Module getAs400Module() { return as400Module; }
     public As400ConnectionPool getPool(String name) { return as400Module.getPool(name); }
+    
+	@Override public boolean checkCallType(String callType) {
+		if (super.checkCallType(callType))
+			return true;
+    	return "As400RelayCall".equals(callType);
+	}
+
 }

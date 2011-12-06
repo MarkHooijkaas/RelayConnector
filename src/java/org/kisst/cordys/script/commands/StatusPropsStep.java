@@ -17,24 +17,26 @@ You should have received a copy of the GNU General Public License
 along with the RelayConnector framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.kisst.cordys.http;
+package org.kisst.cordys.script.commands;
 
-import org.kisst.cordys.relay.RelayConnector;
+import org.kisst.cordys.script.CompilationContext;
+import org.kisst.cordys.script.ExecutionContext;
+import org.kisst.cordys.script.Step;
+import org.kisst.cordys.util.NomUtil;
+import org.kisst.props4j.SimpleProps;
 
-public class HttpConnector extends RelayConnector {
-    public  static final String CONNECTOR_NAME = "HttpConnector";
-	private HttpModule httpModule= new HttpModule();
+public class StatusPropsStep implements Step {
 
-    public HttpConnector(){
-    	addModule(httpModule);
-    }
-    
-    protected String getManagedComponentType() { return CONNECTOR_NAME; }
-    protected String getManagementName() { return CONNECTOR_NAME; }
-    
-	@Override public boolean checkCallType(String callType) {
-		if (super.checkCallType(callType))
-			return true;
-    	return "HttpRelayCall".equals(callType);
+	private final String varName;
+	
+	public StatusPropsStep(CompilationContext compiler, final int node) {
+		varName=NomUtil.getStringAttribute(node, "var", "statusProps");
+		compiler.declareTextVar(varName);
 	}
+
+	public void executeStep(ExecutionContext context) {
+		SimpleProps props = (SimpleProps) context.getBaseConnector().getProps();
+		context.setTextVar(varName, "#\n"+props.toPropertiesString()+"\n#");
+	}
+
 }

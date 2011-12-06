@@ -25,6 +25,7 @@ import org.kisst.cfg4j.IntSetting;
 import org.kisst.cfg4j.MappedSetting;
 import org.kisst.cfg4j.StringSetting;
 import org.kisst.cordys.connector.resourcepool.ResourcePoolSettings;
+import org.kisst.cordys.util.JamonSettings;
 import org.kisst.cordys.util.SeveritySetting;
 
 import com.eibus.util.logger.Severity;
@@ -52,8 +53,11 @@ public class BaseSettings {
 	public final static MappedSetting<ResourcePoolSettings> resourcepool=
 		new MappedSetting<ResourcePoolSettings>(relay, "resourcepool", ResourcePoolSettings.class);
 
-	private final static CompositeSetting jamon=new CompositeSetting(null,"jamon");
-	public final static BooleanSetting jamonEnabled=new BooleanSetting(jamon, "enabled",true);
-	public final static StringSetting jamonfilename=new StringSetting(jamon, "filename", "${cordys.home}/Logs/jamon/${org}-${processor}-${yyyy}-${mm}-${dd}.log");
-	public final static IntSetting jamonIntervalInSeconds=new IntSetting(jamon, "intervalInSeconds",300);
+	public final static JamonSettings jamon=new JamonSettings(null,"jamon");
+	
+	public static class LogbackSettings extends CompositeSetting {
+		public LogbackSettings(CompositeSetting parent, String name) { super(parent, name); }
+		public final StringSetting configfile=new StringSetting(this, "configfile", "D:/Cordys/kisst.org/config/logback.xml");
+	}
+	public final static LogbackSettings logback = new LogbackSettings(relay, "logback"); 
 }

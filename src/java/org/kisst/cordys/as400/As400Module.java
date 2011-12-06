@@ -35,7 +35,7 @@ import com.eibus.util.logger.CordysLogger;
 import com.eibus.util.logger.Severity;
 
 public class As400Module implements Module {
-	private static final CordysLogger logger = CordysLogger.getCordysLogger(As400Module.class);
+	public static final CordysLogger logger = CordysLogger.getCordysLogger(As400Module.class);
 
 	public static final String AS400_POOL_NAME_VARNAME = "_as400PoolName";
 	public static final String AS400_POOL_SUBKEY_VARNAME = "_as400PoolSubKey";
@@ -110,6 +110,7 @@ public class As400Module implements Module {
 		else
 			pool = pools.get(poolName);
 		conn=pool.borrowConnection(context.getProps(),poolSubkeyName);
+		//logger.info("borrowing connection "+conn.getName()+" from "+poolSubkeyName);
 		context.destroyWhenDone(new BorrowedAs400Connection(pool, conn));
 		context.setObject(key, conn);
 		return conn;
