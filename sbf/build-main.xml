@@ -43,6 +43,10 @@
 				<pathelement path="${libdir}/jt400.jar" />
 				<pathelement path="${libdir}/quartz-1.5.2.jar" />
 				<pathelement path="${libdir}/commons-pool-1.5.jar" />
+				<pathelement path="${libdir}/jamon-2.7.jar" />
+				<pathelement path="${libdir}/logback-classic-0.9.29.jar" />
+				<pathelement path="${libdir}/logback-core-0.9.29.jar" />
+				<pathelement path="${libdir}/slf4j-api-1.6.1.jar" />
 			</classpath>
 		</javac>
 	</target>
