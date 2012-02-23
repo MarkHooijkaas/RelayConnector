@@ -15,15 +15,15 @@ One can specify a normal file path, but one can also specify a path in the XMLSt
 <para>
 	Examples for windows systems:
 	<itemizedlist>
-	  <listitem><para><filename>D:/config/@PROJECT@.properties</filename></para></listitem>
-	  <listitem><para><filename>xmlstore:administrator@/config/@PROJECT@.properties</filename></para></listitem>
+	  <listitem><para><filename>D:/config/RelayConnector.properties</filename></para></listitem>
+	  <listitem><para><filename>xmlstore:administrator@/config/RelayConnector.properties</filename></para></listitem>
 	  <listitem><para><filename>xmlstore:cn=administrator,cn=organizational users,o=system,cn=cordys,o=kisst.org@/config/@PROJECT@.properties</filename></para></listitem>
 	</itemizedlist>
 	Examples for Linux systems:
 	<itemizedlist>
-	  <listitem><para><filename>/opt/config/@PROJECT@.properties</filename></para></listitem>
-	  <listitem><para><filename>xmlstore:root@/config/@PROJECT@.properties</filename></para></listitem>
-	  <listitem><para><filename>xmlstore:cn=root,cn=organizational users,o=system,cn=cordys,o=kisst.org@/config/@PROJECT@.properties</filename></para></listitem>
+	  <listitem><para><filename>/opt/config/RelayConnector.properties</filename></para></listitem>
+	  <listitem><para><filename>xmlstore:root@/config/RelayConnector.properties</filename></para></listitem>
+	  <listitem><para><filename>xmlstore:cn=root,cn=organizational users,o=system,cn=cordys,o=kisst.org@/config/RelayConnector.properties</filename></para></listitem>
 	</itemizedlist>
 	When referring to the XMLStore, a special xmlstore url is used.
 	In this syntax the user before the @ sign will be used to retrieve the data from the XMLStore.
@@ -304,6 +304,80 @@ and the various caching settings, which have a more global character, and need
 some more research.
 </para>
 
+</sect1>
+
+<sect1><title>Configuration of AS/400 parameters</title>
+<sect2><title>Working with mulitple machines</title>
+<para>
+Het is mogelijk om meerdere AS/400 systemen met één As400Connector te benaderen. De voornaamste reden om dit te doen is het gebruik maken van een ander systeem voor uitwijk (b.v. buiten kantoortijden). In principe kunnen er zo veel systemen geconfigureerd worden als men wil. Voor ieder systeem dient men een aparte connectionpool te definiëren. Als men geen password definieert, wordt het password uit het configuratiescherm gebruikt. Aangenomen wordt dat alle systemen hetzelfde password gebruiken. Zo niet, dan moet men een of meer passwords opnemen in de configuratiefile. 
+Hieronder staat een voorbeeld
+</para>
+<@xmlcode>
+# door komma's gescheiden lijst aan namen, spaties worden genegeerd
+as400.pools = main, fallback
+
+as400.pool.main.system = 192.168.1.1
+as400.pool.main.user = USER1
+#as400.pool.main.password = secret
+as400.pool.main.maxSize = 10
+as400.pool.main.maxConnectionLifetime = 1800
+
+as400.pool.fallback.system = 192.168.1.2
+as400.pool.fallback.user = USER1
+#as400.pool.fallback.password = secret
+as400.pool.fallback.maxSize = 10
+as400.pool.fallback.maxConnectionLifetime = 1800	
+</@xmlcode>
+</sect2>
+
+<sect2><title>Overzicht van settings</title>
+<para>
+Hieronder staan alle settings opgesomd met een korte uitleg. Indien er een default waarde is, wordt deze gemeld.
+</para>
+<@xmlcode>
+# door komma's gescheiden lijst aan namen, spaties worden genegeerd
+as400.pools = main
+
+# De naam of het IP nummer van de AS/400 machine
+as400.pool.<poolnaam>.system
+
+# De username waarmee wordt ingelogd
+as400.pool.<poolnaam>.user
+
+# Het password waarmee wordt ingelogd
+as400.pool.<poolnaam>.password
+
+# Het maximaal aantal connecties in de pool
+as400.pool.<poolnaam>.maxSize = 10
+
+# De tijd in millisecs, waarna een connectie niet meer gebruikt wordt.
+# Default een half uur. N.B. De connectie wordt niet automatisch opgeruimd
+# Zie daarvoor de volgende setting
+as400.pool.<poolnaam>.maxConnectionLifetimeMillis = 1800000
+
+# De tijd in millisec, waarna een ongebruikte connectie afgesloten wordt.
+# default 5 minuten. Zie documentatie apache commons ObjectPool
+as400.pool.<poolnaam>.minEvictableIdleTimeMillis= 300000
+
+# De tijd in millisecs, hoevaak gecheckt wordt op ongebruikte connecties.
+# default 1 minuut. Zie documentatie apache commons ObjectPool
+as400.pool.<poolnaam>.timeBetweenEvictionRunsMillis= 60000
+
+
+# Als dit de waarde true heeft, worden geen calls naar de AS/400 gedaan
+as400.pool.<poolnaam>.simulationFlag = false
+
+# Een timeout mechanisme wat niet goed lijkt te werken. 0 is geen timeout
+as400.pool.<poolnaam>.socketTimeout = 0
+
+
+# De te gebruiken CCSID
+as400.ccsid =  1140
+
+# De timeout in milliseconden waarna een call wordt afgebroken
+as400.defaultTimeout = 20000
+</@xmlcode>
+</sect2>
 </sect1>
 
 </chapter>

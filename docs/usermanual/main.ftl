@@ -12,9 +12,9 @@ ${txt?replace("&lt;emphasis&gt;","<emphasis role=\"bold\">")?replace("&lt;/empha
 
 <!-- <book xmlns="http://docbook.org/ns/docbook">-->
 <book>
-<title>UserManual for RelayConnector and HttpConnector</title>
+<title>UserManual for RelayConnector, HttpConnector and As400RelayConnector</title>
 
-<subtitle>buildnumber 1.0.${buildnumber}</subtitle>
+<subtitle> buildnumber 1.1.${buildnumber}</subtitle>
 
 
 <#include "intro.ftl">
@@ -22,6 +22,7 @@ ${txt?replace("&lt;emphasis&gt;","<emphasis role=\"bold\">")?replace("&lt;/empha
 <#include "xml.ftl">
 <#include "commands.ftl">
 <#include "http.ftl">
+<#include "as400.ftl">
 <#include "config.ftl">
 <#include "examples.ftl">
 <#include "history.ftl">
