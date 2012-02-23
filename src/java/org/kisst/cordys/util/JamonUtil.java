@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.kisst.cordys.connector.BaseConnector;
 import org.kisst.cordys.connector.BaseSettings;
 import org.kisst.props4j.Props;
@@ -147,13 +146,13 @@ public class JamonUtil {
 	}
 
 
-	private static BasicDataSource ds=null;
+	//private static BasicDataSource ds=null;
 
 	private static void initDatabase(Props props) {
-		if ( BaseSettings.jamon.db.enabled.get(props)) 
-			ds=DatabaseUtil.createDataSource(BaseSettings.jamon.db, props);
-		else
-			ds=null;
+//		if ( BaseSettings.jamon.db.enabled.get(props)) 
+//			ds=DatabaseUtil.createDataSource(BaseSettings.jamon.db, props);
+//		else
+//			ds=null;
 	} 	
 
 	private static String serverIP;
@@ -197,12 +196,13 @@ public class JamonUtil {
 				stmt.close();
 		}
 	}
+	private static String ds=null;
 	private static void logToDatabase(Monitor[] monitors) {
 		if (ds==null)
 			return;
 		Connection conn=null; 
 		try {
-			conn = ds.getConnection();
+			//conn = ds.getConnection();
 			for (Monitor mon : monitors){
 				if (mon.getHits()==0)
 					continue;

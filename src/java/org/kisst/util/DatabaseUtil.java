@@ -1,11 +1,9 @@
 package org.kisst.util;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.kisst.cfg4j.CompositeSetting;
 import org.kisst.cfg4j.IntSetting;
 import org.kisst.cfg4j.LongSetting;
 import org.kisst.cfg4j.StringSetting;
-import org.kisst.props4j.Props;
 
 public class DatabaseUtil {
 	public static class Settings extends CompositeSetting {
@@ -25,7 +23,8 @@ public class DatabaseUtil {
 		public final IntSetting poolMinIdle =new IntSetting(this, "poolMinIdle",0);
 	}
 
-	
+
+	/*
 	public static BasicDataSource createDataSource(Settings settings, Props props) {
 		BasicDataSource ds = new BasicDataSource();
 
@@ -48,5 +47,5 @@ public class DatabaseUtil {
 		
 		return ds;
 	} 	
-
+*/
 }
